@@ -1,0 +1,9 @@
+name: DailyJoin
+version: Beta 1.6
+author: Bergtiger
+main: de.bergtiger.dailyjoin.dailyjoin
+
+commands:
+  dailyjoin:
+    description: DailyJoin Befehle.
+    aliases: [daily]

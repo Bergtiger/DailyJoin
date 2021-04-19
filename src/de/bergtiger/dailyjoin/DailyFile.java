@@ -5,38 +5,38 @@ import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Set;
+import java.util.logging.Level;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
+import de.bergtiger.dailyjoin.data.MySQL;
 import de.bergtiger.dailyjoin.data.MyUtils;
 
 public class DailyFile implements MyUtils{
 	
-	private dailyjoin plugin;
+	public static final String NAME = "name", DAY = "day", TOTALDAYS = "totaldays", FIRSTJOIN = "firstjoin", LASTJOIN = "lastjoin";
 	private String file_player = "plugins/DailyJoin/players";
 	private boolean reward;
 	private boolean sql;
 	
-	public DailyFile(dailyjoin plugin){
-		this.plugin = plugin;
-		this.SetData();
+	public DailyFile(){
+		this.setData();
 	}
 	
-	private void SetData(){
-		if(this.plugin.getConfig().getString("config.SQL").equalsIgnoreCase("true")){
-			this.sql = true;
-		} else {
-			this.sql = false;
-		}
-		if(this.plugin.getConfig().getString("config.GetRewardOnSQLConnectionLost").equalsIgnoreCase("true")){
-			this.reward = true;
-		} else {
-			this.reward = false;
-		}
+	/**
+	 * set configuration data. (rewardOnSQLConnectionLost and saveAsSQL)
+	 */
+	private void setData(){
+		sql = dailyjoin.inst().getConfig().getString("config.SQL").equalsIgnoreCase("true");
+		reward = dailyjoin.inst().getConfig().getString("config.GetRewardOnSQLConnectionLost").equalsIgnoreCase("true");
 	}
 	
+	/**
+	 * File save
+	 * @param p
+	 */
 	public void dailyjoin_file(Player p){
 		File datei = new File(this.file_player, "player.yml");
 		FileConfiguration cfg = YamlConfiguration.loadConfiguration(datei);
@@ -50,7 +50,7 @@ public class DailyFile implements MyUtils{
 			if((keys == null) || ((keys != null) && (keys.size() == 0))){
 				//keys sind leer
 				//new player
-				this.save_new(datei, cfg, p);
+				save(datei, cfg, p);
 			} else {
 				//suche in keys
 				String player = p.getUniqueId().toString();
@@ -65,61 +65,80 @@ public class DailyFile implements MyUtils{
 						} else {
 							day = 1;
 						}
-						this.save_old(datei, cfg, p, day, totaldays);
+						save(datei, cfg, p, day, totaldays);
 					}
 				} else {
 					//new player
-					this.save_new(datei, cfg, p);
+					save(datei, cfg, p);
 				}
 			}
 		} else {
 			//neue datei erstellen
-			this.save_new(datei, cfg, p);
+			save(datei, cfg, p);
 		}
 	}
 	
-	public void save_new(File file, FileConfiguration cfg, Player p){
+	/**
+	 * Save new Player
+	 * @param file saveFile
+	 * @param cfg loaded FileConfiguration
+	 * @param p Player to save
+	 */
+	public void save(File file, FileConfiguration cfg, Player p) {
+		save(file, cfg, p, 1, 1);
+	}
+	
+	/**
+	 * Save Player
+	 * @param file saveFile
+	 * @param cfg loaded FileConfiguration
+	 * @param p Player to save
+	 * @param day player
+	 * @param totaldays player totaldays
+	 */
+	public void save(File file, FileConfiguration cfg, Player p, int day, int totaldays) {
 		Timestamp t = new Timestamp(Calendar.getInstance().getTime().getTime());
 		String player = "player." + p.getUniqueId().toString() + ".";
-		cfg.addDefault(player + "name", p.getName());
-		cfg.addDefault(player + "day", 1);
-		cfg.addDefault(player + "totaldays", 1);
-		cfg.addDefault(player + "firstjoin", t.getTime());
-		cfg.addDefault(player + "lastjoin", t.getTime());
-		
+		// name
+		if(cfg.contains(player + NAME))
+			cfg.set(player + NAME, p.getName());
+		else
+			cfg.addDefault(player + NAME, p.getName());
+		// day
+		if(cfg.contains(player + DAY))
+			cfg.set(player + DAY, day);
+		else
+			cfg.addDefault(player + DAY, day);
+		// totaldays
+		if(cfg.contains(player + TOTALDAYS))
+			cfg.set(player + TOTALDAYS, totaldays);
+		else
+			cfg.addDefault(player + TOTALDAYS, totaldays);
+		// firstjoin
+		if(!cfg.contains(player + FIRSTJOIN))
+			cfg.set(player + FIRSTJOIN, t.getTime());
+		// lastjoin
+		if(cfg.contains(player + LASTJOIN))
+			cfg.set(player + LASTJOIN, t.getTime());
+		else
+			cfg.addDefault(player + LASTJOIN, t.getTime());
+		//
 		cfg.options().copyDefaults(true);
 		try{
 			cfg.save(file);
-			if((!this.sql) || ((!this.plugin.getMySQL().hasConnection()) && this.reward)){
-				this.plugin.getDailyReward().setReward(p, 1, 1, t);
+			if((!sql) || ((!MySQL.inst().hasConnection()) && reward)){
+				dailyjoin.inst().getDailyReward().setReward(p, day, totaldays, t);
 			}
-			System.out.println("Save File");
+			dailyjoin.getDailyLogger().log(Level.INFO, "Save File");
 		} catch (IOException e){
-			System.out.println("Error on save file");
+			dailyjoin.getDailyLogger().log(Level.INFO, "Error on save file");
 		}
 	}
 	
-	public void save_old(File file, FileConfiguration cfg, Player p, int day, int totaldays){
-		Timestamp t = new Timestamp(Calendar.getInstance().getTime().getTime());
-		String player = "player." + p.getUniqueId().toString() + ".";
-		cfg.set(player + "name", p.getName());
-		cfg.set(player + "day", day);
-		cfg.set(player + "totaldays", totaldays);
-		cfg.set(player + "lastjoin", t.getTime());
-		
-		cfg.options().copyDefaults(true);
-		try{
-			cfg.save(file);
-			if((!this.sql) || ((!this.plugin.getMySQL().hasConnection()) && this.reward)){
-				this.plugin.getDailyReward().setReward(p, day, totaldays, t);
-			}
-			System.out.println("Save File");
-		} catch (IOException e){
-			System.out.println("Error on save file");
-		}
-	}
-	
+	/**
+	 * reload configuration
+	 */
 	public void reload(){
-		this.plugin.reloadConfig();
+		setData();
 	}
 }

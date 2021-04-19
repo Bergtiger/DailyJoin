@@ -19,16 +19,21 @@ public class MySQL {
 	private String password;
 	private String database;
 	
-	private Connection conn;
+	private static Connection conn;
 
-	private dailyjoin plugin;
 	private FileConfiguration cfg;
 	private int thread = -1;
 	
-	public MySQL(dailyjoin plugin){
-		this.plugin = plugin;
-		
-		this.cfg = this.plugin.getConfig();	
+	private static MySQL instance;
+	
+	public static MySQL inst() {
+		if(instance == null)
+			instance = new MySQL();
+		return instance;
+	}
+	
+	private MySQL(){
+		this.cfg = dailyjoin.inst().getConfig();
 		
 		if(this.cfg.getString("config.SQL").equalsIgnoreCase("true")){
 			String db = "database.";
@@ -42,11 +47,11 @@ public class MySQL {
 			try {
 				this.openConnection();
 				new DailyDataBase(this);
-				new DailyFileToSQL(this.plugin).FileToSQL();
+				new DailyFileToSQL().FileToSQL();
 			} catch (Exception e) {
 				System.out.println("[DailyJoin] Error No SQL-Connection");
 				System.out.println("[DailyJoin] Try SQL-Reconnection.");		
-				this.thread = Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable(){
+				this.thread = Bukkit.getScheduler().scheduleSyncDelayedTask(dailyjoin.inst(), new Runnable(){
 					@Override
 					public void run() {
 						reconnect();
@@ -57,8 +62,7 @@ public class MySQL {
 	
 	
 	public void reload(){
-		this.plugin.reloadConfig();
-		this.cfg = this.plugin.getConfig();	
+		this.cfg = dailyjoin.inst().getConfig();	
 		
 		this.closeThread();
 		
@@ -71,17 +75,17 @@ public class MySQL {
 			this.password = this.cfg.getString(db + "password");
 			this.database = this.cfg.getString(db + "database");
 		
-			if(this.hasConnection()){
+			if(hasConnection()){
 				this.clossConnection();
 			}
 			try {
 				this.openConnection();
 				new DailyDataBase(this);
-				new DailyFileToSQL(this.plugin).FileToSQL();
+				new DailyFileToSQL().FileToSQL();
 			} catch (Exception e) {
 				System.out.println("[DailyJoin] Error No Connection");
 				System.out.println("[DailyJoin] Try SQL-Reconnection in 30 seconds.");
-				this.thread = Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable(){
+				this.thread = Bukkit.getScheduler().scheduleSyncDelayedTask(dailyjoin.inst(), new Runnable(){
 					@Override
 					public void run() {
 						reconnect();
@@ -97,11 +101,11 @@ public class MySQL {
 			new DailyDataBase(this);
 			System.out.println("[DailyJoin] SQL-Connection");
 			System.out.println("[DailyJoin] Get offline Joins");
-			new DailyFileToSQL(this.plugin).FileToSQL();
+			new DailyFileToSQL().FileToSQL();
 		} catch (Exception e) {
 			System.out.println("[DailyJoin] Error No Connection");
 			System.out.println("[DailyJoin] Try SQL-Reconnection in 30 seconds.");
-			this.thread = Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable(){
+			this.thread = Bukkit.getScheduler().scheduleSyncDelayedTask(dailyjoin.inst(), new Runnable(){
 				@Override
 				public void run() {
 					reconnect();
@@ -118,20 +122,32 @@ public class MySQL {
 	
 	public Connection openConnection()throws Exception{
 		Class.forName("com.mysql.jdbc.Driver");
-		Connection conn = DriverManager.getConnection("jdbc:mysql://" + this.host + ":" + this.port + "/" + this.database, this.user, this.password);
-		this.conn =conn;
+		conn = DriverManager.getConnection("jdbc:mysql://" + this.host + ":" + this.port + "/" + this.database, this.user, this.password);
 		return conn;
 	}
 	
+	@Deprecated
 	public Connection getConnection(){
-		return this.conn;
+		return conn;
 	}
 	
-	public boolean hasConnection() {
+	/**
+	 * get SQL-Connection.
+	 * @return
+	 */
+	public static Connection conn() {
+		return conn;
+	}
+	
+	/**
+	 * check if Connection is available.
+	 * @return true if connected.
+	 */
+	public static boolean hasConnection() {
 		try {	
-			if(this.conn == null){
+			if(conn == null){
 				return false;
-			} else if(this.conn != null || this.conn.isValid(1)){	
+			} else if(conn != null || conn.isValid(1)){	
 				return true;
 			}
 		} catch (SQLException e) {	
@@ -140,7 +156,19 @@ public class MySQL {
 		return false;
 	}
 	
-	public void closeRessources(ResultSet rs, PreparedStatement st) {
+	/**
+	 * 
+	 */
+	public static void noConnection() {
+		// TODO
+	}
+	
+	/**
+	 * save close of resources.
+	 * @param rs ResultSet
+	 * @param st PreparedStatement
+	 */
+	public static void closeRessources(ResultSet rs, PreparedStatement st) {
 		if(rs != null){
 			try {
 				rs.close();
@@ -155,18 +183,21 @@ public class MySQL {
 		}
 	}
 	
+	/**
+	 * close Connection
+	 */
 	public void clossConnection() {
 		try {
-			this.conn.close();
+			conn.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
-		this.conn = null;
+			conn = null;
 		}
 	}
 	
+	@Deprecated
 	public void queryUpdate(String query) {
-		Connection conn = this.conn;
 		PreparedStatement st = null;
 		try {
 			st = conn.prepareStatement(query);
@@ -174,7 +205,7 @@ public class MySQL {
 		} catch (SQLException e) {
 			System.err.println("Failed to sendupdate '" + query + "'.");
 		} finally {
-			this.closeRessources(null, st);
+			closeRessources(null, st);
 		}
 	}
 }

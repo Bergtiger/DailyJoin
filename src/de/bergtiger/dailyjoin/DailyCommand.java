@@ -22,31 +22,28 @@ import org.bukkit.entity.Player;
 
 import de.bergtiger.dailyjoin.data.MySQL;
 import de.bergtiger.dailyjoin.data.MyUtils;
+import de.bergtiger.dailyjoin.lang.Lang;
 
 public class DailyCommand implements CommandExecutor, MyUtils{
-
-	private dailyjoin plugin;
-	private FileConfiguration cfg;
 	
-	public DailyCommand(dailyjoin plugin){
-		this.plugin = plugin;
-		this.cfg = this.plugin.getConfig();
-	}
+	public static final String CMD = "dailyjoin", TOP = "top", SET = "set", ADD = "add", INFO = "info", RELOAD = "reload", PLAYER = "player";
 	
 	@Override
 	public boolean onCommand(CommandSender cs, Command cmd, String label, String[] args) {
 		//info - set - reload - config - player
 		if(args.length > 0){
 			switch (args[0]) {
-				case "top": daily_top(cs, args);break;
-				case "set": daily_set_player(cs, args);break;
-				case "add": daily_add_player(cs, args);break;
-				case "info": daily_info(cs);break;
-				case "reload": daily_reload(cs);break;
-				case "player": daily_player(cs, args);break;
+				case TOP	: daily_top(cs, args);break;
+				case SET	: daily_set_player(cs, args);break;
+				case ADD	: daily_add_player(cs, args);break;
+				case INFO	: daily_info(cs);break;
+				case RELOAD	: daily_reload(cs);break;
+				case PLAYER	: daily_player(cs, args);break;
 		//		case "config": daily_config(cs, args);break;
-
-				default: cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.WrongArgument")));return true;
+				default: {
+					cs.sendMessage(Lang.WrongArgument.colored());
+					return true;
+				}
 			}
 		} else {
 			daily_command(cs);
@@ -56,16 +53,27 @@ public class DailyCommand implements CommandExecutor, MyUtils{
 	
 	private void daily_command(CommandSender cs){
 		if(cs.hasPermission(p_admin) || cs.hasPermission(p_cmd)){
-			cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.DailyInfo")));
-			cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.DailyInfoTop")));
-			cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.DailyInfoSet")));
-			cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.DailyInfoAdd")));
-			cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.DailyInfoInfo")));
-			cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.DailyInfoReload")));
-			cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.DailyInfoPlayer")));
-			cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.DailyInfoConfig")));
+			if(cs instanceof Player) {
+				Player p = (Player)cs;
+				p.spigot().sendMessage(Lang.buildTC(Lang.DailyInfo.get()));
+				p.spigot().sendMessage(Lang.buildTC(Lang.DailyInfoTop.get(), null, null, CMD + " " + TOP));
+				p.spigot().sendMessage(Lang.buildTC(Lang.DailyInfoSet.get(), null, null, CMD + " " + SET));
+				p.spigot().sendMessage(Lang.buildTC(Lang.DailyInfoAdd.get(), null, null, CMD + " " + ADD));
+				p.spigot().sendMessage(Lang.buildTC(Lang.DailyInfoInfo.get(), null, null, CMD + " " + INFO));
+				p.spigot().sendMessage(Lang.buildTC(Lang.DailyInfoReload.get(), CMD + " " + RELOAD, null, null));
+				p.spigot().sendMessage(Lang.buildTC(Lang.DailyInfoPlayer.get(), null, null, CMD + " " + PLAYER));
+			} else {
+				cs.sendMessage(Lang.DailyInfo.colored());
+				cs.sendMessage(Lang.DailyInfoTop.colored());
+				cs.sendMessage(Lang.DailyInfoSet.colored());
+				cs.sendMessage(Lang.DailyInfoAdd.colored());
+				cs.sendMessage(Lang.DailyInfoInfo.colored());
+				cs.sendMessage(Lang.DailyInfoReload.colored());
+				cs.sendMessage(Lang.DailyInfoPlayer.colored());
+//				cs.sendMessage(Lang.DailyInfoConfig.colored());
+			}
 		} else {
-			cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.NoPermission")));
+			cs.sendMessage(Lang.NoPermission.colored());
 		}
 	}
 	
@@ -114,13 +122,13 @@ public class DailyCommand implements CommandExecutor, MyUtils{
 				try {
 					addPlayerData(cs, change_to_uuid(cs, args[1]), args[2], Integer.parseInt(args[3]));
 				} catch (NumberFormatException e) {
-					//TODO wrong number
+					cs.sendMessage(Lang.NoNumber.colored().replace(Lang.VALUE, args[3]));
 				}
 			} else {
-				cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.DailyAdd")));
+				cs.sendMessage(Lang.DailyAdd.colored());
 			}
 		} else {
-			cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.NoPermission")));
+			cs.sendMessage(Lang.NoPermission.colored());
 		}
 	}
 	

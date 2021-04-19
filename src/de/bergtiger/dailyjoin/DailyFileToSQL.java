@@ -2,211 +2,312 @@ package de.bergtiger.dailyjoin;
 
 import java.io.File;
 import java.io.IOException;
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.logging.Level;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
+import de.bergtiger.dailyjoin.bdo.DailyPlayer;
 import de.bergtiger.dailyjoin.data.MySQL;
+import de.bergtiger.dailyjoin.exception.NoSQLConnectionException;
+import de.bergtiger.dailyjoin.exception.UpdatePlayerException;
 
 public class DailyFileToSQL {
 
-	private dailyjoin plugin;
-	private List<DailyPlayer> player_list;
-	private String file_player = "plugins/DailyJoin/players";
+	public final String 
+			FILE_DIRECTORY		= "plugins/DailyJoin/players", 
+			FILE_NAME			= "player.yml",
+			// key path
+			PLAYER_PATH			= "player",
+			PLAYER_PATH_FORMAT	= "player.%s.",
+			// data
+			NAME				= "name",
+			DAYS_CONSECUTIVE	= "days.consecutive",
+			DAYS_TOTAL			= "days.total",
+			DAYS_OLD_CONSECUTIVE= "day", 
+			DAYS_OLD_TOTAL		= "totaldays",
+			FIRSTJOIN			= "firstjoin",
+			LASTJOIN			= "lastjoin";
 	
-	public DailyFileToSQL(dailyjoin plugin){
-		this.plugin = plugin;
-	}
-	
-	private List<DailyPlayer> getlist(){
-		File datei = new File(this.file_player, "player.yml");
-		if(datei.exists()){
-			FileConfiguration cfg_p = YamlConfiguration.loadConfiguration(datei);
-			List<String> list = cfg_p.getStringList("uuids");
-			List<DailyPlayer> player = new ArrayList<DailyPlayer>();
+	/**
+	 * load players from file.
+	 * @return
+	 */
+	private List<DailyPlayer> getlist() {
+		File file = new File(FILE_DIRECTORY, FILE_NAME);
+		if (file.exists()) {
+			FileConfiguration cfg = YamlConfiguration.loadConfiguration(file);
+			List<String> list = cfg.getStringList("uuids");
+			List<DailyPlayer> players = new ArrayList<>();
 			String path = "";
-			for(int i = 0; i < list.size(); i++){
+			for (int i = 0; i < list.size(); i++) {
 				path = "player." + list.get(i) + ".";
-				DailyPlayer p = new DailyPlayer(cfg_p.getString(path + "name"), list.get(i), cfg_p.getInt(path + "day"), cfg_p.getInt(path + "totaldays"), new Timestamp(cfg_p.getLong(path + "firstjoin")), new Timestamp(cfg_p.getLong(path + "lastjoin")));
-				player.add(p);
+				DailyPlayer p = new DailyPlayer(cfg.getString(path + "name"), list.get(i), cfg.getInt(path + "day"),
+						cfg.getInt(path + "totaldays"), new Timestamp(cfg.getLong(path + "firstjoin")),
+						new Timestamp(cfg.getLong(path + "lastjoin")));
+				players.add(p);
 			}
-			return player;
-		} else {
-			return null;
+			// load players with uuid
+			cfg.getConfigurationSection("player").getKeys(false).forEach(uuid -> {
+				DailyPlayer p = new DailyPlayer();
+				String dp = String.format(PLAYER_PATH_FORMAT, uuid);
+				// set uuid
+				p.setUuid(uuid);
+				// set name
+				if (cfg.contains(dp + NAME))
+					p.setName(cfg.getString(dp + NAME));
+				// set days total
+				if (cfg.contains(dp + DAYS_TOTAL))
+					p.setTotaldays(cfg.getInt(dp + DAYS_TOTAL));
+				// set days consecutive
+				if (cfg.contains(dp + DAYS_CONSECUTIVE))
+					p.setDay(cfg.getInt(dp + DAYS_CONSECUTIVE));
+				// set first join
+				if (cfg.contains(dp + FIRSTJOIN))
+					p.setFirstjoin(new Timestamp(cfg.getLong(dp + FIRSTJOIN)));
+				// set last join
+				if (cfg.contains(dp + LASTJOIN))
+					p.setLastjoin(new Timestamp(cfg.getLong(dp + LASTJOIN)));
+				// TODO remove old code
+				// set days total
+				if (cfg.contains(dp + DAYS_OLD_TOTAL))
+					p.setTotaldays(cfg.getInt(dp + DAYS_OLD_TOTAL));
+				// set days consecutive
+				if (cfg.contains(dp + DAYS_OLD_CONSECUTIVE))
+					p.setDay(cfg.getInt(dp + DAYS_OLD_CONSECUTIVE));
+				// add players
+				players.add(p);
+			});
+			return players;
 		}
+		return null;
 	}
-	
-	private void savelist(){
-		File datei = new File(this.file_player, "player.yml");
-		datei.delete();
-		if(!this.player_list.isEmpty()){
-			FileConfiguration cfg_p = YamlConfiguration.loadConfiguration(datei);
-			List<String> list = new ArrayList<String>();
-			String path = "";
-			for(int i = 0; i < this.player_list.size(); i++){
-			list.add(this.player_list.get(i).uuid());
-			path = "player." + this.player_list.get(i).uuid() + ".";
-			cfg_p.set(path + "name", this.player_list.get(i).name());
-			cfg_p.set(path + "day", this.player_list.get(i).day());
-			cfg_p.set(path + "totaldays", this.player_list.get(i).totaldays());
-			cfg_p.set(path + "firstjoin", this.player_list.get(i).firstjoin().getTime());
-			cfg_p.set(path + "lastjoin", this.player_list.get(i).lastjoin().getTime());
-			}
-			cfg_p.set("uuids", list);
-			try{
-				cfg_p.save(datei);
-				System.out.println("Save File");
-			} catch (IOException e){
-				System.out.println("Error on save file");
-			}
-		}
-	}
-	
-	public void SQLconnError(){
-		System.out.println("[DailyJoin] Error: Sql-Connection");
-		savelist();
-		this.plugin.getMySQL().reconnect();
-	}
-	
-	private boolean updatePlayer(String uuid, int day, int totaldays, Timestamp t){
-		boolean status = true;
-		MySQL sql = this.plugin.getMySQL();
-		Connection conn = sql.getConnection();
-		PreparedStatement st = null;
-		try {
-			st = conn.prepareStatement("UPDATE dailyjoin SET day = ?, totaldays = ?, lastjoin=? WHERE uuid = ?");
-			st.setInt(1, day);
-			st.setInt(2, totaldays);
-			st.setTimestamp(3, t);
-			st.setString(4, uuid);
-			st.executeUpdate();
-		} catch (SQLException e) {
-			e.printStackTrace();
-			status = false;
-		} finally {
-			sql.closeRessources(null, st);
-		}
-		return status;
-	}
-	
-	private boolean insertPlayer(DailyPlayer p){
-		boolean status = true;
-		MySQL sql = this.plugin.getMySQL();
-		Connection conn = sql.getConnection();
-		PreparedStatement st = null;
-		try {
-			st = conn.prepareStatement("INSERT INTO dailyjoin (name, uuid, day, totaldays, firstjoin, lastjoin) VALUES (?, ?, ?, ?, ?, ?)");
-			st.setString(1, p.name());
-			st.setString(2, p.uuid());
-			st.setInt(3, p.day());
-			st.setInt(4, p.totaldays());
-			st.setTimestamp(5, p.firstjoin());
-			st.setTimestamp(6, p.lastjoin());
-			st.executeUpdate();
-		} catch (SQLException error) {
-			error.printStackTrace();
-			status = false;
-		} finally {
-			sql.closeRessources(null, st);
-		}
-		return status;
-	}
-	
-	private boolean yesterday(Timestamp fjoin, Timestamp ljoin){
-		Calendar firstjoin = Calendar.getInstance();
-		Calendar lastjoin = Calendar.getInstance();
-		firstjoin.setTimeInMillis(fjoin.getTime());
-		lastjoin.setTimeInMillis(ljoin.getTime());
-		if((firstjoin.get(Calendar.YEAR) == lastjoin.get(Calendar.YEAR)) && (firstjoin.get(Calendar.DAY_OF_YEAR) == (lastjoin.get(Calendar.DAY_OF_YEAR)+1))){
-			return true;
-		} else if((firstjoin.get(Calendar.YEAR) == (lastjoin.get(Calendar.YEAR)+1)) && (((lastjoin.get(Calendar.MONTH) == 11)&&(lastjoin.get(Calendar.DAY_OF_MONTH) == 31))&&(firstjoin.get(Calendar.DAY_OF_YEAR) == 1))){
-			return true;
-		}
-		return false;
-	}
-	
-	private boolean today(Timestamp fjoin, Timestamp ljoin){
-		Calendar firstjoin = Calendar.getInstance();
-		Calendar lastjoin = Calendar.getInstance();
-		firstjoin.setTimeInMillis(fjoin.getTime());
-		lastjoin.setTimeInMillis(ljoin.getTime());
-		if((firstjoin.get(Calendar.YEAR) == lastjoin.get(Calendar.YEAR)) && (firstjoin.get(Calendar.DAY_OF_YEAR) == lastjoin.get(Calendar.DAY_OF_YEAR))){
-			return true;
-		}
-		return false;
-	}
-	
-	private boolean getPlayer(DailyPlayer p){
-		boolean status = false;
-		MySQL sql = this.plugin.getMySQL();
-		Connection conn = sql.getConnection();
-		ResultSet rs = null;
-		PreparedStatement st = null;
-		try {
-			st = conn.prepareStatement("SELECT * FROM dailyjoin WHERE uuid = ? ");
-			st.setString(1, p.uuid());
-			rs = st.executeQuery();
-			rs.last();
-			if(rs.getRow() != 0) {
-				//oldPlayer
-				int day;
-				int totaldays;
-				Timestamp lastjoin;
-				if(yesterday(p.firstjoin(),rs.getTimestamp("lastjoin"))){
-					day = p.day() + rs.getInt("day");
-					totaldays = p.totaldays() + rs.getInt("totaldays");
-					lastjoin = p.lastjoin();
-				} else if(today(p.firstjoin(),rs.getTimestamp("lastjoin"))){
-					day = p.day() + rs.getInt("day") - 1;
-					totaldays = p.totaldays() + rs.getInt("totaldays") - 1;
-					lastjoin = p.lastjoin();
-				} else {
-					day = 1;
-					totaldays = p.totaldays() + rs.getInt("totaldays");
-					lastjoin = p.lastjoin();
-				}
-				if(updatePlayer(p.uuid(), day, totaldays, lastjoin)){status = true;}
+
+	private void savelist(List<DailyPlayer> players) {
+		File file = new File(FILE_DIRECTORY, FILE_NAME);
+		// delte existing file
+		if (file.exists()) {
+			if(file.delete()) {
+				dailyjoin.getDailyLogger().log(Level.INFO, "deleted old player file.");
 			} else {
-				if(insertPlayer(p)){status = true;}
+				dailyjoin.getDailyLogger().log(Level.WARNING, "Could not delete old player file.");
 			}
-		} catch (SQLException error) {
-			error.printStackTrace();
-		} finally {
-			sql.closeRessources(rs, st);
 		}
-		return status;
+		// build new players
+		if (players != null && !players.isEmpty()) {
+			FileConfiguration cfg = YamlConfiguration.loadConfiguration(file);
+			String path;
+			// add player
+			for(DailyPlayer p : players) {
+				path = String.format(PLAYER_PATH_FORMAT, p.getUuid());
+				cfg.addDefault(path + NAME, p.getName());
+				cfg.addDefault(path + DAYS_TOTAL, p.getTotaldays());
+				cfg.addDefault(path + DAYS_CONSECUTIVE, p.getDay());
+				cfg.addDefault(path + FIRSTJOIN, p.getFirstjoin());
+				cfg.addDefault(path + LASTJOIN, p.getLastjoin());
+			}
+			// save file
+			try {
+				cfg.options().header("DailyJoin offline player list");
+				cfg.options().copyHeader(true);
+				cfg.options().copyDefaults(true);
+				cfg.save(file);
+			} catch (IOException e) {
+				dailyjoin.getDailyLogger().log(Level.SEVERE, "savelist: ", e);
+			}
+		}
+	}
+
+	/**
+	 * check if ljoin is yesterday to fjoin.
+	 * @param fjoin
+	 * @param ljoin
+	 * @return
+	 */
+	private boolean yesterday(Timestamp fjoin, Timestamp ljoin) {
+		Calendar firstjoin = Calendar.getInstance();
+		Calendar lastjoin = Calendar.getInstance();
+		firstjoin.setTimeInMillis(fjoin.getTime());
+		lastjoin.setTimeInMillis(ljoin.getTime());
+		if ((firstjoin.get(Calendar.YEAR) == lastjoin.get(Calendar.YEAR))
+				&& (firstjoin.get(Calendar.DAY_OF_YEAR) == (lastjoin.get(Calendar.DAY_OF_YEAR) + 1))) {
+			return true;
+		} else if ((firstjoin.get(Calendar.YEAR) == (lastjoin.get(Calendar.YEAR) + 1))
+				&& (((lastjoin.get(Calendar.MONTH) == 11) && (lastjoin.get(Calendar.DAY_OF_MONTH) == 31))
+						&& (firstjoin.get(Calendar.DAY_OF_YEAR) == 1))) {
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * check if fjoin and ljoin are on the same day.
+	 * @param fjoin
+	 * @param ljoin
+	 * @return
+	 */
+	private boolean today(Timestamp fjoin, Timestamp ljoin) {
+		Calendar firstjoin = Calendar.getInstance();
+		Calendar lastjoin = Calendar.getInstance();
+		firstjoin.setTimeInMillis(fjoin.getTime());
+		lastjoin.setTimeInMillis(ljoin.getTime());
+		if ((firstjoin.get(Calendar.YEAR) == lastjoin.get(Calendar.YEAR))
+				&& (firstjoin.get(Calendar.DAY_OF_YEAR) == lastjoin.get(Calendar.DAY_OF_YEAR))) {
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * update Player in Database
+	 * @param p
+	 * @return
+	 * @throws NoSQLConnectionException 
+	 * @throws UpdatePlayerException 
+	 */
+	private Integer updatePlayer(DailyPlayer p) throws NoSQLConnectionException, UpdatePlayerException {
+		if(p != null) {
+			if(MySQL.hasConnection()) {
+				ResultSet rs = null;
+				PreparedStatement st = null;
+				try {
+					st = MySQL.conn().prepareStatement("INSERT INTO dailyjoin (uuid, name, day, totaldays, firstjoin, lastjoin) VALUES (?,?,?,?,?,?) ON DUPLICATE KEY UPDATE "
+							+ "name = VALUES(name), "
+							+ "day = VALUES(day), "
+							+ "totaldays = VALUES(totaldays), "
+							+ "lastjoin = VALUES(lastjoin)", Statement.RETURN_GENERATED_KEYS);
+					st.setString(1, p.getUuid());
+					st.setString(2, p.getName());
+					st.setInt(3, p.getDay());
+					st.setInt(4, p.getTotaldays());
+					st.setTimestamp(5, p.getFirstjoin());
+					st.setTimestamp(6, p.getLastjoin());
+					st.executeUpdate();
+					rs = st.getGeneratedKeys();
+					if(rs.next()) {
+						return rs.getInt(1);
+					}
+				} catch (SQLException e) {
+					dailyjoin.getDailyLogger().log(Level.SEVERE, "updatePlayer: " + p, e);
+					throw new UpdatePlayerException(p);
+				} finally {
+					MySQL.closeRessources(rs, st);
+				}
+			} else {
+				throw new NoSQLConnectionException();
+			}
+		}
+		return null;
 	}
 	
-	public void FileToSQL(){
-		File datei = new File(this.file_player, "player.yml");
-		if(datei.exists()){
-			this.player_list = getlist();
-			if(!this.player_list.isEmpty()){
-				for(int i = 0; i < this.player_list.size(); i++){
-					if(getPlayer(this.player_list.get(i))){
-					//hat funktioniert
-						this.player_list.remove(i);
+	/**
+	 * get Player
+	 * @param uuid
+	 * @return
+	 * @throws NoSQLConnectionException 
+	 */
+	private DailyPlayer getPlayer(String uuid) throws NoSQLConnectionException {
+		if (MySQL.hasConnection()) {
+			ResultSet rs = null;
+			PreparedStatement st = null;
+			try {
+				if(uuid.length() > 16)
+					st = MySQL.conn().prepareStatement("SELECT * FROM dailyjoin WHERE uuid LIKE ?", ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+				else
+					st = MySQL.conn().prepareStatement("SELECT * FROM dailyjoin WHERE name LIKE ?", ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+				// set uuid
+				st.setString(1, uuid);
+				// get Query
+				rs = st.executeQuery();
+				// only one player allowed
+				if(rs.next()) {
+					DailyPlayer p = new DailyPlayer();
+					p.setName(rs.getString("name"));
+					p.setUuid(rs.getString("uuid"));
+					p.setDay(rs.getInt("day"));
+					p.setTotaldays(rs.getInt("totaldays"));
+					p.setFirstjoin(rs.getTimestamp("firstjoin"));
+					p.setLastjoin(rs.getTimestamp("lastjoin"));
+				}
+			} catch (SQLException e) {
+				dailyjoin.getDailyLogger().log(Level.SEVERE, "getPlayer: " + uuid, e);
+			} finally {
+				MySQL.closeRessources(rs, st);
+			}
+		} else {
+			throw new NoSQLConnectionException();
+		}
+		return null;
+	}
+	
+	/**
+	 * 
+	 */
+	public void FileToSQL() {
+		File datei = new File(FILE_DIRECTORY, "player.yml");
+		if (datei.exists()) {
+			List<DailyPlayer> players = getlist();
+			if (players != null && !players.isEmpty()) {
+				for (int i = 0; i < players.size(); i++) {
+					try {
+						DailyPlayer pFile = players.get(i);
+						DailyPlayer pSQL = getPlayer(pFile.getUuid());
+						// check if existing Player
+						if (pSQL != null) {
+							// existing Player -> merge
+							if (today(pFile.getFirstjoin(), pSQL.getLastjoin())) {
+								// continues logins day overlapping
+								// sum totaldays - 1
+								pFile.setTotaldays(pFile.getTotaldays() + pSQL.getTotaldays() - 1);
+								// check if days correct ???
+								pFile.setDay(pFile.getDay() + pSQL.getDay() - 1);
+								// lastlogin = file.lastlogin
+							} else
+							if (yesterday(pFile.getFirstjoin(), pSQL.getLastjoin())) {
+								// continues logins
+								// sum totaldays
+								pFile.setTotaldays(pFile.getTotaldays() + pSQL.getTotaldays());
+								// check if days correct ???
+								pFile.setDay(pFile.getDay() + pSQL.getDay());
+								// lastlogin = file.lastlogin
+							} else {
+								// not continues logins
+								// sum totaldays
+								pFile.setTotaldays(pFile.getTotaldays() + pSQL.getTotaldays());
+								// day = file.day
+								// lastlogin = file.lastlogin
+							}
+						}
+						// update or insert Player
+						updatePlayer(pFile);
+						// remove from working list
+						players.remove(i);
 						i--;
-					} else {
-						SQLconnError();
+					} catch (NoSQLConnectionException e) {
+						// NoSQLException
+						// stop merge and save file
+						savelist(players);
+						MySQL.noConnection();
 						return;
+					} catch (UpdatePlayerException e) {
+						dailyjoin.getDailyLogger().log(Level.SEVERE, "FileToSQL", e);
 					}
 				}
-				savelist();
 			} else {
-				//EmptyList
-				System.out.println("[DailyJoin] Error: Empty Offline List");
+				// EmptyList
+				dailyjoin.getDailyLogger().log(Level.INFO, "Empty Offline List");
 			}
 		} else {
-			System.out.println("[DailyJoin] No offline Player");
+			// No File
+			dailyjoin.getDailyLogger().log(Level.INFO, "No Offline List");
 		}
 	}
 }

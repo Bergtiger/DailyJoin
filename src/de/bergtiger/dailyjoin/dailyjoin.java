@@ -1,5 +1,6 @@
 package de.bergtiger.dailyjoin;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.bukkit.plugin.PluginManager;
@@ -30,8 +31,8 @@ public class dailyjoin extends JavaPlugin{
 	@Override
 	public void onEnable() {
 		instance = this;
-		
-		System.out.println("Starte DailyJoin...");
+
+		getDailyLogger().log(Level.INFO, "Starte DailyJoin...");
 		
 		PluginManager pm = this.getServer().getPluginManager();
 		
@@ -89,7 +90,7 @@ public class dailyjoin extends JavaPlugin{
 	
 	@Override
 	public void onDisable() {
-		System.out.println("DailyJoin beendet.");
+		getDailyLogger().log(Level.INFO, "DailyJoin beendet.");
 		TigerConnection.inst().closeThread();
 	}
 }

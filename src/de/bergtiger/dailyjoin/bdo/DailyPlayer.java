@@ -102,20 +102,5 @@ public class DailyPlayer {
 	/**
 	 * @param lastjoin the lastjoin to set
 	 */
-	public void setLastjoin(Timestamp lastjoin) {
-		this.lastjoin = lastjoin;
-	}
-	
-//	@Deprecated
-//	public String name(){return this.name;}
-//	@Deprecated
-//	public String uuid(){return this.uuid;}
-//	@Deprecated
-//	public int day(){return this.daysConsecutive;}
-//	@Deprecated
-//	public int totaldays(){return this.daysTotal;}
-//	@Deprecated
-//	public Timestamp firstjoin(){return this.firstjoin;}
-//	@Deprecated
-//	public Timestamp lastjoin(){return this.lastjoin;}
+	public void setLastjoin(Timestamp lastjoin) { this.lastjoin = lastjoin; }
 }

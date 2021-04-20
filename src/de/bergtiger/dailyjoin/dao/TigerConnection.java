@@ -47,7 +47,7 @@ public class TigerConnection {
 		
 			try {
 				this.openConnection();
-				new DailyDataBase(this);
+				DailyDataBase.createTable();
 				new DailyFileToSQL().FileToSQL();
 			} catch (Exception e) {
 				System.out.println("[DailyJoin] Error No SQL-Connection");
@@ -81,7 +81,7 @@ public class TigerConnection {
 			}
 			try {
 				this.openConnection();
-				new DailyDataBase(this);
+				DailyDataBase.createTable();
 				new DailyFileToSQL().FileToSQL();
 			} catch (Exception e) {
 				System.out.println("[DailyJoin] Error No Connection");
@@ -99,7 +99,7 @@ public class TigerConnection {
 		this.closeThread();
 		try {
 			this.openConnection();
-			new DailyDataBase(this);
+			DailyDataBase.createTable();
 			System.out.println("[DailyJoin] SQL-Connection");
 			System.out.println("[DailyJoin] Get offline Joins");
 			new DailyFileToSQL().FileToSQL();

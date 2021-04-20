@@ -16,11 +16,12 @@ import de.bergtiger.dailyjoin.exception.UpdatePlayerException;
 public class playerDAOImplSQL implements playerDAO {
 
 	/**
-	 * update Player in Database
-	 * @param p
-	 * @return
-	 * @throws NoSQLConnectionException 
-	 * @throws UpdatePlayerException 
+	 * insert Player in Database.
+	 * if Player exists update.
+	 * @param p Player to update or insert.
+	 * @return generated key
+	 * @throws NoSQLConnectionException could not connect with database.
+	 * @throws UpdatePlayerException could not execute update.
 	 */
 	@Override
 	public Integer updatePlayer(DailyPlayer p) throws NoSQLConnectionException, UpdatePlayerException {
@@ -60,9 +61,9 @@ public class playerDAOImplSQL implements playerDAO {
 
 	/**
 	 * get Player
-	 * @param uuid
-	 * @return
-	 * @throws NoSQLConnectionException 
+	 * @param uuid Player uuid or name.
+	 * @return player statistic.
+	 * @throws NoSQLConnectionException could not connect with database.
 	 */
 	@Override
 	public DailyPlayer getPlayer(String uuid) throws NoSQLConnectionException {

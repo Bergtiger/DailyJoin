@@ -7,69 +7,8 @@ import java.io.IOException;
 import org.bukkit.configuration.file.FileConfiguration;
 
 public class DailyConfig {
-	public DailyConfig(dailyjoin plugin){
-//		FileConfiguration cfg = plugin.getConfig();
-//		
-//		String db = "database.";
-//		cfg.addDefault(db + "host", "localhost");
-//		cfg.addDefault(db + "port", 3306);
-//		cfg.addDefault(db + "user", "user");
-//		cfg.addDefault(db + "password", "password");
-//		cfg.addDefault(db + "database", "database");
-//		
-//		String lang ="lang.";
-//		cfg.addDefault(lang + "Daily", "&7Du hast dich bereits den &e-day-&7. Tag in Folge eingeloggt.");
-//		cfg.addDefault(lang + "SpezialDay", "&e-player- &7ist bereits &e-day- &7Tage in Folge auf dem Server.");
-//		cfg.addDefault(lang + "SpezialTotalDays", "&e-player- &7ist bereits insgesamt &e-day- &7Tage auf dem Server.");
-//		cfg.addDefault(lang + "Birthday", "&e-player- &7hat heute seinen Server-Geburtstag.");
-//		
-//		cfg.addDefault(lang + "DailyInfo", "&b/daily  -  &7zeigt alle g�ltigen Befehle");
-//		cfg.addDefault(lang + "DailyInfoTop", "&b/daily top [day, totaldays] [value] -  &7zeigt top Liste");
-//		cfg.addDefault(lang + "DailyInfoSet", "&b/daily set [player, uuid] [day, totaldays] [value]  -  &7Setzt dem Spieler day/totaldays value");
-//		cfg.addDefault(lang + "DailyInfoAdd", "&b/daily add [player, uuid] [day, totaldays] [value]  -  &7Addiert dem Spieler day/totaldays value");
-//		cfg.addDefault(lang + "DailyInfoInfo", "&b/daily info  -  &7zeigt Plugin version");
-//		cfg.addDefault(lang + "DailyInfoReload", "&b/daily reload  -  &7l�dt config neu");
-//		cfg.addDefault(lang + "DailyInfoPlayer", "&b/daily player [player, uuid]  -  &7zeigt die Daten des Spielers");
-//		cfg.addDefault(lang + "DailyInfoConfig", "&b/daily config [ma/system/reward/oldfiles/delay] [true/false/in case of delay number]  -  &7�ndert die config");
-//		
-//		cfg.addDefault(lang + "EqualNames", "&cError: Equal names: -player-");
-//		cfg.addDefault(lang + "EqualNamesList", "&7-uuid-");
-//		cfg.addDefault(lang + "NoPermission", "&cNo Permission");
-//		cfg.addDefault(lang + "NoConnection", "&7Error: SQL-Connection");
-//		cfg.addDefault(lang + "NoPlayer", "&7No such player could be found");
-//		cfg.addDefault(lang + "NoUUID", "&7Not a correct UUID or Player is not online.");
-//		cfg.addDefault(lang + "NoFile", "&7Could not find Player file.");
-//		cfg.addDefault(lang + "WrongArgument", "&7Wrong Argument. Please Check your Command.");
-//		cfg.addDefault(lang + "OnlySQL", "&7This Command works only with SQL.");
-//		
-//		cfg.addDefault(lang + "PlayerUmrandungOben", "&a----<[&6-player-&a]>----");
-//		cfg.addDefault(lang + "PlayerUmrandungUnten", "&a--------------------");
-//		cfg.addDefault(lang + "PlayerFirstJoin", "&eFirstJoin: &7Day Month Year");
-//		cfg.addDefault(lang + "PlayerLastJoin", "&eLastJoin: &7Day Month Year");
-//		cfg.addDefault(lang + "PlayerDay", "&eDay: &7-day-");
-//		cfg.addDefault(lang + "PlayerTotalDays", "&eTotalDays: &7-day-");
-//		
-//		cfg.addDefault(lang + "PluginUmrandungOben", "&a----<[&6DailyJoin&a]>----");
-//		cfg.addDefault(lang + "PluginUmrandungUnten", "&a---------------------");
-//		cfg.addDefault(lang + "PluginVersion", "&eVersion: &7-version-");
-//		cfg.addDefault(lang + "PluginMonatsAnzeige", "&eMonatsAnzeige: &7-status-");
-//		cfg.addDefault(lang + "PluginSystem", "&eSystem: &7-status-");
-//		cfg.addDefault(lang + "PluginRewardReconnection", "&eReward on Reconnection: &7-status-");
-//		cfg.addDefault(lang + "PluginDelay", "&eRewardDelay: &7-delay-");
-//		cfg.addDefault(lang + "PluginTopPlayer", "&eTopPlayer: &7-amount-");
-//		
-//		cfg.addDefault(lang + "DailySet", "&7/daily set [player/uuid] [day, totaldays] [value]");
-//		cfg.addDefault(lang + "DailyAdd", "&7/daily add [player/uuid] [day, totaldays] [value]");
-//		cfg.addDefault(lang + "DailySetData", "&aBei dem Spieler mit der UUID: &e-player- &awurde &e-data- &aauf &e-value- &agesetzt.");
-//		cfg.addDefault(lang + "DailyAddData", "&aBei dem Spieler mit der UUID: &e-player- &awurde &e-data- &aum &e-value- &aerh�ht.");
-//		cfg.addDefault(lang + "DailyReload", "&7DailyJoin reloaded.");
-//		cfg.addDefault(lang + "DailyConfig", "&7/daily config [ma/system/reward/oldfiles/delay] [true/false/in case of delay number]");
-//		cfg.addDefault(lang + "DailySetConfig", "&7DailyJoin reloaded.");
-//		
-//		cfg.addDefault(lang + "TopPlayerDay", "&a----<[&6Top Day&a]>----");
-//		cfg.addDefault(lang + "TopPlayerTotalDays", "&a----<[&6Top Totaldays&a]>----");
-//		cfg.addDefault(lang + "TopPlayerList", "&e-player-: &7-days-");
-//		
+	
+	public DailyConfig(dailyjoin plugin){		
 //		String config = "config.";
 //		cfg.addDefault(config + "MonatsAnzeige", "true");
 //		cfg.addDefault(config + "SQL", "true");

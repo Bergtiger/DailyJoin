@@ -6,7 +6,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
-import de.bergtiger.dailyjoin.data.MySQL;
+import de.bergtiger.dailyjoin.dao.TigerConnection;
 
 public class DailyListener implements Listener {
 
@@ -59,7 +59,7 @@ public class DailyListener implements Listener {
 				public void run() {
 					// onPlayerOnline(p);
 					if (p.isOnline()) {
-						if (sql && MySQL.inst().hasConnection()) {
+						if (sql && TigerConnection.hasConnection()) {
 							dailyjoin.inst().getDailySQL().dailyjoin_sql(p);
 						} else {
 							dailyjoin.inst().getDailyFile().dailyjoin_file(p);

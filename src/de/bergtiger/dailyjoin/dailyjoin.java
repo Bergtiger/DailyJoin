@@ -5,11 +5,11 @@ import java.util.logging.Logger;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import de.bergtiger.dailyjoin.data.MySQL;
+import de.bergtiger.dailyjoin.dao.TigerConnection;
 
 
 public class dailyjoin extends JavaPlugin{
-	private MySQL sql;
+	private TigerConnection sql;
 	private DailyListener dl;
 	private DailyCommand dc;
 	private DailyReward dr;
@@ -37,21 +37,22 @@ public class dailyjoin extends JavaPlugin{
 		
 		new DailyConfig(this);
 		
-		this.sql = MySQL.inst();
+		this.sql = TigerConnection.inst();
 //		this.dl = new DailyListener(this);
 		this.dl = DailyListener.inst();
 //		this.dc = new DailyCommand(this);
 		this.dc = new DailyCommand();
-		this.dr = new DailyReward(this);
+//		this.dr = new DailyReward(this);
+		this.dr = DailyReward.inst();
 		this.dFile = new DailyFile();
-		this.dSQL = new DailySQL(this);
+		this.dSQL = new DailySQL();
 		
 		pm.registerEvents(this.dl, this);
 		
 		this.getCommand("dailyjoin").setExecutor(this.dc);
 	}
 	
-	public MySQL getMySQL(){
+	public TigerConnection getMySQL(){
 		return this.sql;
 	}
 	
@@ -79,16 +80,16 @@ public class dailyjoin extends JavaPlugin{
 		this.reloadConfig();
 		this.dFile.reload();
 //		this.sql.reload();
-		MySQL.inst().reload();
+		TigerConnection.inst().reload();
 //		this.dl.reload();
 		DailyListener.inst().reload();
-		this.dc.reload();
-		this.dr.reload();
+//		this.dr.reload();
+		DailyReward.inst().reload();
 	}
 	
 	@Override
 	public void onDisable() {
 		System.out.println("DailyJoin beendet.");
-		MySQL.inst().closeThread();
+		TigerConnection.inst().closeThread();
 	}
 }

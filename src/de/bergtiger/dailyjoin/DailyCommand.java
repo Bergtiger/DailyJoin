@@ -20,7 +20,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
-import de.bergtiger.dailyjoin.data.MySQL;
+import de.bergtiger.dailyjoin.dao.TigerConnection;
 import de.bergtiger.dailyjoin.data.MyUtils;
 import de.bergtiger.dailyjoin.lang.Lang;
 
@@ -53,25 +53,23 @@ public class DailyCommand implements CommandExecutor, MyUtils{
 	
 	private void daily_command(CommandSender cs){
 		if(cs.hasPermission(p_admin) || cs.hasPermission(p_cmd)){
-			if(cs instanceof Player) {
-				Player p = (Player)cs;
-				p.spigot().sendMessage(Lang.buildTC(Lang.DailyInfo.get()));
-				p.spigot().sendMessage(Lang.buildTC(Lang.DailyInfoTop.get(), null, null, CMD + " " + TOP));
-				p.spigot().sendMessage(Lang.buildTC(Lang.DailyInfoSet.get(), null, null, CMD + " " + SET));
-				p.spigot().sendMessage(Lang.buildTC(Lang.DailyInfoAdd.get(), null, null, CMD + " " + ADD));
-				p.spigot().sendMessage(Lang.buildTC(Lang.DailyInfoInfo.get(), null, null, CMD + " " + INFO));
-				p.spigot().sendMessage(Lang.buildTC(Lang.DailyInfoReload.get(), CMD + " " + RELOAD, null, null));
-				p.spigot().sendMessage(Lang.buildTC(Lang.DailyInfoPlayer.get(), null, null, CMD + " " + PLAYER));
-			} else {
-				cs.sendMessage(Lang.DailyInfo.colored());
-				cs.sendMessage(Lang.DailyInfoTop.colored());
-				cs.sendMessage(Lang.DailyInfoSet.colored());
-				cs.sendMessage(Lang.DailyInfoAdd.colored());
-				cs.sendMessage(Lang.DailyInfoInfo.colored());
-				cs.sendMessage(Lang.DailyInfoReload.colored());
-				cs.sendMessage(Lang.DailyInfoPlayer.colored());
-//				cs.sendMessage(Lang.DailyInfoConfig.colored());
-			}
+			cs.spigot().sendMessage(Lang.buildTC(Lang.DailyInfo.get()));
+			cs.spigot().sendMessage(Lang.buildTC(Lang.DailyInfoTop.get(), null, null, CMD + " " + TOP));
+			cs.spigot().sendMessage(Lang.buildTC(Lang.DailyInfoSet.get(), null, null, CMD + " " + SET));
+			cs.spigot().sendMessage(Lang.buildTC(Lang.DailyInfoAdd.get(), null, null, CMD + " " + ADD));
+			cs.spigot().sendMessage(Lang.buildTC(Lang.DailyInfoInfo.get(), null, null, CMD + " " + INFO));
+			cs.spigot().sendMessage(Lang.buildTC(Lang.DailyInfoReload.get(), CMD + " " + RELOAD, null, null));
+			cs.spigot().sendMessage(Lang.buildTC(Lang.DailyInfoPlayer.get(), null, null, CMD + " " + PLAYER));
+//			} else {
+//				cs.sendMessage(Lang.DailyInfo.colored());
+//				cs.sendMessage(Lang.DailyInfoTop.colored());
+//				cs.sendMessage(Lang.DailyInfoSet.colored());
+//				cs.sendMessage(Lang.DailyInfoAdd.colored());
+//				cs.sendMessage(Lang.DailyInfoInfo.colored());
+//				cs.sendMessage(Lang.DailyInfoReload.colored());
+//				cs.sendMessage(Lang.DailyInfoPlayer.colored());
+////				cs.sendMessage(Lang.DailyInfoConfig.colored());
+//			}
 		} else {
 			cs.sendMessage(Lang.NoPermission.colored());
 		}
@@ -135,7 +133,7 @@ public class DailyCommand implements CommandExecutor, MyUtils{
 	private void addPlayerData(CommandSender cs, String p_uuid, String data, int value){
 		if(p_uuid != null){
 			boolean status = false;
-			if(cfg.getString("config.SQL").equalsIgnoreCase("true") && this.plugin.getMySQL().hasConnection()){
+			if(dailyjoin.inst().getConfig().getString("config.SQL").equalsIgnoreCase("true") && TigerConnection.hasConnection()){
 				status = addPlayerData_SQL(cs, p_uuid, data, value);
 			} else {
 				status = addPlayerData_file(cs, p_uuid, data, value);
@@ -198,13 +196,11 @@ public class DailyCommand implements CommandExecutor, MyUtils{
 	}
 	
 	private boolean addPlayerData_SQL(CommandSender cs, String p_uuid, String data, int value){
-		MySQL sql = this.plugin.getMySQL();
-		if(sql.hasConnection()){
-			Connection conn = sql.getConnection();
+		if(TigerConnection.hasConnection()){
 			ResultSet rs = null;
 			PreparedStatement st = null;
 			try {
-				st = conn.prepareStatement("SELECT * FROM dailyjoin WHERE uuid = ? ");
+				st = TigerConnection.conn().prepareStatement("SELECT * FROM dailyjoin WHERE uuid = ? ");
 				st.setString(1, p_uuid);
 				rs = st.executeQuery();
 				rs.last();
@@ -217,7 +213,7 @@ public class DailyCommand implements CommandExecutor, MyUtils{
 			} catch (SQLException error) {
 				cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.NoConnection")));
 			} finally {
-				sql.closeRessources(rs, st);
+				TigerConnection.closeRessources(rs, st);
 			}
 		}
 		return false;
@@ -243,7 +239,7 @@ public class DailyCommand implements CommandExecutor, MyUtils{
 	private void setPlayerData(CommandSender cs, String p_uuid, String data, int value){
 		if(p_uuid != null){
 			boolean status = false;
-			if(cfg.getString("config.SQL").equalsIgnoreCase("true")&&this.plugin.getMySQL().hasConnection()){
+			if(cfg.getString("config.SQL").equalsIgnoreCase("true")&&TigerConnection.hasConnection()){
 				status = setPlayerData_SQL(cs, p_uuid, data, value);
 			} else {
 				status = setPlayerData_file(cs, p_uuid, data, value);
@@ -306,8 +302,7 @@ public class DailyCommand implements CommandExecutor, MyUtils{
 	}
 	
 	private boolean setPlayerData_SQL(CommandSender cs, String p_uuid, String data, int value){
-		MySQL sql = this.plugin.getMySQL();
-		sql.queryUpdate("UPDATE dailyjoin SET " + data + " = '" + value + "' WHERE uuid='" + p_uuid + "'");
+		TigerConnection.inst().queryUpdate("UPDATE dailyjoin SET " + data + " = '" + value + "' WHERE uuid='" + p_uuid + "'");
 		return true;
 	}
 	
@@ -336,7 +331,7 @@ public class DailyCommand implements CommandExecutor, MyUtils{
 	}
 	
 	private void getPlayerInfo(CommandSender cs, String p_uuid){
-		if(cfg.getString("config.SQL").equalsIgnoreCase("true") && this.plugin.getMySQL().hasConnection()){
+		if(cfg.getString("config.SQL").equalsIgnoreCase("true") && TigerConnection.hasConnection()){
 			getPlayerInfo_SQL(cs, p_uuid);
 		} else {
 			getPlayerInfo_file(cs, p_uuid);
@@ -397,13 +392,11 @@ public class DailyCommand implements CommandExecutor, MyUtils{
 	
 	private void getPlayerInfo_SQL(CommandSender cs, String p_uuid){
 		if(p_uuid != null){
-			MySQL sql = this.plugin.getMySQL();
-			if(sql.hasConnection()){
-				Connection conn = sql.getConnection();
+			if(TigerConnection.hasConnection()){
 				ResultSet rs = null;
 				PreparedStatement st = null;
 				try {
-					st = conn.prepareStatement("SELECT * FROM dailyjoin WHERE uuid = ? ");
+					st = TigerConnection.conn().prepareStatement("SELECT * FROM dailyjoin WHERE uuid = ? ");
 					st.setString(1, p_uuid);
 					rs = st.executeQuery();
 					rs.last();
@@ -423,7 +416,7 @@ public class DailyCommand implements CommandExecutor, MyUtils{
 				} catch (SQLException error) {
 					cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.NoConnection")));
 				} finally {
-					sql.closeRessources(rs, st);
+					TigerConnection.closeRessources(rs, st);
 				}
 			} else {
 				cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.NoUUID")));
@@ -466,7 +459,7 @@ public class DailyCommand implements CommandExecutor, MyUtils{
 		if(cs.hasPermission("dailyjoin.info")||cs.hasPermission("dailyjoin.admin")){
 			//plugin info
 			cs.sendMessage(ChatColor.translateAlternateColorCodes('&', this.cfg.getString("lang.PluginUmrandungOben")));
-			cs.sendMessage(ChatColor.translateAlternateColorCodes('&', this.cfg.getString("lang.PluginVersion").replace("-version-", plugin.getDescription().getVersion())));
+			cs.sendMessage(ChatColor.translateAlternateColorCodes('&', this.cfg.getString("lang.PluginVersion").replace("-version-", dailyjoin.inst().getDescription().getVersion())));
 			
 			//config
 			cs.sendMessage(ChatColor.translateAlternateColorCodes('&', this.cfg.getString("lang.PluginMonatsAnzeige").replace("-status-", cfg.getString("config.MonatsAnzeige"))));
@@ -489,7 +482,7 @@ public class DailyCommand implements CommandExecutor, MyUtils{
 	
 	private void daily_reload(CommandSender cs){
 		if(cs.hasPermission(p_admin) || cs.hasPermission(p_reload)){
-			this.plugin.reload();
+			dailyjoin.inst().reload();
 			cs.sendMessage(ChatColor.translateAlternateColorCodes('&', this.cfg.getString("lang.DailyReload")));
 		} else {
 			cs.sendMessage(ChatColor.translateAlternateColorCodes('&', this.cfg.getString("lang.NoPermission")));
@@ -542,61 +535,56 @@ public class DailyCommand implements CommandExecutor, MyUtils{
 	}
 	
 	private void top_player_sql_day(CommandSender cs, int count){
-		MySQL sql = this.plugin.getMySQL();
-		Connection conn = sql.getConnection();
-		ResultSet rs = null;
-		PreparedStatement st = null;
-		try {
-			st = conn.prepareStatement("SELECT name, day FROM dailyjoin ORDER BY day DESC LIMIT ?");
-			st.setInt(1, count);
-			rs = st.executeQuery();
-			rs.last();
-			if(rs.getRow() != 0) {
-				rs.first();
-				cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.TopPlayerDay")));
-				while(!rs.isAfterLast()){
-					cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.TopPlayerList").replace("-days-", rs.getString("day")).replace("-player-", rs.getString("name"))));
-					rs.next();
+		if(TigerConnection.hasConnection()) {
+			ResultSet rs = null;
+			PreparedStatement st = null;
+			try {
+				st = TigerConnection.conn().prepareStatement("SELECT name, day FROM dailyjoin ORDER BY day DESC LIMIT ?");
+				st.setInt(1, count);
+				rs = st.executeQuery();
+				rs.last();
+				if(rs.getRow() != 0) {
+					rs.first();
+					cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.TopPlayerDay")));
+					while(!rs.isAfterLast()){
+						cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.TopPlayerList").replace("-days-", rs.getString("day")).replace("-player-", rs.getString("name"))));
+						rs.next();
+					}
+				} else {
+					cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.NoPlayer")));
 				}
-			} else {
-				cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.NoPlayer")));
+			} catch (SQLException error) {
+				cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.NoConnection")));
+			} finally {
+				TigerConnection.closeRessources(rs, st);
 			}
-		} catch (SQLException error) {
-			cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.NoConnection")));
-		} finally {
-			sql.closeRessources(rs, st);
 		}
 	}
 	
 	private void top_player_sql_totaldays(CommandSender cs, int count){
-		MySQL sql = this.plugin.getMySQL();
-		Connection conn = sql.getConnection();
-		ResultSet rs = null;
-		PreparedStatement st = null;
-		try {
-			st = conn.prepareStatement("SELECT name, totaldays FROM dailyjoin ORDER BY totaldays DESC LIMIT ?");
-			st.setInt(1, count);
-			rs = st.executeQuery();
-			rs.last();
-			if(rs.getRow() != 0) {
-				rs.first();
-				cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.TopPlayerTotalDays")));
-				while(!rs.isAfterLast()){
-					cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.TopPlayerList").replace("-days-", rs.getString("totaldays")).replace("-player-", rs.getString("name"))));
-					rs.next();
+		if(TigerConnection.hasConnection()) {
+			ResultSet rs = null;
+			PreparedStatement st = null;
+			try {
+				st = TigerConnection.conn().prepareStatement("SELECT name, totaldays FROM dailyjoin ORDER BY totaldays DESC LIMIT ?");
+				st.setInt(1, count);
+				rs = st.executeQuery();
+				rs.last();
+				if(rs.getRow() != 0) {
+					rs.first();
+					cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.TopPlayerTotalDays")));
+					while(!rs.isAfterLast()){
+						cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.TopPlayerList").replace("-days-", rs.getString("totaldays")).replace("-player-", rs.getString("name"))));
+						rs.next();
+					}
+				} else {
+					cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.NoPlayer")));
 				}
-			} else {
-				cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.NoPlayer")));
+			} catch (SQLException error) {
+				cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.NoConnection")));
+			} finally {
+				sql.closeRessources(rs, st);
 			}
-		} catch (SQLException error) {
-			cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.NoConnection")));
-		} finally {
-			sql.closeRessources(rs, st);
 		}
-	}
-	
-	public void reload(){
-		this.plugin.reloadConfig();
-		this.cfg = this.plugin.getConfig();
 	}
 }

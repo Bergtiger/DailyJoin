@@ -5,7 +5,7 @@ import java.util.Calendar;
 
 public interface MyUtils {
 	
-	public String
+	public final String
 		p_admin = "dailyjoin.admin",
 		p_user = "dailyjoin.user",
 		p_set = "dailyjoin.set",
@@ -13,7 +13,8 @@ public interface MyUtils {
 		p_player = "dailyjoin.player",
 		p_reload = "dailyjoin.reload",
 		
-		file_player = "plugins/DailyJoin/players";
+		FILE_DIRECTORY = "plugins/DailyJoin/players",
+		FILE_NAME = "player.yml";
 	
 	
 	public default boolean yesterday(Timestamp t){

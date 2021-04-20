@@ -6,23 +6,22 @@ public class DailyPlayer {
 
 	private String name;
 	private String uuid;
-	private int day;
-	private int totaldays;
+	private int daysConsecutive;
+	private int daysTotal;
 	private Timestamp firstjoin;
 	private Timestamp lastjoin;
 
 	public DailyPlayer() {}
 	
-	public DailyPlayer(String name, String uuid, int day, int totaldays, Timestamp firstjoin, Timestamp lastjoin){
+	public DailyPlayer(String name, String uuid, int daysConsecutive, int daysTotal, Timestamp firstjoin, Timestamp lastjoin){
 		this.name = name;
 		this.uuid = uuid;
-		this.day = day;
-		this.totaldays = totaldays;
+		this.daysTotal = daysTotal;
+		this.daysConsecutive = daysConsecutive;
 		this.firstjoin = firstjoin;
 		this.lastjoin = lastjoin;
 	}
-	
-	
+
 	/**
 	 * @return the name
 	 */
@@ -52,33 +51,33 @@ public class DailyPlayer {
 	}
 
 	/**
-	 * @return the day
+	 * @return the daysConsecutive
 	 */
-	public int getDay() {
-		return day;
+	public int getDaysConsecutive() {
+		return daysConsecutive;
 	}
 
 	/**
-	 * @param day the day to set
+	 * @param daysConsecutive the daysConsecutive to set
 	 */
-	public void setDay(int day) {
-		this.day = day;
+	public void setDaysConsecutive(int daysConsecutive) {
+		this.daysConsecutive = daysConsecutive;
 	}
 
 	/**
-	 * @return the totaldays
+	 * @return the daysTotal
 	 */
-	public int getTotaldays() {
-		return totaldays;
+	public int getDaysTotal() {
+		return daysTotal;
 	}
 
 	/**
-	 * @param totaldays the totaldays to set
+	 * @param daysTotal the daysTotal to set
 	 */
-	public void setTotaldays(int totaldays) {
-		this.totaldays = totaldays;
+	public void setDaysTotal(int daysTotal) {
+		this.daysTotal = daysTotal;
 	}
-
+	
 	/**
 	 * @return the firstjoin
 	 */
@@ -106,17 +105,17 @@ public class DailyPlayer {
 	public void setLastjoin(Timestamp lastjoin) {
 		this.lastjoin = lastjoin;
 	}
-
-	@Deprecated
-	public String name(){return this.name;}
-	@Deprecated
-	public String uuid(){return this.uuid;}
-	@Deprecated
-	public int day(){return this.day;}
-	@Deprecated
-	public int totaldays(){return this.totaldays;}
-	@Deprecated
-	public Timestamp firstjoin(){return this.firstjoin;}
-	@Deprecated
-	public Timestamp lastjoin(){return this.lastjoin;}
+	
+//	@Deprecated
+//	public String name(){return this.name;}
+//	@Deprecated
+//	public String uuid(){return this.uuid;}
+//	@Deprecated
+//	public int day(){return this.daysConsecutive;}
+//	@Deprecated
+//	public int totaldays(){return this.daysTotal;}
+//	@Deprecated
+//	public Timestamp firstjoin(){return this.firstjoin;}
+//	@Deprecated
+//	public Timestamp lastjoin(){return this.lastjoin;}
 }

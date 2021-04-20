@@ -11,13 +11,13 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
-import de.bergtiger.dailyjoin.data.MySQL;
+import de.bergtiger.dailyjoin.dao.TigerConnection;
 import de.bergtiger.dailyjoin.data.MyUtils;
 
 public class DailyFile implements MyUtils{
 	
 	public static final String NAME = "name", DAY = "day", TOTALDAYS = "totaldays", FIRSTJOIN = "firstjoin", LASTJOIN = "lastjoin";
-	private String file_player = "plugins/DailyJoin/players";
+	public static final String FILE_DIRECTORY = "plugins/DailyJoin/players", FILE_NAME = "player.yml";
 	private boolean reward;
 	private boolean sql;
 	
@@ -37,8 +37,9 @@ public class DailyFile implements MyUtils{
 	 * File save
 	 * @param p
 	 */
+	@Deprecated
 	public void dailyjoin_file(Player p){
-		File datei = new File(this.file_player, "player.yml");
+		File datei = new File(FILE_DIRECTORY, FILE_NAME);
 		FileConfiguration cfg = YamlConfiguration.loadConfiguration(datei);
 		if(datei.exists()){
 			//datei existiert
@@ -126,8 +127,8 @@ public class DailyFile implements MyUtils{
 		cfg.options().copyDefaults(true);
 		try{
 			cfg.save(file);
-			if((!sql) || ((!MySQL.inst().hasConnection()) && reward)){
-				dailyjoin.inst().getDailyReward().setReward(p, day, totaldays, t);
+			if((!sql) || ((!TigerConnection.hasConnection()) && reward)){
+				dailyjoin.inst().getDailyReward().giveReward(p, day, totaldays, t);
 			}
 			dailyjoin.getDailyLogger().log(Level.INFO, "Save File");
 		} catch (IOException e){

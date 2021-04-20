@@ -6,129 +6,175 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
 import de.bergtiger.dailyjoin.data.MyUtils;
+import de.bergtiger.dailyjoin.lang.Lang;
 
 public class DailyReward implements MyUtils{
 	
-	private dailyjoin plugin;
-	private FileConfiguration cfg;
 	private List<String> daily;
 	private List<String> birthday;
-	private HashMap<Integer, List<String>> day			= new HashMap<Integer, List<String>>();;
-	private HashMap<Integer, List<String>> totaldays	= new HashMap<Integer, List<String>>();
+	private HashMap<Integer, List<String>> rewardsConsecutive = new HashMap<>();
+	private HashMap<Integer, List<String>> rewardsTotal	= new HashMap<>();
 	
+	private static DailyReward instance;
 	
-	public DailyReward(dailyjoin plugin){
-		this.plugin = plugin;
-		this.cfg = this.plugin.getConfig();
-		this.setData();
+	public static DailyReward inst() {
+		if(instance == null)
+			instance = new DailyReward();
+		return instance;
+	}
+	
+	private DailyReward() {
+		setData();
 	}
 	
 	private void setData(){
-		this.daily = cfg.getStringList("config.daily");
-		this.birthday = cfg.getStringList("config.birthday");
-		this.getDataDay();
-		this.getDataTotalDays();
+		this.daily = dailyjoin.inst().getConfig().getStringList("config.daily");
+		this.birthday = dailyjoin.inst().getConfig().getStringList("config.birthday");
+		this.loadDaysConsecutive();
+		this.loadDaysTotal();
 	}
 	
-	private void getDataDay(){
-		File file = new File("plugins/DailyJoin/", this.cfg.getString("config.FileDay"));
+	/**
+	 * load configuration for consecutive days rewards.
+	 */
+	private void loadDaysConsecutive(){
+		File file = new File("plugins/DailyJoin/", dailyjoin.inst().getConfig().getString("config.FileDay"));
 		if(file.exists()){
-			this.day.clear();
-			FileConfiguration cfg_day = YamlConfiguration.loadConfiguration(file);
-			Set<String> keys = null;
-			try {
-				keys = cfg_day.getKeys(false);
-			} catch (Exception e) {
-			}
-			if((keys == null) || ((keys != null) && (keys.size() == 0))){
-				System.err.println("DailyJoin: getDataDay: No Keys");
-				return;
-			} else {
-			keys.forEach(k -> {
-					this.day.put(Integer.parseInt(k), cfg_day.getStringList(k));
+			rewardsConsecutive.clear();
+			FileConfiguration cfg = YamlConfiguration.loadConfiguration(file);
+			Set<String> keys = cfg.getKeys(false);
+			if(keys != null && !keys.isEmpty()) {
+				keys.forEach(k -> {
+					try {
+						rewardsConsecutive.put(Integer.parseInt(k), cfg.getStringList(k));
+					} catch (NumberFormatException e) {
+						dailyjoin.getDailyLogger().log(Level.WARNING, String.format("loadDaysConsecutive: %s is not a valid number and will be ignored", k), e);
+					}
 				});
+			} else {
+				dailyjoin.getDailyLogger().log(Level.INFO, "loadDaysConsecutive: No Keys");
 			}
+		} else {
+			dailyjoin.getDailyLogger().log(Level.INFO, String.format("loadDaysConsecutive: No file '%s'", file.getAbsolutePath()));
 		}
 	}
 	
-	private void getDataTotalDays(){
-		File file = new File("plugins/DailyJoin/", cfg.getString("config.FileTotalDays"));
+	/**
+	 * load configuration for total days rewards.
+	 */
+	private void loadDaysTotal(){
+		File file = new File("plugins/DailyJoin/", dailyjoin.inst().getConfig().getString("config.FileTotalDays"));
 		if(file.exists()){
-			this.totaldays.clear();
-			FileConfiguration cfg_totaldays = YamlConfiguration.loadConfiguration(file);
-			Set<String> keys = null;
-			try {
-				keys = cfg_totaldays.getKeys(false);
-			} catch (Exception e) {
-			}
-			if((keys == null) || ((keys != null) && (keys.size() == 0))){
-				System.err.println("DailyJoin: getDataTotalDays: No Keys");
-				return;
-			} else {
-			keys.forEach(k -> {
-					this.totaldays.put(Integer.parseInt(k), cfg_totaldays.getStringList(k));
+			rewardsTotal.clear();
+			FileConfiguration cfg = YamlConfiguration.loadConfiguration(file);
+			Set<String> keys = cfg.getKeys(false);
+			if(keys != null && !keys.isEmpty()) {
+				keys.forEach(k -> {
+					try {
+						this.rewardsTotal.put(Integer.parseInt(k), cfg.getStringList(k));
+					} catch(NumberFormatException e) {
+						dailyjoin.getDailyLogger().log(Level.WARNING, String.format("loadDaysTotal: %s is not a valid number and will be ignored", k), e);
+					}
 				});
+			} else {
+				dailyjoin.getDailyLogger().log(Level.INFO, "loadDaysTotal: No Keys");
 			}
+		} else {
+			dailyjoin.getDailyLogger().log(Level.INFO, String.format("loadDaysTotal: No file '%s'", file.getAbsolutePath()));
 		}
 	}
 	
-	public void setReward(Player p, int day, int totaldays, Timestamp t){
-		this.setDaily(p, day);
-		this.setDay(p, day);
-		this.setTotalDays(p, totaldays);
-		this.setBirthday(p, totaldays, t);
+	/**
+	 * give Player his Rewards.
+	 * @param p Player
+	 * @param daysConsecutive
+	 * @param daysTotal
+	 * @param t
+	 */
+	public void giveReward(Player p, int daysConsecutive, int daysTotal, Timestamp t){
+		giveDaily(p, daysConsecutive);
+		giveDaysConsecutive(p, daysConsecutive);
+		giveDaysTotal(p, daysTotal);
+		giveBirthday(p, daysTotal, t);
 	}
 	
-	private void setDaily(Player p, int day){
-		if((this.daily != null) && (!this.daily.isEmpty())){
-			this.setCommand(p, this.daily);
-			p.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.Daily").replace("-day-", Integer.toString(day))));
+	/**
+	 * give daily rewards
+	 * @param p
+	 * @param day
+	 */
+	private void giveDaily(Player p, int day){
+		if((daily != null) && (!daily.isEmpty())){
+			performCmds(p, daily);
+			p.spigot().sendMessage(Lang.buildTC(Lang.RewardDaily.get().replace(Lang.VALUE, Integer.toString(day))));
+			
+//			p.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.Daily").replace("-day-", Integer.toString(day))));
 		}
 	}
 	
-	private void setDay(Player p, int day){
-		if((this.day != null) && this.day.containsKey(day)){
-			this.setCommand(p, this.day.get(day));
-			Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.SpezialDay").replace("-day-", Integer.toString(day)).replace("-player-", p.getName())));
+	/**
+	 * give rewards for consecutive days
+	 * @param p
+	 * @param day
+	 */
+	private void giveDaysConsecutive(Player p, int day){
+		if((rewardsConsecutive != null) && rewardsConsecutive.containsKey(day)){
+			performCmds(p, rewardsConsecutive.get(day));
+			Bukkit.spigot().broadcast(Lang.buildTC(Lang.RewardSpezialDay.get().replace(Lang.VALUE, Integer.toString(day)).replace(Lang.PLAYER, p.getName())));
+
+//			Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.SpezialDay").replace("-day-", Integer.toString(day)).replace("-player-", p.getName())));
 		}
 	}
 	
-	private void setTotalDays(Player p, int totaldays){
-		if((this.totaldays != null) && this.totaldays.containsKey(totaldays)){
-			this.setCommand(p, this.totaldays.get(totaldays));
-			Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.SpezialTotalDays").replace("-day-", Integer.toString(totaldays)).replace("-player-", p.getName())));
+	/**
+	 * give rewards for total days
+	 * @param p
+	 * @param totaldays
+	 */
+	private void giveDaysTotal(Player p, int totaldays){
+		if((rewardsTotal != null) && rewardsTotal.containsKey(totaldays)){
+			performCmds(p, rewardsTotal.get(totaldays));
+			Bukkit.spigot().broadcast(Lang.buildTC(Lang.RewardSpezialTotalDays.get().replace(Lang.VALUE, Integer.toString(totaldays)).replace(Lang.PLAYER, p.getName())));
+			
+//			Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.SpezialTotalDays").replace("-day-", Integer.toString(totaldays)).replace("-player-", p.getName())));
 		}
 	}
 	
-	private void setBirthday(Player p, int totaldays, Timestamp t){
-		if((this.birthday != null) && (!this.birthday.isEmpty())){
+	/**
+	 * give birthday rewards
+	 * @param p
+	 * @param totaldays
+	 * @param t
+	 */
+	private void giveBirthday(Player p, int totaldays, Timestamp t){
+		if((birthday != null) && (!birthday.isEmpty())){
 			Calendar today = Calendar.getInstance();
 			Calendar time = today;
 			time.setTimeInMillis(t.getTime());
 			if((time.get(Calendar.YEAR)!=today.get(Calendar.YEAR))&&((time.get(Calendar.DAY_OF_MONTH) == today.get(Calendar.DAY_OF_MONTH))&&(time.get(Calendar.MONTH)==today.get(Calendar.MONTH)))){
-				setCommand(p, this.birthday);
-				Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.Birthday").replace("-day-", Integer.toString(totaldays)).replace("-player-", p.getName())));
+				performCmds(p, this.birthday);
+				Bukkit.spigot().broadcast(Lang.buildTC(Lang.RewardBirthday.get().replace(Lang.VALUE, Integer.toString(totaldays)).replace(Lang.PLAYER, p.getName())));
+				
+//				Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.Birthday").replace("-day-", Integer.toString(totaldays)).replace("-player-", p.getName())));
 			}
 		}
 	}
 	
-	private void setCommand(Player p, List<String> list){
+	private void performCmds(Player p, List<String> list){
 		for(int i = 0; i < list.size(); i++){
 			Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), list.get(i).replace("-player-", p.getName()));
 		}
 	}
 	
 	public void reload(){
-		this.plugin.reloadConfig();
-		this.cfg = this.plugin.getConfig();
-		this.setData();
+		setData();
 	}
 }

@@ -1,4 +1,4 @@
-package de.bergtiger.dailyjoin.data;
+package de.bergtiger.dailyjoin.dao;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -11,8 +11,9 @@ import org.bukkit.configuration.file.FileConfiguration;
 
 import de.bergtiger.dailyjoin.DailyFileToSQL;
 import de.bergtiger.dailyjoin.dailyjoin;
+import de.bergtiger.dailyjoin.dao.impl.sql.playerDAOImplSQL;
 
-public class MySQL {
+public class TigerConnection {
 	private String host;
 	private int port;
 	private String user;
@@ -24,15 +25,15 @@ public class MySQL {
 	private FileConfiguration cfg;
 	private int thread = -1;
 	
-	private static MySQL instance;
+	private static TigerConnection instance;
 	
-	public static MySQL inst() {
+	public static TigerConnection inst() {
 		if(instance == null)
-			instance = new MySQL();
+			instance = new TigerConnection();
 		return instance;
 	}
 	
-	private MySQL(){
+	private TigerConnection(){
 		this.cfg = dailyjoin.inst().getConfig();
 		
 		if(this.cfg.getString("config.SQL").equalsIgnoreCase("true")){
@@ -194,6 +195,10 @@ public class MySQL {
 		} finally {
 			conn = null;
 		}
+	}
+	
+	public playerDAO getPlayerDAO() {
+		return new playerDAOImplSQL();
 	}
 	
 	@Deprecated

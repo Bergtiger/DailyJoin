@@ -10,20 +10,26 @@ import net.md_5.bungee.api.chat.hover.content.Text;
 
 public enum Lang implements Constants {
 
-	NoPermission(""),
+	NoPermission("&cNo Permission"),
 	NoNumber("No such number (" + VALUE + ")"),
-	WrongArgument(""),
+	NoPlayer("&7No such player could be found"),
+	WrongArgument("&7Wrong Argument. Please Check your Command."),
 	
-	DailyInfo(""),
-	DailyInfoTop(""),
-	DailyInfoSet(""),
-	DailyInfoAdd(""),
-	DailyInfoInfo(""),
-	DailyInfoReload(""),
-	DailyInfoPlayer(""),
-	DailyInfoConfig(""),
+	RewardDaily("&7Du hast dich bereits den &e-day-&7. Tag in Folge eingeloggt."),
+	RewardBirthday("&e" + PLAYER + " &7hat heute seinen Server-Geburtstag."),
+	RewardSpezialDay("&e" + PLAYER + " &7ist bereits &e" + VALUE + " &7Tage in Folge auf dem Server."),
+	RewardSpezialTotalDays("&e" + PLAYER + " &7ist bereits insgesamt &e" + VALUE + " &7Tage auf dem Server."),
 	
-	DailyAdd("");
+	DailyInfo("&b/daily  -  &7zeigt alle gültigen Befehle"),
+	DailyInfoTop("&b/daily top [day, totaldays] [value] -  &7zeigt top Liste"),
+	DailyInfoSet("&b/daily set [player, uuid] [day, totaldays] [value]  -  &7Setzt dem Spieler day/totaldays value"),
+	DailyInfoAdd("&b/daily add [player, uuid] [day, totaldays] [value]  -  &7Addiert dem Spieler day/totaldays value"),
+	DailyInfoInfo("&b/daily info  -  &7zeigt Plugin version"),
+	DailyInfoReload("&b/daily reload  -  &7lädt config neu"),
+	DailyInfoPlayer("&b/daily player [player, uuid]  -  &7zeigt die Daten des Spielers"),
+	DailyInfoConfig("&b/daily config [ma/system/reward/oldfiles/delay] [true/false/in case of delay number]  -  &7ändert die config"),
+	
+	DailyAdd("&7/daily add [player/uuid] [day, totaldays] [value]");
 	
 	private String message;
 	

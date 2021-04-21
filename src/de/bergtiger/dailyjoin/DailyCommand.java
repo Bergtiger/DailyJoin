@@ -2,7 +2,6 @@ package de.bergtiger.dailyjoin;
 
 import java.io.File;
 import java.io.IOException;
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -12,7 +11,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -50,7 +48,11 @@ public class DailyCommand implements CommandExecutor, MyUtils{
 		}
 		return true;
 	}
-	
+
+	/**
+	 * show daily commands.
+	 * @param cs CommandSender
+	 */
 	private void daily_command(CommandSender cs){
 		if(cs.hasPermission(p_admin) || cs.hasPermission(p_cmd)){
 			cs.spigot().sendMessage(Lang.buildTC(Lang.DailyInfo.get()));
@@ -60,16 +62,6 @@ public class DailyCommand implements CommandExecutor, MyUtils{
 			cs.spigot().sendMessage(Lang.buildTC(Lang.DailyInfoInfo.get(), null, null, CMD + " " + INFO));
 			cs.spigot().sendMessage(Lang.buildTC(Lang.DailyInfoReload.get(), CMD + " " + RELOAD, null, null));
 			cs.spigot().sendMessage(Lang.buildTC(Lang.DailyInfoPlayer.get(), null, null, CMD + " " + PLAYER));
-//			} else {
-//				cs.sendMessage(Lang.DailyInfo.colored());
-//				cs.sendMessage(Lang.DailyInfoTop.colored());
-//				cs.sendMessage(Lang.DailyInfoSet.colored());
-//				cs.sendMessage(Lang.DailyInfoAdd.colored());
-//				cs.sendMessage(Lang.DailyInfoInfo.colored());
-//				cs.sendMessage(Lang.DailyInfoReload.colored());
-//				cs.sendMessage(Lang.DailyInfoPlayer.colored());
-////				cs.sendMessage(Lang.DailyInfoConfig.colored());
-//			}
 		} else {
 			cs.sendMessage(Lang.NoPermission.colored());
 		}
@@ -139,25 +131,29 @@ public class DailyCommand implements CommandExecutor, MyUtils{
 				status = addPlayerData_file(cs, p_uuid, data, value);
 			}
 			if(status){
-				cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.DailyAddData").replace("-player-", p_uuid).replace("-data-", data).replace("-value-", Integer.toString(value))));
+				cs.spigot().sendMessage(Lang.buildTC(Lang.DailyAddData.get().replace(Lang.PLAYER, p_uuid).replace(Lang.VALUE, data).replace(Lang.VALUE, Integer.toString(value))));
+//				cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.DailyAddData").replace("-player-", p_uuid).replace("-data-", data).replace("-value-", Integer.toString(value))));
 			}
 		} else {
-			cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.NoUUID")));
+			cs.spigot().sendMessage(Lang.buildTC(Lang.NoUUid.get()));
+//			cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.NoUUID")));
 		}
 	}
 	
 	private boolean addPlayerData_file(CommandSender cs, String p_uuid, String data, int value){
-		File datei = new File(file_player, "player.yml");
+//		File datei = new File(file_player, "player.yml");
+		File datei = new File(DailyFile.FILE_DIRECTORY, DailyFile.FILE_NAME);
 		if(datei.exists()){
 			FileConfiguration cfg_p = YamlConfiguration.loadConfiguration(datei);
 			Set<String> keys = null;
 			try {
-				keys = cfg.getConfigurationSection("player").getKeys(false);
+				keys = cfg_p.getConfigurationSection("player").getKeys(false);
 			} catch (Exception e) {
 			}
 			if((keys == null) || ((keys != null) && (keys.size() == 0))){
 				//keys sind leer
-				cs.sendMessage(ChatColor.translateAlternateColorCodes('&', this.cfg.getString("lang.NoPlayer")));
+//				cs.sendMessage(ChatColor.translateAlternateColorCodes('&', this.cfg.getString("lang.NoPlayer")));
+				cs.spigot().sendMessage(Lang.buildTC(Lang.NoPlayer.get()));
 			} else {
 				//suche in keys
 				if(p_uuid.length() <= 16){
@@ -167,7 +163,8 @@ public class DailyCommand implements CommandExecutor, MyUtils{
 							try{
 								cfg_p.save(datei);
 								System.out.println("Save File");
-								cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.DailyAddData").replace("-player-", p_uuid).replace("-data-", data).replace("-value-", Integer.toString(value))));
+//								cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.DailyAddData").replace("-player-", p_uuid).replace("-data-", data).replace("-value-", Integer.toString(value))));
+								cs.spigot().sendMessage(Lang.buildTC(Lang.DailyAddData.get().replace(Lang.PLAYER, p_uuid).replace(Lang.DATA, data).replace(Lang.VALUE, Integer.toString(value))));
 								return;
 							} catch (IOException e){
 								System.out.println("Error on save file");
@@ -185,12 +182,14 @@ public class DailyCommand implements CommandExecutor, MyUtils{
 							System.out.println("Error on save file");
 						}						
 					} else {
-						cs.sendMessage(ChatColor.translateAlternateColorCodes('&', this.cfg.getString("lang.NoPlayer")));
+//						cs.sendMessage(ChatColor.translateAlternateColorCodes('&', this.cfg.getString("lang.NoPlayer")));
+						cs.spigot().sendMessage(Lang.buildTC(Lang.NoPlayer.get()));
 					}
 				}
 			}
 		} else {
-			cs.sendMessage(ChatColor.translateAlternateColorCodes('&', this.cfg.getString("lang.NoFile")));
+//			cs.sendMessage(ChatColor.translateAlternateColorCodes('&', this.cfg.getString("lang.NoFile")));
+			cs.spigot().sendMessage(Lang.buildTC(Lang.NoFile.get()));
 		}
 		return false;
 	}
@@ -208,10 +207,12 @@ public class DailyCommand implements CommandExecutor, MyUtils{
 					rs.first();
 					return setPlayerData_SQL(cs, p_uuid, data, (value + rs.getInt(data)));
 				} else {
-					cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.NoPlayer")));
+//					cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.NoPlayer")));
+					cs.spigot().sendMessage(Lang.buildTC(Lang.NoPlayer.get()));
 				}
 			} catch (SQLException error) {
-				cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.NoConnection")));
+//				cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.NoConnection")));
+				cs.spigot().sendMessage(Lang.buildTC(Lang.NoConnection.get()));
 			} finally {
 				TigerConnection.closeRessources(rs, st);
 			}
@@ -229,41 +230,46 @@ public class DailyCommand implements CommandExecutor, MyUtils{
 					// TODO Wrong number
 				}
 			} else {
-				cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.DailySet")));
+//				cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.DailySet")));
+				cs.spigot().sendMessage(Lang.buildTC(Lang.DailySet.get()));
 			}
 		} else {
-			cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.NoPermission")));
+//			cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.NoPermission")));
+			cs.spigot().sendMessage(Lang.buildTC(Lang.NoPermission.get()));
 		}
 	}
 	
 	private void setPlayerData(CommandSender cs, String p_uuid, String data, int value){
 		if(p_uuid != null){
 			boolean status = false;
-			if(cfg.getString("config.SQL").equalsIgnoreCase("true")&&TigerConnection.hasConnection()){
+			if(dailyjoin.inst().getConfig().getString("config.SQL").equalsIgnoreCase("true") && TigerConnection.hasConnection()){
 				status = setPlayerData_SQL(cs, p_uuid, data, value);
 			} else {
 				status = setPlayerData_file(cs, p_uuid, data, value);
 			}
 			if(status){
-				cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.DailySetData").replace("-player-", p_uuid).replace("-data-", data).replace("-value-", Integer.toString(value))));
+//				cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.DailySetData").replace("-player-", p_uuid).replace("-data-", data).replace("-value-", Integer.toString(value))));
+				cs.spigot().sendMessage(Lang.buildTC(Lang.DailySetData.get().replace(Lang.PLAYER, p_uuid).replace(Lang.DATA, data).replace(Lang.VALUE, Integer.toString(value))));
 			}
 		} else {
-			cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.NoUUID")));
+//			cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.NoUUID")));
+			cs.spigot().sendMessage(Lang.buildTC(Lang.NoUUid.get()));
 		}
 	}
 	
 	private boolean setPlayerData_file(CommandSender cs, String p_uuid, String data, int value){
-		File datei = new File(file_player, "player.yml");
+		File datei = new File(DailyFile.FILE_DIRECTORY, DailyFile.FILE_NAME);
 		if(datei.exists()){
 			FileConfiguration cfg_p = YamlConfiguration.loadConfiguration(datei);
 			Set<String> keys = null;
 			try {
-				keys = cfg.getConfigurationSection("player").getKeys(false);
+				keys = cfg_p.getConfigurationSection("player").getKeys(false);
 			} catch (Exception e) {
 			}
 			if((keys == null) || ((keys != null) && (keys.size() == 0))){
 				//keys sind leer
-				cs.sendMessage(ChatColor.translateAlternateColorCodes('&', this.cfg.getString("lang.NoPlayer")));
+//				cs.sendMessage(ChatColor.translateAlternateColorCodes('&', this.cfg.getString("lang.NoPlayer")));
+				cs.spigot().sendMessage(Lang.buildTC(Lang.NoPlayer.get()));
 			} else {
 				//suche in keys
 				if(p_uuid.length() <= 16){
@@ -273,7 +279,8 @@ public class DailyCommand implements CommandExecutor, MyUtils{
 							try{
 								cfg_p.save(datei);
 								System.out.println("Save File");
-								cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.DailyAddData").replace("-player-", p_uuid).replace("-data-", data).replace("-value-", Integer.toString(value))));
+//								cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.DailyAddData").replace("-player-", p_uuid).replace("-data-", data).replace("-value-", Integer.toString(value))));
+								cs.spigot().sendMessage(Lang.buildTC(Lang.DailyAddData.get().replace(Lang.PLAYER, p_uuid).replace(Lang.DATA, data).replace(Lang.VALUE, Integer.toString(value))));
 								return;
 							} catch (IOException e){
 								System.out.println("Error on save file");
@@ -291,12 +298,14 @@ public class DailyCommand implements CommandExecutor, MyUtils{
 							System.out.println("Error on save file");
 						}						
 					} else {
-						cs.sendMessage(ChatColor.translateAlternateColorCodes('&', this.cfg.getString("lang.NoPlayer")));
+//						cs.sendMessage(ChatColor.translateAlternateColorCodes('&', this.cfg.getString("lang.NoPlayer")));
+						cs.spigot().sendMessage(Lang.buildTC(Lang.NoPlayer.get()));
 					}
 				}
 			}
 		} else {
-			cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.NoFile")));
+//			cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.NoFile")));
+			cs.spigot().sendMessage(Lang.buildTC(Lang.NoFile.get()));
 		}
 		return false;
 	}
@@ -312,7 +321,8 @@ public class DailyCommand implements CommandExecutor, MyUtils{
 		} else if((args.length == 2) && ((args[1].equalsIgnoreCase(cs.getName()) && cs.hasPermission(p_user)) || cs.hasPermission(p_admin) || cs.hasPermission(p_player))){		
 			getPlayerInfo(cs, change_to_uuid(cs, args[1]));
 		} else {
-			cs.sendMessage(ChatColor.translateAlternateColorCodes('&', this.cfg.getString("lang.NoPermission")));
+//			cs.sendMessage(ChatColor.translateAlternateColorCodes('&', this.cfg.getString("lang.NoPermission")));
+			cs.spigot().sendMessage(Lang.buildTC(Lang.NoPermission.get()));
 		}
 	}
 	
@@ -320,18 +330,17 @@ public class DailyCommand implements CommandExecutor, MyUtils{
 		if(p_name.length() > 16){			
 			return p_name;
 		} else {
-			for(Player p : Bukkit.getOnlinePlayers()){
-				if(p.getName().equalsIgnoreCase(p_name)){
+			for (Player p : Bukkit.getOnlinePlayers()) {
+				if (p.getName().equalsIgnoreCase(p_name)) {
 					return p.getUniqueId().toString();
 				}
 			}
-			
 		}
-		return new DailyUUid(this.plugin, this.cfg, file_player).getUUID(cs, p_name);
+		return new DailyUUid().getUUID(cs, p_name);
 	}
 	
 	private void getPlayerInfo(CommandSender cs, String p_uuid){
-		if(cfg.getString("config.SQL").equalsIgnoreCase("true") && TigerConnection.hasConnection()){
+		if(dailyjoin.inst().getConfig().getString("config.SQL").equalsIgnoreCase("true") && TigerConnection.hasConnection()){
 			getPlayerInfo_SQL(cs, p_uuid);
 		} else {
 			getPlayerInfo_file(cs, p_uuid);
@@ -339,33 +348,41 @@ public class DailyCommand implements CommandExecutor, MyUtils{
 	}
 	
 	private void getPlayerInfo_file(CommandSender cs, String p_uuid){
-		File datei = new File(file_player, "player.yml");
+		File datei = new File(DailyFile.FILE_DIRECTORY, DailyFile.FILE_NAME);
 		if(datei.exists()){
 			FileConfiguration cfg_p = YamlConfiguration.loadConfiguration(datei);
 			Set<String> keys = null;
 			try {
-				keys = cfg.getConfigurationSection("player").getKeys(false);
+				keys = cfg_p.getConfigurationSection("player").getKeys(false);
 			} catch (Exception e) {
 			}
 			if((keys == null) || ((keys != null) && (keys.size() == 0))){
 				//keys sind leer
-				cs.sendMessage(ChatColor.translateAlternateColorCodes('&', this.cfg.getString("lang.NoPlayer")));
+//				cs.sendMessage(ChatColor.translateAlternateColorCodes('&', this.cfg.getString("lang.NoPlayer")));
+				cs.spigot().sendMessage(Lang.buildTC(Lang.NoPlayer.get()));
 			} else {
 				//suche in keys
 				if(keys.contains(p_uuid)){
 					String path = "player." + p_uuid + ".";
 					
-					cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.PlayerUmrandungOben").replace("-player-", cfg_p.getString(path + "name"))));				
+//					cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.PlayerUmrandungOben").replace("-player-", cfg_p.getString(path + "name"))));
+					cs.spigot().sendMessage(Lang.buildTC(Lang.PlayerHeader.get().replace(Lang.PLAYER, cfg_p.getString(path + "name"))));
 					Calendar calendar = Calendar.getInstance();				
 					calendar.setTime(new Timestamp(cfg_p.getLong(path + "firstjoin")));
-					cs.sendMessage(ChatColor.translateAlternateColorCodes('&', TimeToString(calendar, cfg.getString("lang.PlayerFirstJoin"))));
+//					cs.sendMessage(ChatColor.translateAlternateColorCodes('&', TimeToString(calendar, cfg.getString("lang.PlayerFirstJoin"))));
+					cs.spigot().sendMessage(Lang.buildTC(TimeToString(calendar, Lang.PlayerFirstJoin.get())));
 					calendar.setTime(new Timestamp(cfg_p.getLong(path + "lastjoin")));
-					cs.sendMessage(ChatColor.translateAlternateColorCodes('&', TimeToString(calendar, cfg.getString("lang.PlayerLastJoin"))));
-					cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.PlayerDay").replace("-day-", Integer.toString(cfg_p.getInt(path + "day")))));
-					cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.PlayerTotalDays").replace("-day-", Integer.toString(cfg_p.getInt(path + "totaldays")))));
-					cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.PlayerUmrandungUnten")));
+//					cs.sendMessage(ChatColor.translateAlternateColorCodes('&', TimeToString(calendar, cfg.getString("lang.PlayerLastJoin"))));
+					cs.spigot().sendMessage(Lang.buildTC(TimeToString(calendar, Lang.PlayerLastJoin.get())));
+//					cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.PlayerDay").replace("-day-", Integer.toString(cfg_p.getInt(path + "day")))));
+					cs.spigot().sendMessage(Lang.buildTC(Lang.PlayerDay.get().replace(Lang.VALUE, Integer.toString(cfg_p.getInt(path + "day")))));
+//					cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.PlayerTotalDays").replace("-day-", Integer.toString(cfg_p.getInt(path + "totaldays")))));
+					cs.spigot().sendMessage(Lang.buildTC(Lang.PlayerTotalDays.get().replace(Lang.VALUE, Integer.toString(cfg_p.getInt(path + "totaldays")))));
+//					cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.PlayerUmrandungUnten")));
+					cs.spigot().sendMessage(Lang.buildTC(Lang.PlayerFooter.get()));
 				} else {
-					cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.NoPlayer")));
+//					cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.NoPlayer")));
+					cs.spigot().sendMessage(Lang.buildTC(Lang.NoPlayer.get()));
 				}
 			}
 			
@@ -386,7 +403,8 @@ public class DailyCommand implements CommandExecutor, MyUtils{
 //				cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.NoPlayer")));
 //			}
 		} else {
-			cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.NoFile")));
+//			cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.NoFile")));
+			cs.spigot().sendMessage(Lang.buildTC(Lang.NoFile.get()));
 		}
 	}
 	
@@ -401,25 +419,34 @@ public class DailyCommand implements CommandExecutor, MyUtils{
 					rs = st.executeQuery();
 					rs.last();
 					if(rs.getRow() != 0) {
-						cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.PlayerUmrandungOben").replace("-player-", rs.getString("name"))));				
+//						cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.PlayerUmrandungOben").replace("-player-", rs.getString("name"))));
+						cs.spigot().sendMessage(Lang.buildTC(Lang.PlayerHeader.get().replace(Lang.PLAYER, rs.getString("name"))));
 						Calendar calendar = Calendar.getInstance();				
 						calendar.setTime(rs.getTimestamp("firstjoin"));
-						cs.sendMessage(ChatColor.translateAlternateColorCodes('&', TimeToString(calendar, cfg.getString("lang.PlayerFirstJoin"))));
+//						cs.sendMessage(ChatColor.translateAlternateColorCodes('&', TimeToString(calendar, cfg.getString("lang.PlayerFirstJoin"))));
+						cs.spigot().sendMessage(Lang.buildTC(TimeToString(calendar, Lang.PlayerFirstJoin.get())));
 						calendar.setTime(rs.getTimestamp("lastjoin"));
-						cs.sendMessage(ChatColor.translateAlternateColorCodes('&', TimeToString(calendar, cfg.getString("lang.PlayerLastJoin"))));
-						cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.PlayerDay").replace("-day-", Integer.toString(rs.getInt("day")))));
-						cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.PlayerTotalDays").replace("-day-", Integer.toString(rs.getInt("totaldays")))));
-						cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.PlayerUmrandungUnten")));
+//						cs.sendMessage(ChatColor.translateAlternateColorCodes('&', TimeToString(calendar, cfg.getString("lang.PlayerLastJoin"))));
+						cs.spigot().sendMessage(Lang.buildTC(TimeToString(calendar, Lang.PlayerLastJoin.get())));
+//						cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.PlayerDay").replace("-day-", Integer.toString(rs.getInt("day")))));
+						cs.spigot().sendMessage(Lang.buildTC(Lang.PlayerDay.get().replace(Lang.VALUE, Integer.toString(rs.getInt("day")))));
+//						cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.PlayerTotalDays").replace("-day-", Integer.toString(rs.getInt("totaldays")))));
+						cs.spigot().sendMessage(Lang.buildTC(Lang.PlayerTotalDays.get().replace(Lang.VALUE, Integer.toString(rs.getInt("totaldays")))));
+//						cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.PlayerUmrandungUnten")));
+						cs.spigot().sendMessage(Lang.buildTC(Lang.PlayerFooter.get()));
 					} else {
-						cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.NoPlayer")));
+//						cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.NoPlayer")));
+						cs.spigot().sendMessage(Lang.buildTC(Lang.NoPlayer.get()));
 					}
 				} catch (SQLException error) {
-					cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.NoConnection")));
+//					cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.NoConnection")));
+					cs.spigot().sendMessage(Lang.buildTC(Lang.NoConnection.get()));
 				} finally {
 					TigerConnection.closeRessources(rs, st);
 				}
 			} else {
-				cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.NoUUID")));
+//				cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.NoUUID")));
+				cs.spigot().sendMessage(Lang.buildTC(Lang.NoUUid.get()));
 			}
 		}
 	}
@@ -428,7 +455,7 @@ public class DailyCommand implements CommandExecutor, MyUtils{
 		String[] month = {"Jan","Feb","Mar","Apr","Mai","Jun","Jul","Aug","Sep","Oct","Nov","Dec"};
 		String buf;
 		text = text.replace("Year", Integer.toString(calendar.get(Calendar.YEAR)));
-		if(cfg.get("config.MonatsAnzeige").equals("true")){
+		if(dailyjoin.inst().getConfig().get("config.MonatsAnzeige").equals("true")){
 			buf = month[calendar.get(Calendar.MONTH)];
 		} else {
 			buf = Integer.toString(calendar.get(Calendar.MONTH) + 1);
@@ -458,43 +485,56 @@ public class DailyCommand implements CommandExecutor, MyUtils{
 	private void daily_info(CommandSender cs){
 		if(cs.hasPermission("dailyjoin.info")||cs.hasPermission("dailyjoin.admin")){
 			//plugin info
-			cs.sendMessage(ChatColor.translateAlternateColorCodes('&', this.cfg.getString("lang.PluginUmrandungOben")));
-			cs.sendMessage(ChatColor.translateAlternateColorCodes('&', this.cfg.getString("lang.PluginVersion").replace("-version-", dailyjoin.inst().getDescription().getVersion())));
-			
+//			cs.sendMessage(ChatColor.translateAlternateColorCodes('&', this.cfg.getString("lang.PluginUmrandungOben")));
+			cs.spigot().sendMessage(Lang.buildTC(Lang.PluginHeader.get()));
+//			cs.sendMessage(ChatColor.translateAlternateColorCodes('&', this.cfg.getString("lang.PluginVersion").replace("-version-", dailyjoin.inst().getDescription().getVersion())));
+			cs.spigot().sendMessage(Lang.buildTC(Lang.PluginVersion.get().replace(Lang.VALUE, dailyjoin.inst().getDescription().getVersion())));
 			//config
-			cs.sendMessage(ChatColor.translateAlternateColorCodes('&', this.cfg.getString("lang.PluginMonatsAnzeige").replace("-status-", cfg.getString("config.MonatsAnzeige"))));
-			if(this.cfg.getString("config.SQL").equalsIgnoreCase("true")){
-				cs.sendMessage(ChatColor.translateAlternateColorCodes('&', this.cfg.getString("lang.PluginSystem").replace("-status-", "SQL")));
-				cs.sendMessage(ChatColor.translateAlternateColorCodes('&', this.cfg.getString("lang.PluginRewardReconnection").replace("-status-", cfg.getString("config.GetRewardOnSQLConnectionLost"))));
+//			cs.sendMessage(ChatColor.translateAlternateColorCodes('&', this.cfg.getString("lang.PluginMonatsAnzeige").replace("-status-", cfg.getString("config.MonatsAnzeige"))));
+			cs.spigot().sendMessage(Lang.buildTC(Lang.PluginMonatsAnzeige.get().replace(Lang.VALUE, dailyjoin.inst().getConfig().getString("config.MonatsAnzeige"))));
+			if(dailyjoin.inst().getConfig().getString("config.SQL").equalsIgnoreCase("true")){
+//				cs.sendMessage(ChatColor.translateAlternateColorCodes('&', this.cfg.getString("lang.PluginSystem").replace("-status-", "SQL")));
+				cs.spigot().sendMessage(Lang.buildTC(Lang.PluginSystem.get().replace(Lang.VALUE, "SQL")));
+//				cs.sendMessage(ChatColor.translateAlternateColorCodes('&', this.cfg.getString("lang.PluginRewardReconnection").replace("-status-", cfg.getString("config.GetRewardOnSQLConnectionLost"))));
+				cs.spigot().sendMessage(Lang.buildTC(Lang.PluginRewardReconnection.get().replace(Lang.VALUE, dailyjoin.inst().getConfig().getString("config.GetRewardOnSQLConnectionLost"))));
 			} else {
-				cs.sendMessage(ChatColor.translateAlternateColorCodes('&', this.cfg.getString("lang.PluginSystem").replace("-status-", "File")));
+//				cs.sendMessage(ChatColor.translateAlternateColorCodes('&', this.cfg.getString("lang.PluginSystem").replace("-status-", "File")));
+				cs.spigot().sendMessage(Lang.buildTC(Lang.PluginSystem.get().replace(Lang.VALUE, "File")));
 			}
 		//	cs.sendMessage(ChatColor.translateAlternateColorCodes('&', this.cfg.getString("lang.PluginGetOldFiles").replace("-status-", cfg.getString("config.GetOldFiles"))));
-			cs.sendMessage(ChatColor.translateAlternateColorCodes('&', this.cfg.getString("lang.PluginDelay").replace("-delay-", Integer.toString(cfg.getInt("config.delay")))));
-			cs.sendMessage(ChatColor.translateAlternateColorCodes('&', this.cfg.getString("lang.PluginTopPlayer").replace("-amount-", Integer.toString(cfg.getInt("config.TopPlayer")))));
+//			cs.sendMessage(ChatColor.translateAlternateColorCodes('&', this.cfg.getString("lang.PluginDelay").replace("-delay-", Integer.toString(cfg.getInt("config.delay")))));
+			cs.spigot().sendMessage(Lang.buildTC(Lang.PluginDelay.get().replace(Lang.VALUE, Integer.toString(dailyjoin.inst().getConfig().getInt("config.delay")))));
+//			cs.sendMessage(ChatColor.translateAlternateColorCodes('&', this.cfg.getString("lang.PluginTopPlayer").replace("-amount-", Integer.toString(cfg.getInt("config.TopPlayer")))));
+			cs.spigot().sendMessage(Lang.buildTC(Lang.PluginTopPlayer.get().replace(Lang.VALUE, Integer.toString(dailyjoin.inst().getConfig().getInt("config.TopPlayer")))));
 			
 			
-			cs.sendMessage(ChatColor.translateAlternateColorCodes('&', this.cfg.getString("lang.PluginUmrandungUnten")));
+//			cs.sendMessage(ChatColor.translateAlternateColorCodes('&', this.cfg.getString("lang.PluginUmrandungUnten")));
+			cs.spigot().sendMessage(Lang.buildTC(Lang.PluginFooter.get()));
 		} else {
-			cs.sendMessage(ChatColor.translateAlternateColorCodes('&', this.cfg.getString("lang.NoPermission")));
+//			cs.sendMessage(ChatColor.translateAlternateColorCodes('&', this.cfg.getString("lang.NoPermission")));
+			cs.spigot().sendMessage(Lang.buildTC(Lang.NoPermission.get()));
 		}
 	}
 	
 	private void daily_reload(CommandSender cs){
 		if(cs.hasPermission(p_admin) || cs.hasPermission(p_reload)){
 			dailyjoin.inst().reload();
-			cs.sendMessage(ChatColor.translateAlternateColorCodes('&', this.cfg.getString("lang.DailyReload")));
+//			cs.sendMessage(ChatColor.translateAlternateColorCodes('&', this.cfg.getString("lang.DailyReload")));
+			cs.spigot().sendMessage(Lang.buildTC(Lang.DailyReload.get()));
 		} else {
-			cs.sendMessage(ChatColor.translateAlternateColorCodes('&', this.cfg.getString("lang.NoPermission")));
+//			cs.sendMessage(ChatColor.translateAlternateColorCodes('&', this.cfg.getString("lang.NoPermission")));
+			cs.spigot().sendMessage(Lang.buildTC(Lang.NoPermission.get()));
 		}
 	}
 	
 	private void daily_top(CommandSender cs, String[]args){
 		if(cs.hasPermission("dailyjoin.top")||cs.hasPermission("dailyjoin.admin")){
 			if((args.length < 2)||(args.length > 3)){
-				cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.WrongArgument")));
+//				cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.WrongArgument")));
+				cs.spigot().sendMessage(Lang.buildTC(Lang.WrongArgument.get()));
 			} else {
-				int count = cfg.getInt("config.TopPlayer");
+//				int count = cfg.getInt("config.TopPlayer");
+				int count = dailyjoin.inst().getConfig().getInt("config.TopPlayer");
 				if(args.length == 3){
 					try {
 						count = Integer.parseInt(args[2]);
@@ -502,35 +542,39 @@ public class DailyCommand implements CommandExecutor, MyUtils{
 						//musst be a number
 					}
 				}
-				if(cfg.getString("config.SQL").equalsIgnoreCase("true") && this.plugin.getMySQL().hasConnection()){
+				if(dailyjoin.inst().getConfig().getString("config.SQL").equalsIgnoreCase("true") && TigerConnection.hasConnection()){
 					switch (args[1]) {
 						case "day": top_player_sql_day(cs, count);break;
 						case "totaldays": top_player_sql_totaldays(cs, count);break;
 						
-						default: cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.WrongArgument")));
+//						default: cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.WrongArgument")));
+						default: cs.spigot().sendMessage(Lang.buildTC(Lang.WrongArgument.get()));
 					}
 				} else {
-					cs.sendMessage(ChatColor.translateAlternateColorCodes('&', this.cfg.getString("lang.OnlySQL")));
+//					cs.sendMessage(ChatColor.translateAlternateColorCodes('&', this.cfg.getString("lang.OnlySQL")));
+					cs.spigot().sendMessage(Lang.buildTC(Lang.OnlySQL.get()));
 					//file
 					this.top_player_file(cs, count, args[1]);
 				}
 			}
 		} else {
-			cs.sendMessage(ChatColor.translateAlternateColorCodes('&', this.cfg.getString("lang.NoPermission")));
+//			cs.sendMessage(ChatColor.translateAlternateColorCodes('&', this.cfg.getString("lang.NoPermission")));
+			cs.spigot().sendMessage(Lang.buildTC(Lang.NoPermission.get()));
 		}
 	}
 	
 	private void top_player_file(CommandSender cs, int count, String value){
 		System.out.println("test 1");
-		File datei = new File(file_player, "player.yml");
+		File datei = new File(DailyFile.FILE_DIRECTORY, DailyFile.FILE_NAME);
 		if(datei.exists()){
 			FileConfiguration cfg_p = YamlConfiguration.loadConfiguration(datei);
 			List<String> list = cfg_p.getStringList("uuids");
 			for(int i = 0; i < list.size(); i++){
-				
+				// TODO
 			}
 		} else {
-			cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.NoFile")));
+//			cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.NoFile")));
+			cs.spigot().sendMessage(Lang.buildTC(Lang.NoFile.get()));
 		}
 	}
 	
@@ -545,16 +589,20 @@ public class DailyCommand implements CommandExecutor, MyUtils{
 				rs.last();
 				if(rs.getRow() != 0) {
 					rs.first();
-					cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.TopPlayerDay")));
+//					cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.TopPlayerDay")));
+					cs.spigot().sendMessage(Lang.buildTC(Lang.TopPlayerDay.get()));
 					while(!rs.isAfterLast()){
-						cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.TopPlayerList").replace("-days-", rs.getString("day")).replace("-player-", rs.getString("name"))));
+//						cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.TopPlayerList").replace("-days-", rs.getString("day")).replace("-player-", rs.getString("name"))));
+						cs.spigot().sendMessage(Lang.buildTC(Lang.TopPlayerList.get().replace(Lang.VALUE, rs.getString("day")).replace(Lang.PLAYER, rs.getString("name"))));
 						rs.next();
 					}
 				} else {
-					cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.NoPlayer")));
+//					cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.NoPlayer")));
+					cs.spigot().sendMessage(Lang.buildTC(Lang.NoPlayer.get()));
 				}
 			} catch (SQLException error) {
-				cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.NoConnection")));
+//				cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.NoConnection")));
+				cs.spigot().sendMessage(Lang.buildTC(Lang.NoConnection.get()));
 			} finally {
 				TigerConnection.closeRessources(rs, st);
 			}
@@ -572,18 +620,22 @@ public class DailyCommand implements CommandExecutor, MyUtils{
 				rs.last();
 				if(rs.getRow() != 0) {
 					rs.first();
-					cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.TopPlayerTotalDays")));
+//					cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.TopPlayerTotalDays")));
+					cs.spigot().sendMessage(Lang.buildTC(Lang.TopPlayerTotalDays.get()));
 					while(!rs.isAfterLast()){
-						cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.TopPlayerList").replace("-days-", rs.getString("totaldays")).replace("-player-", rs.getString("name"))));
+//						cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.TopPlayerList").replace("-days-", rs.getString("totaldays")).replace("-player-", rs.getString("name"))));
+						cs.spigot().sendMessage(Lang.buildTC(Lang.TopPlayerList.get().replace(Lang.VALUE, rs.getString("totaldays")).replace(Lang.PLAYER, rs.getString("name"))));
 						rs.next();
 					}
 				} else {
-					cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.NoPlayer")));
+//					cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.NoPlayer")));
+					cs.spigot().sendMessage(Lang.buildTC(Lang.NoPlayer.get()));
 				}
 			} catch (SQLException error) {
-				cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.NoConnection")));
+//				cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.NoConnection")));
+				cs.spigot().sendMessage(Lang.buildTC(Lang.NoConnection.get()));
 			} finally {
-				sql.closeRessources(rs, st);
+				TigerConnection.closeRessources(rs, st);
 			}
 		}
 	}

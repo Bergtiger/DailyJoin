@@ -12,6 +12,7 @@ import de.bergtiger.dailyjoin.dao.TigerConnection;
 import de.bergtiger.dailyjoin.dao.playerDAO;
 import de.bergtiger.dailyjoin.exception.NoSQLConnectionException;
 import de.bergtiger.dailyjoin.exception.UpdatePlayerException;
+import static de.bergtiger.dailyjoin.dao.DailyDataBase.*;
 
 public class playerDAOImplSQL implements playerDAO {
 
@@ -30,11 +31,17 @@ public class playerDAOImplSQL implements playerDAO {
 				ResultSet rs = null;
 				PreparedStatement st = null;
 				try {
-					st = TigerConnection.conn().prepareStatement("INSERT INTO dailyjoin (uuid, name, totaldays, day, firstjoin, lastjoin) VALUES (?,?,?,?,?,?) ON DUPLICATE KEY UPDATE "
-							+ "name = VALUES(name), "
-							+ "day = VALUES(day), "
-							+ "totaldays = VALUES(totaldays), "
-							+ "lastjoin = VALUES(lastjoin)", Statement.RETURN_GENERATED_KEYS);
+					st = TigerConnection.conn().prepareStatement(String.format("INSERT INTO %s (%s, %s, %s, %s, %s, %s) VALUES (?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE "
+							+ "%s = VALUES(%s), "
+							+ "%s = VALUES(%s), "
+							+ "%s = VALUES(%s), "
+							+ "%s = VALUES(%s)",
+							DAILY_JOIN_TABLE,
+							UUID, NAME, DAYS_TOTAL, DAYS_CONSECUTIVE, FIRSTJOIN, LASTJOIN,
+							NAME, NAME,
+							DAYS_TOTAL, DAYS_TOTAL,
+							DAYS_CONSECUTIVE, DAYS_CONSECUTIVE,
+							LASTJOIN, LASTJOIN), Statement.RETURN_GENERATED_KEYS);
 					st.setString(1, p.getUuid());
 					st.setString(2, p.getName());
 					st.setInt(3, p.getDaysTotal());
@@ -82,12 +89,12 @@ public class playerDAOImplSQL implements playerDAO {
 				// only one player allowed
 				if(rs.next()) {
 					DailyPlayer p = new DailyPlayer();
-					p.setName(rs.getString("name"));
-					p.setUuid(rs.getString("uuid"));
-					p.setDaysTotal(rs.getInt("totaldays"));
-					p.setDaysConsecutive(rs.getInt("day"));
-					p.setFirstjoin(rs.getTimestamp("firstjoin"));
-					p.setLastjoin(rs.getTimestamp("lastjoin"));
+					p.setName(rs.getString(NAME));
+					p.setUuid(rs.getString(UUID));
+					p.setDaysTotal(rs.getInt(DAYS_TOTAL));
+					p.setDaysConsecutive(rs.getInt(DAYS_CONSECUTIVE));
+					p.setFirstjoin(rs.getTimestamp(FIRSTJOIN));
+					p.setLastjoin(rs.getTimestamp(LASTJOIN));
 				}
 			} catch (SQLException e) {
 				dailyjoin.getDailyLogger().log(Level.SEVERE, "getPlayer: " + uuid, e);

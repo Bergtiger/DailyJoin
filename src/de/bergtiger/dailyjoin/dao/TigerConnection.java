@@ -5,6 +5,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -14,93 +15,50 @@ import de.bergtiger.dailyjoin.dailyjoin;
 import de.bergtiger.dailyjoin.dao.impl.sql.playerDAOImplSQL;
 
 public class TigerConnection {
-	private String host;
-	private int port;
-	private String user;
-	private String password;
-	private String database;
 	
 	private static Connection conn;
-
-	private FileConfiguration cfg;
-	private int thread = -1;
-	
 	private static TigerConnection instance;
 	
+	private String host, user, password, database;
+	private int port;
+	private int thread = -1;
+
+	
 	public static TigerConnection inst() {
-		if(instance == null)
+		System.out.println("TC: " + instance);
+		if(instance == null) {
+			System.out.println("new TC");
 			instance = new TigerConnection();
+		}
 		return instance;
 	}
 	
-	private TigerConnection(){
-		this.cfg = dailyjoin.inst().getConfig();
-		
-		if(this.cfg.getString("config.SQL").equalsIgnoreCase("true")){
+	private TigerConnection() {}
+
+	public void loadData() {
+		FileConfiguration cfg = dailyjoin.inst().getConfig();
+		if(cfg.getString("config.SQL").equalsIgnoreCase("true")){
 			String db = "database.";
 		
-			this.host = this.cfg.getString(db + "host");
-			this.port = this.cfg.getInt(db + "port");
-			this.user = this.cfg.getString(db + "user");
-			this.password = this.cfg.getString(db + "password");
-			this.database = this.cfg.getString(db + "database");
-		
-			try {
-				this.openConnection();
-				DailyDataBase.createTable();
-				new DailyFileToSQL().FileToSQL();
-			} catch (Exception e) {
-				System.out.println("[DailyJoin] Error No SQL-Connection");
-				System.out.println("[DailyJoin] Try SQL-Reconnection.");		
-				this.thread = Bukkit.getScheduler().scheduleSyncDelayedTask(dailyjoin.inst(), new Runnable(){
-					@Override
-					public void run() {
-						reconnect();
-				}}, 0*20L);
-			}
+			host = cfg.getString(db + "host");
+			port = cfg.getInt(db + "port");
+			user = cfg.getString(db + "user");
+			password = cfg.getString(db + "password");
+			database = cfg.getString(db + "database");
 		}
 	}
 	
-	
-	public void reload(){
-		this.cfg = dailyjoin.inst().getConfig();	
-		
-		this.closeThread();
-		
-		if(this.cfg.getString("config.SQL").equalsIgnoreCase("true")){
-			String db = "database.";
-		
-			this.host = this.cfg.getString(db + "host");
-			this.port = this.cfg.getInt(db + "port");
-			this.user = this.cfg.getString(db + "user");
-			this.password = this.cfg.getString(db + "password");
-			this.database = this.cfg.getString(db + "database");
-		
-			if(hasConnection()){
-				this.clossConnection();
-			}
-			try {
-				this.openConnection();
-				DailyDataBase.createTable();
-				new DailyFileToSQL().FileToSQL();
-			} catch (Exception e) {
-				System.out.println("[DailyJoin] Error No Connection");
-				System.out.println("[DailyJoin] Try SQL-Reconnection in 30 seconds.");
-				this.thread = Bukkit.getScheduler().scheduleSyncDelayedTask(dailyjoin.inst(), new Runnable(){
-					@Override
-					public void run() {
-						reconnect();
-				}}, 30*20L);
-			}
-		}
-	}
-	
-	public void reconnect(){
-		this.closeThread();
+	public void connect() {
+		// if Thread exists stop
+		closeThread();
+		// if connection exists stop
+		if(hasConnection())
+			closeConnection();
+		// try Connection
 		try {
-			this.openConnection();
-			DailyDataBase.createTable();
+			openConnection();
 			System.out.println("[DailyJoin] SQL-Connection");
+			DailyDataBase.createTable();
 			System.out.println("[DailyJoin] Get offline Joins");
 			new DailyFileToSQL().FileToSQL();
 		} catch (Exception e) {
@@ -110,8 +68,33 @@ public class TigerConnection {
 				@Override
 				public void run() {
 					reconnect();
-				}}, 30*20L);
+			}}, 30*20L);
 		}
+	}
+	
+	public void reload(){
+		// if Thread exists stop
+		closeThread();
+		// if connection exists stop
+		if(hasConnection())
+			closeConnection();
+		// if sql is set
+		if(dailyjoin.inst().getConfig().getString("config.SQL").equalsIgnoreCase("true")) {
+			// load new Data
+			loadData();
+			// connect
+			connect();
+		}
+	}
+	
+	public void reconnect(){
+		// if Thread exists stop
+		closeThread();
+		// if connection exits stop
+		if(hasConnection())
+			return;
+		// connect
+		connect();
 	}
 	
 	public void closeThread(){
@@ -121,14 +104,9 @@ public class TigerConnection {
 		}
 	}
 	
-	public Connection openConnection()throws Exception{
+	private Connection openConnection() throws Exception{
 		Class.forName("com.mysql.jdbc.Driver");
 		conn = DriverManager.getConnection("jdbc:mysql://" + this.host + ":" + this.port + "/" + this.database, this.user, this.password);
-		return conn;
-	}
-	
-	@Deprecated
-	public Connection getConnection(){
 		return conn;
 	}
 	
@@ -141,20 +119,15 @@ public class TigerConnection {
 	}
 	
 	/**
-	 * check if Connection is available.
-	 * @return true if connected.
+	 * Checks if the connection exists and is valid
+	 * @return true when connection is valid
 	 */
-	public static boolean hasConnection() {
-		try {	
-			if(conn == null){
-				return false;
-			} else if(conn != null || conn.isValid(1)){	
-				return true;
-			}
-		} catch (SQLException e) {	
-			System.out.println(e);
+	public static Boolean hasConnection() {
+		try {
+			return (conn != null) && conn.isValid(1);
+		} catch (SQLException ex) {
+			return false;
 		}
-		return false;
 	}
 	
 	/**
@@ -165,33 +138,39 @@ public class TigerConnection {
 	}
 	
 	/**
-	 * save close of resources.
+	 * save close of resources
+	 * @param st PreparedStatment
 	 * @param rs ResultSet
-	 * @param st PreparedStatement
 	 */
 	public static void closeRessources(ResultSet rs, PreparedStatement st) {
-		if(rs != null){
+		if(rs != null) {
 			try {
 				rs.close();
-			} catch (SQLException e) {
+			} catch (SQLException ex) {
+				dailyjoin.getDailyLogger().log(Level.SEVERE, null, ex);
 			}
 		}
-		if(st != null){
+		if(st != null) {
 			try {
 				st.close();
-			} catch (SQLException e) {
+			} catch (SQLException ex) {
+				dailyjoin.getDailyLogger().log(Level.SEVERE, null, ex);
 			}
 		}
 	}
 	
 	/**
-	 * close Connection
+	 * if there is a Valid Connection the Connection will be closed
+	 * after closing the connection value will be set to null
 	 */
-	public void clossConnection() {
+	public void closeConnection() {
 		try {
-			conn.close();
-		} catch (SQLException e) {
-			e.printStackTrace();
+			if(hasConnection()) {
+				conn.close();
+				dailyjoin.getDailyLogger().log(Level.INFO, "Logout");
+			}
+		} catch (SQLException ex) {
+			dailyjoin.getDailyLogger().log(Level.SEVERE, null, ex);
 		} finally {
 			conn = null;
 		}

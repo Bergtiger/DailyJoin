@@ -18,15 +18,11 @@ import de.bergtiger.dailyjoin.dao.TigerConnection;
 import de.bergtiger.dailyjoin.lang.Lang;
 
 public class DailyUUid {
-	
-//	private dailyjoin plugin;
+
 	private FileConfiguration cfg;
-	private String file_player;
 	
-	public DailyUUid(dailyjoin plugin, FileConfiguration cfg, String file_player){
-//		this.plugin = plugin;
-		this.cfg = cfg;
-		this.file_player = file_player;
+	public DailyUUid(){
+		this.cfg = dailyjoin.inst().getConfig();
 	}
 	
 	public String getUUID(CommandSender cs, String name){
@@ -45,7 +41,7 @@ public class DailyUUid {
 	}
 	
 	private String uuid_file(CommandSender cs, String name){
-		File datei = new File(this.file_player, "player.yml");
+		File datei = new File(DailyFile.FILE_DIRECTORY, DailyFile.FILE_NAME);
 		if(datei.exists()){
 			FileConfiguration cfg = YamlConfiguration.loadConfiguration(datei);
 			Set<String> keys = cfg.getConfigurationSection("player").getKeys(false);

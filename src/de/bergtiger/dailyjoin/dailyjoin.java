@@ -10,7 +10,6 @@ import de.bergtiger.dailyjoin.dao.TigerConnection;
 
 
 public class dailyjoin extends JavaPlugin{
-	private TigerConnection sql;
 	private DailyListener dl;
 	private DailyCommand dc;
 	private DailyReward dr;
@@ -38,7 +37,8 @@ public class dailyjoin extends JavaPlugin{
 		
 		new DailyConfig(this);
 		
-		this.sql = TigerConnection.inst();
+		TigerConnection.inst().loadData();
+		TigerConnection.inst().connect();
 //		this.dl = new DailyListener(this);
 		this.dl = DailyListener.inst();
 //		this.dc = new DailyCommand(this);
@@ -51,10 +51,6 @@ public class dailyjoin extends JavaPlugin{
 		pm.registerEvents(this.dl, this);
 		
 		this.getCommand("dailyjoin").setExecutor(this.dc);
-	}
-	
-	public TigerConnection getMySQL(){
-		return this.sql;
 	}
 	
 	public DailyReward getDailyReward(){

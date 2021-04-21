@@ -11,9 +11,14 @@ import net.md_5.bungee.api.chat.hover.content.Text;
 public enum Lang implements Constants {
 
 	NoPermission("&cNo Permission"),
+	NoUUid("&7Not a correct UUID or Player is not online."),
+	NoFile("&7Could not find Player file."),
 	NoNumber("No such number (" + VALUE + ")"),
 	NoPlayer("&7No such player could be found"),
+	NoConnection("&7Error: SQL-Connection"),
 	WrongArgument("&7Wrong Argument. Please Check your Command."),
+
+	OnlySQL("&7This Command works only with SQL."),
 	
 	RewardDaily("&7Du hast dich bereits den &e-day-&7. Tag in Folge eingeloggt."),
 	RewardBirthday("&e" + PLAYER + " &7hat heute seinen Server-Geburtstag."),
@@ -29,11 +34,37 @@ public enum Lang implements Constants {
 	DailyInfoPlayer("&b/daily player [player, uuid]  -  &7zeigt die Daten des Spielers"),
 	DailyInfoConfig("&b/daily config [ma/system/reward/oldfiles/delay] [true/false/in case of delay number]  -  &7ändert die config"),
 	
-	DailyAdd("&7/daily add [player/uuid] [day, totaldays] [value]");
+	DailyAdd("&7/daily add [player/uuid] [day, totaldays] [value]"),
+	DailyAddData("&aBei dem Spieler mit der UUID: &e-player- &awurde &e-data- &aum &e-value- &aerh?ht."),
+
+	DailySet("&7/daily set [player/uuid] [day, totaldays] [value]"),
+	DailySetData("&aBei dem Spieler mit der UUID: &e-player- &awurde &e-data- &aauf &e-value- &agesetzt."),
+
+	DailyReload("&7DailyJoin reloaded."),
+
+	TopPlayerDay("&a----<[&6Top Day&a]>----"),
+	TopPlayerTotalDays("&a----<[&6Top Totaldays&a]>----"),
+	TopPlayerList("&e-player-: &7-days-"),
+
+	PluginHeader("&a----<[&6DailyJoin&a]>----"),
+	PluginFooter("&a---------------------"),
+	PluginVersion("&eVersion: &7-version-"),
+	PluginMonatsAnzeige("&eMonatsAnzeige: &7-status-"),
+	PluginSystem("&eSystem: &7-status-"),
+	PluginRewardReconnection("&eReward on Reconnection: &7-status-"),
+	PluginDelay("&eRewardDelay: &7-delay-"),
+	PluginTopPlayer("&eTopPlayer: &7-amount-"),
+
+	PlayerHeader("&a----<[&6-player-&a]>----"),
+	PlayerFooter("&a--------------------"),
+	PlayerFirstJoin("&eFirstJoin: &7Day Month Year"),
+	PlayerLastJoin("&eLastJoin: &7Day Month Year"),
+	PlayerDay("&eDay: &7-day-"),
+	PlayerTotalDays("&eTotalDays: &7-day-");
 	
 	private String message;
 	
-	private Lang(String message) {
+	Lang(String message) {
 		this.message = message;
 	}
 	
@@ -68,10 +99,10 @@ public enum Lang implements Constants {
 	
 	/**
 	 * Adds Extras to TextComponent no Color or anything!
-	 * @param tc - TextComponent witch will be modified
+	 * @param args - String
 	 * @param cmd - onClick command
 	 * @param hover - onHover text
-	 * @param cmd_suggestion
+	 * @param cmd_suggestion - command suggestion will be set in chat
 	 * @return TextComponent
 	 */
 	public static TextComponent buildTC2(String args, String cmd, BaseComponent hover, String cmd_suggestion) {
@@ -94,12 +125,12 @@ public enum Lang implements Constants {
 	 * builds recursive BaseComponent with RGB colors
 	 * @param bc - BaseComponent, TextComponent
 	 * @param color - Color for BaseComponent
-	 * @return
+	 * @return colored BaseComponent
 	 */
 	private static BaseComponent rgbColor(BaseComponent bc, ChatColor color) {
 		if(bc instanceof TextComponent) {
 			if(color != null)
-				((TextComponent)bc).setColor(color);
+				bc.setColor(color);
 			// getText
 			String text = ((TextComponent)bc).getText();
 			// if text contains hexColor

@@ -14,7 +14,6 @@ public class dailyjoin extends JavaPlugin{
 	private DailyCommand dc;
 	private DailyReward dr;
 	private DailyFile dFile;
-	private DailySQL dSQL;
 
 	private static dailyjoin instance;
 
@@ -46,7 +45,6 @@ public class dailyjoin extends JavaPlugin{
 //		this.dr = new DailyReward(this);
 		this.dr = DailyReward.inst();
 		this.dFile = new DailyFile();
-		this.dSQL = new DailySQL();
 		
 		pm.registerEvents(this.dl, this);
 		
@@ -55,10 +53,6 @@ public class dailyjoin extends JavaPlugin{
 	
 	public DailyReward getDailyReward(){
 		return this.dr;
-	}
-	
-	public DailySQL getDailySQL(){
-		return this.dSQL;
 	}
 	
 	public DailyFile getDailyFile(){

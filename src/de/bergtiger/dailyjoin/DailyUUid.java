@@ -15,7 +15,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import de.bergtiger.dailyjoin.dao.TigerConnection;
-import de.bergtiger.dailyjoin.lang.Lang;
+import de.bergtiger.dailyjoin.utils.lang.Lang;
 
 public class DailyUUid {
 

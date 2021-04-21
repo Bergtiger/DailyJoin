@@ -19,24 +19,24 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
 import de.bergtiger.dailyjoin.dao.TigerConnection;
-import de.bergtiger.dailyjoin.data.MyUtils;
-import de.bergtiger.dailyjoin.lang.Lang;
+import de.bergtiger.dailyjoin.utils.lang.Lang;
+import static de.bergtiger.dailyjoin.utils.TigerPermission.*;
 
-public class DailyCommand implements CommandExecutor, MyUtils{
+public class DailyCommand implements CommandExecutor {
 	
-	public static final String CMD = "dailyjoin", TOP = "top", SET = "set", ADD = "add", INFO = "info", RELOAD = "reload", PLAYER = "player";
+	public static final String CMD_CMD = "dailyjoin", CMD_TOP = "top", CMD_SET = "set", CMD_ADD = "add", CMD_INFO = "info", CMD_RELOAD = "reload", CMD_PLAYER = "player";
 	
 	@Override
 	public boolean onCommand(CommandSender cs, Command cmd, String label, String[] args) {
 		//info - set - reload - config - player
 		if(args.length > 0){
 			switch (args[0]) {
-				case TOP	: daily_top(cs, args);break;
-				case SET	: daily_set_player(cs, args);break;
-				case ADD	: daily_add_player(cs, args);break;
-				case INFO	: daily_info(cs);break;
-				case RELOAD	: daily_reload(cs);break;
-				case PLAYER	: daily_player(cs, args);break;
+				case CMD_TOP: daily_top(cs, args);break;
+				case CMD_SET: daily_set_player(cs, args);break;
+				case CMD_ADD: daily_add_player(cs, args);break;
+				case CMD_INFO: daily_info(cs);break;
+				case CMD_RELOAD: daily_reload(cs);break;
+				case CMD_PLAYER: daily_player(cs, args);break;
 		//		case "config": daily_config(cs, args);break;
 				default: {
 					cs.sendMessage(Lang.WrongArgument.colored());
@@ -54,14 +54,23 @@ public class DailyCommand implements CommandExecutor, MyUtils{
 	 * @param cs CommandSender
 	 */
 	private void daily_command(CommandSender cs){
-		if(cs.hasPermission(p_admin) || cs.hasPermission(p_cmd)){
+		if(hasPermission(cs, ADMIN, CMD)){
 			cs.spigot().sendMessage(Lang.buildTC(Lang.DailyInfo.get()));
-			cs.spigot().sendMessage(Lang.buildTC(Lang.DailyInfoTop.get(), null, null, CMD + " " + TOP));
-			cs.spigot().sendMessage(Lang.buildTC(Lang.DailyInfoSet.get(), null, null, CMD + " " + SET));
-			cs.spigot().sendMessage(Lang.buildTC(Lang.DailyInfoAdd.get(), null, null, CMD + " " + ADD));
-			cs.spigot().sendMessage(Lang.buildTC(Lang.DailyInfoInfo.get(), null, null, CMD + " " + INFO));
-			cs.spigot().sendMessage(Lang.buildTC(Lang.DailyInfoReload.get(), CMD + " " + RELOAD, null, null));
-			cs.spigot().sendMessage(Lang.buildTC(Lang.DailyInfoPlayer.get(), null, null, CMD + " " + PLAYER));
+			cs.spigot().sendMessage(Lang.buildTC(Lang.DailyInfoTop.get(), null, null, CMD_CMD + " " + CMD_TOP));
+			// Set
+			if(hasPermission(cs, ADMIN, SET)) {
+				cs.spigot().sendMessage(Lang.buildTC(Lang.DailyInfoSet.get(), null, null, CMD_CMD + " " + CMD_SET + " "));
+				cs.spigot().sendMessage(Lang.buildTC(Lang.DailyInfoAdd.get(), null, null, CMD_CMD + " " + CMD_ADD + " "));
+			}
+			// PluginInfo
+			if(hasPermission(cs, ADMIN, PLUGIN))
+				cs.spigot().sendMessage(Lang.buildTC(Lang.DailyInfoInfo.get(), CMD_CMD + " " + CMD_INFO, null, null));
+			// Reload
+			if(hasPermission(cs, ADMIN, RELOAD))
+				cs.spigot().sendMessage(Lang.buildTC(Lang.DailyInfoReload.get(), CMD_CMD + " " + CMD_RELOAD, null, null));
+			// Player
+			if(hasPermission(cs, ADMIN, PLAYER))
+				cs.spigot().sendMessage(Lang.buildTC(Lang.DailyInfoPlayer.get(), null, null, CMD_CMD + " " + CMD_PLAYER + " "));
 		} else {
 			cs.sendMessage(Lang.NoPermission.colored());
 		}
@@ -107,7 +116,7 @@ public class DailyCommand implements CommandExecutor, MyUtils{
 //	}
 	
 	private void daily_add_player(CommandSender cs, String[] args){
-		if(cs.hasPermission(p_admin) || cs.hasPermission(p_set)){
+		if(hasPermission(cs, ADMIN, SET)){
 			if((args.length == 4) && (args[2].equalsIgnoreCase("day") || args[2].equalsIgnoreCase("totaldays"))){
 				try {
 					addPlayerData(cs, change_to_uuid(cs, args[1]), args[2], Integer.parseInt(args[3]));
@@ -222,7 +231,7 @@ public class DailyCommand implements CommandExecutor, MyUtils{
 	
 	private void daily_set_player(CommandSender cs, String[] args){
 		//dailyjoin set [player] day [value]
-		if(cs.hasPermission("dailyjoin.set")||cs.hasPermission("dailyjoin.admin")){
+		if(hasPermission(cs, ADMIN, SET)){
 			if((args.length == 4)&&(args[2].equalsIgnoreCase("day")||args[2].equalsIgnoreCase("totaldays"))){
 				try {
 					setPlayerData(cs, change_to_uuid(cs, args[1]), args[2], Integer.parseInt(args[3]));
@@ -316,9 +325,9 @@ public class DailyCommand implements CommandExecutor, MyUtils{
 	}
 	
 	private void daily_player(CommandSender cs, String[] args){
-		if((args.length == 1) && (cs.hasPermission(p_admin) || cs.hasPermission(p_user) || cs.hasPermission(p_user))){
+		if((args.length == 1) && hasPermission(cs, ADMIN, USER, PLAYER)){
 			getPlayerInfo(cs, change_to_uuid(cs, cs.getName()));
-		} else if((args.length == 2) && ((args[1].equalsIgnoreCase(cs.getName()) && cs.hasPermission(p_user)) || cs.hasPermission(p_admin) || cs.hasPermission(p_player))){		
+		} else if((args.length == 2) && ((args[1].equalsIgnoreCase(cs.getName()) && hasPermission(cs, USER)) || hasPermission(cs, ADMIN, PLAYER))){
 			getPlayerInfo(cs, change_to_uuid(cs, args[1]));
 		} else {
 //			cs.sendMessage(ChatColor.translateAlternateColorCodes('&', this.cfg.getString("lang.NoPermission")));
@@ -483,7 +492,7 @@ public class DailyCommand implements CommandExecutor, MyUtils{
 	}
 	
 	private void daily_info(CommandSender cs){
-		if(cs.hasPermission("dailyjoin.info")||cs.hasPermission("dailyjoin.admin")){
+		if(hasPermission(cs, ADMIN, PLUGIN)){
 			//plugin info
 //			cs.sendMessage(ChatColor.translateAlternateColorCodes('&', this.cfg.getString("lang.PluginUmrandungOben")));
 			cs.spigot().sendMessage(Lang.buildTC(Lang.PluginHeader.get()));
@@ -517,7 +526,7 @@ public class DailyCommand implements CommandExecutor, MyUtils{
 	}
 	
 	private void daily_reload(CommandSender cs){
-		if(cs.hasPermission(p_admin) || cs.hasPermission(p_reload)){
+		if(hasPermission(cs, ADMIN, RELOAD)){
 			dailyjoin.inst().reload();
 //			cs.sendMessage(ChatColor.translateAlternateColorCodes('&', this.cfg.getString("lang.DailyReload")));
 			cs.spigot().sendMessage(Lang.buildTC(Lang.DailyReload.get()));
@@ -528,7 +537,7 @@ public class DailyCommand implements CommandExecutor, MyUtils{
 	}
 	
 	private void daily_top(CommandSender cs, String[]args){
-		if(cs.hasPermission("dailyjoin.top")||cs.hasPermission("dailyjoin.admin")){
+		if(hasPermission(cs, ADMIN, TOP)){
 			if((args.length < 2)||(args.length > 3)){
 //				cs.sendMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString("lang.WrongArgument")));
 				cs.spigot().sendMessage(Lang.buildTC(Lang.WrongArgument.get()));

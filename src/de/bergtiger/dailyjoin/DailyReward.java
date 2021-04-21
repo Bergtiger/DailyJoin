@@ -13,8 +13,8 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
-import de.bergtiger.dailyjoin.data.MyUtils;
-import de.bergtiger.dailyjoin.lang.Lang;
+import de.bergtiger.dailyjoin.utils.MyUtils;
+import de.bergtiger.dailyjoin.utils.lang.Lang;
 
 public class DailyReward implements MyUtils{
 	

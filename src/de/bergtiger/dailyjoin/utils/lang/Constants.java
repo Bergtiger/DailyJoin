@@ -1,4 +1,4 @@
-package de.bergtiger.dailyjoin.lang;
+package de.bergtiger.dailyjoin.utils.lang;
 
 public interface Constants {
 

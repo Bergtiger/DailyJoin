@@ -18,115 +18,11 @@ import de.bergtiger.dailyjoin.exception.UpdatePlayerException;
 
 public class DailyFileToSQL {
 
-	public final String 
-			FILE_DIRECTORY		= "plugins/DailyJoin/players", 
-			FILE_NAME			= "player.yml",
-			// key path
-			PLAYER_PATH			= "player",
-			PLAYER_PATH_FORMAT	= "player.%s.",
-			// data
-			NAME				= "name",
-			DAYS_CONSECUTIVE	= "days.consecutive",
-			DAYS_TOTAL			= "days.total",
-			DAYS_OLD_CONSECUTIVE= "day", 
-			DAYS_OLD_TOTAL		= "totaldays",
-			FIRSTJOIN			= "firstjoin",
-			LASTJOIN			= "lastjoin";
-	
-	/**
-	 * load players from file.
-	 * @return
-	 */
-	private List<DailyPlayer> getlist() {
-		File file = new File(FILE_DIRECTORY, FILE_NAME);
-		if (file.exists()) {
-			FileConfiguration cfg = YamlConfiguration.loadConfiguration(file);
-			List<String> list = cfg.getStringList("uuids");
-			List<DailyPlayer> players = new ArrayList<>();
-			String path = "";
-			for (int i = 0; i < list.size(); i++) {
-				path = "player." + list.get(i) + ".";
-				DailyPlayer p = new DailyPlayer(cfg.getString(path + "name"), list.get(i), cfg.getInt(path + "day"),
-						cfg.getInt(path + "totaldays"), new Timestamp(cfg.getLong(path + "firstjoin")),
-						new Timestamp(cfg.getLong(path + "lastjoin")));
-				players.add(p);
-			}
-			// load players with uuid
-			cfg.getConfigurationSection("player").getKeys(false).forEach(uuid -> {
-				DailyPlayer p = new DailyPlayer();
-				String dp = String.format(PLAYER_PATH_FORMAT, uuid);
-				// set uuid
-				p.setUuid(uuid);
-				// set name
-				if (cfg.contains(dp + NAME))
-					p.setName(cfg.getString(dp + NAME));
-				// set days total
-				if (cfg.contains(dp + DAYS_TOTAL))
-					p.setDaysTotal(cfg.getInt(dp + DAYS_TOTAL));
-				// set days consecutive
-				if (cfg.contains(dp + DAYS_CONSECUTIVE))
-					p.setDaysConsecutive(cfg.getInt(dp + DAYS_CONSECUTIVE));
-				// set first join
-				if (cfg.contains(dp + FIRSTJOIN))
-					p.setFirstjoin(new Timestamp(cfg.getLong(dp + FIRSTJOIN)));
-				// set last join
-				if (cfg.contains(dp + LASTJOIN))
-					p.setLastjoin(new Timestamp(cfg.getLong(dp + LASTJOIN)));
-				// TODO remove old code
-				// set days total
-				if (cfg.contains(dp + DAYS_OLD_TOTAL))
-					p.setDaysTotal(cfg.getInt(dp + DAYS_OLD_TOTAL));
-				// set days consecutive
-				if (cfg.contains(dp + DAYS_OLD_CONSECUTIVE))
-					p.setDaysConsecutive(cfg.getInt(dp + DAYS_OLD_CONSECUTIVE));
-				// add players
-				players.add(p);
-			});
-			return players;
-		}
-		return null;
-	}
-
-	private void savelist(List<DailyPlayer> players) {
-		File file = new File(FILE_DIRECTORY, FILE_NAME);
-		// delte existing file
-		if (file.exists()) {
-			if(file.delete()) {
-				dailyjoin.getDailyLogger().log(Level.INFO, "deleted old player file.");
-			} else {
-				dailyjoin.getDailyLogger().log(Level.WARNING, "Could not delete old player file.");
-			}
-		}
-		// build new players
-		if (players != null && !players.isEmpty()) {
-			FileConfiguration cfg = YamlConfiguration.loadConfiguration(file);
-			String path;
-			// add player
-			for(DailyPlayer p : players) {
-				path = String.format(PLAYER_PATH_FORMAT, p.getUuid());
-				cfg.addDefault(path + NAME, p.getName());
-				cfg.addDefault(path + DAYS_TOTAL, p.getDaysTotal());
-				cfg.addDefault(path + DAYS_CONSECUTIVE, p.getDaysConsecutive());
-				cfg.addDefault(path + FIRSTJOIN, p.getFirstjoin());
-				cfg.addDefault(path + LASTJOIN, p.getLastjoin());
-			}
-			// save file
-			try {
-				cfg.options().header("DailyJoin offline player list");
-				cfg.options().copyHeader(true);
-				cfg.options().copyDefaults(true);
-				cfg.save(file);
-			} catch (IOException e) {
-				dailyjoin.getDailyLogger().log(Level.SEVERE, "savelist: ", e);
-			}
-		}
-	}
-
 	/**
 	 * check if ljoin is yesterday to fjoin.
-	 * @param fjoin
-	 * @param ljoin
-	 * @return
+	 * @param fjoin firstjoin
+	 * @param ljoin lastjoin
+	 * @return true when fjoin and ljoin are on the same day
 	 */
 	private boolean yesterday(Timestamp fjoin, Timestamp ljoin) {
 		Calendar firstjoin = Calendar.getInstance();
@@ -146,29 +42,26 @@ public class DailyFileToSQL {
 
 	/**
 	 * check if fjoin and ljoin are on the same day.
-	 * @param fjoin
-	 * @param ljoin
-	 * @return
+	 * @param fjoin firstjoin
+	 * @param ljoin lastjoin
+	 * @return true when fjoin and ljoin are on the same day
 	 */
 	private boolean today(Timestamp fjoin, Timestamp ljoin) {
 		Calendar firstjoin = Calendar.getInstance();
 		Calendar lastjoin = Calendar.getInstance();
 		firstjoin.setTimeInMillis(fjoin.getTime());
 		lastjoin.setTimeInMillis(ljoin.getTime());
-		if ((firstjoin.get(Calendar.YEAR) == lastjoin.get(Calendar.YEAR))
-				&& (firstjoin.get(Calendar.DAY_OF_YEAR) == lastjoin.get(Calendar.DAY_OF_YEAR))) {
-			return true;
-		}
-		return false;
+		return (firstjoin.get(Calendar.YEAR) == lastjoin.get(Calendar.YEAR))
+				&& (firstjoin.get(Calendar.DAY_OF_YEAR) == lastjoin.get(Calendar.DAY_OF_YEAR));
 	}
 	
 	/**
 	 * 
 	 */
 	public void FileToSQL() {
-		File datei = new File(FILE_DIRECTORY, "player.yml");
-		if (datei.exists()) {
-			List<DailyPlayer> players = getlist();
+		File file = new File(DailyFile.FILE_DIRECTORY, DailyFile.FILE_NAME);
+		if (file.exists()) {
+			List<DailyPlayer> players = DailyFile.loadAll();
 			if (players != null && !players.isEmpty()) {
 				for (int i = 0; i < players.size(); i++) {
 					try {
@@ -208,7 +101,7 @@ public class DailyFileToSQL {
 					} catch (NoSQLConnectionException e) {
 						// NoSQLException
 						// stop merge and save file
-						savelist(players);
+						DailyFile.saveAll(players);
 						TigerConnection.noConnection();
 						return;
 					} catch (UpdatePlayerException e) {
@@ -218,6 +111,11 @@ public class DailyFileToSQL {
 			} else {
 				// EmptyList
 				dailyjoin.getDailyLogger().log(Level.INFO, "Empty Offline List");
+			}
+			// finished merging file in sql
+			// delete file when players is empty
+			if(players == null || players.isEmpty()) {
+				file.delete();
 			}
 		} else {
 			// No File

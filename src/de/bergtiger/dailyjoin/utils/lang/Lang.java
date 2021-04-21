@@ -1,4 +1,4 @@
-package de.bergtiger.dailyjoin.lang;
+package de.bergtiger.dailyjoin.utils.lang;
 
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;

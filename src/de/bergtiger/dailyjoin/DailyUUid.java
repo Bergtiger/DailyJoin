@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import de.bergtiger.dailyjoin.dao.impl.file.DailyFile;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -67,7 +68,7 @@ public class DailyUUid {
 				}
 				
 			} else {
-				cs.spigot().sendMessage(Lang.buildTC(Lang.NoPlayer.get()));
+				cs.spigot().sendMessage(Lang.buildTC(Lang.NOPLAYER.get()));
 			}
 		}
 		return null;

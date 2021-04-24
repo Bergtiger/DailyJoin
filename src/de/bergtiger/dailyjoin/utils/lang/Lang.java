@@ -10,20 +10,32 @@ import net.md_5.bungee.api.chat.hover.content.Text;
 
 public enum Lang implements Constants {
 
-	NoPermission("&cNo Permission"),
-	NoUUid("&7Not a correct UUID or Player is not online."),
-	NoFile("&7Could not find Player file."),
-	NoNumber("No such number (" + VALUE + ")"),
-	NoPlayer("&7No such player could be found"),
-	NoConnection("&7Error: SQL-Connection"),
-	WrongArgument("&7Wrong Argument. Please Check your Command."),
+	/** CommandSender has no Permission.*/
+	NOPERMISSION("&cNo Permission"),
+	/** TODO*/
+	NOUUID("&7Not a correct UUID or Player is not online."),
+	/** No such file exists (file as VALUE)*/
+	NOFILE(String.format("&7Could not find file '%s'.", VALUE)),
+	/** Not a correct Number(shows wrong input as VALUE)*/
+	NONUMBER(String.format("'%s' is not a valid number", VALUE)),
+	/** No such player (shows input as PLAYER)*/
+	NOPLAYER(String.format("&7No such player '%s' could be found", PLAYER)),
+	/** No database connection*/
+	NOCONNECTION("&7Error: SQL-Connection"),
+	/** No entries in the database*/
+	NOLIST("No entries in the database"),
 
-	OnlySQL("&7This Command works only with SQL."),
+	WRONG_ARGUMENT("&7Wrong Argument. Please Check your Command."),
+
+	/** Time format !WITHOUT COLORS!*/
+	FORMAT_TIME			("dd.MM.yyyy, HH:mm"),
+	//TODO
+	ONLY_SQL("&7This Command works only with SQL."),
 	
-	RewardDaily("&7Du hast dich bereits den &e-day-&7. Tag in Folge eingeloggt."),
-	RewardBirthday("&e" + PLAYER + " &7hat heute seinen Server-Geburtstag."),
-	RewardSpezialDay("&e" + PLAYER + " &7ist bereits &e" + VALUE + " &7Tage in Folge auf dem Server."),
-	RewardSpezialTotalDays("&e" + PLAYER + " &7ist bereits insgesamt &e" + VALUE + " &7Tage auf dem Server."),
+	REWARD_DAILY("&7Du hast dich bereits den &e-day-&7. Tag in Folge eingeloggt."),
+	REWARD_BIRTHDAY("&e" + PLAYER + " &7hat heute seinen Server-Geburtstag."),
+	REWARD_DAYS_CONSECUTIVE("&e" + PLAYER + " &7ist bereits &e" + VALUE + " &7Tage in Folge auf dem Server."),
+	REWARD_DAYS_TOTAL("&e" + PLAYER + " &7ist bereits insgesamt &e" + VALUE + " &7Tage auf dem Server."),
 	
 	DailyInfo("&b/daily  -  &7zeigt alle gültigen Befehle"),
 	DailyInfoTop("&b/daily top [day, totaldays] [value] -  &7zeigt top Liste"),

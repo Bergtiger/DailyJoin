@@ -3,6 +3,10 @@ package de.bergtiger.dailyjoin;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import de.bergtiger.dailyjoin.cmd.DailyCommand;
+import de.bergtiger.dailyjoin.dao.impl.file.DailyFile;
+import de.bergtiger.dailyjoin.listener.DailyListener;
+import de.bergtiger.dailyjoin.utils.DailyReward;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -69,18 +73,16 @@ public class dailyjoin extends JavaPlugin{
 	
 	public void reload() {
 		this.reloadConfig();
-		this.dFile.reload();
-//		this.sql.reload();
+
 		TigerConnection.inst().reload();
-//		this.dl.reload();
 		DailyListener.inst().reload();
-//		this.dr.reload();
 		DailyReward.inst().reload();
 	}
 	
 	@Override
 	public void onDisable() {
 		getDailyLogger().log(Level.INFO, "DailyJoin beendet.");
-		TigerConnection.inst().closeThread();
+		TigerConnection.inst().closeConnection();
+		TigerConnection.inst().closeThread();	
 	}
 }

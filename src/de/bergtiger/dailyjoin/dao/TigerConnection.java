@@ -12,7 +12,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 
 import de.bergtiger.dailyjoin.DailyFileToSQL;
 import de.bergtiger.dailyjoin.dailyjoin;
-import de.bergtiger.dailyjoin.dao.impl.sql.playerDAOImplSQL;
+import de.bergtiger.dailyjoin.dao.impl.sql.PlayerDAOImplSQL;
 
 public class TigerConnection {
 	
@@ -25,11 +25,8 @@ public class TigerConnection {
 
 	
 	public static TigerConnection inst() {
-		System.out.println("TC: " + instance);
-		if(instance == null) {
-			System.out.println("new TC");
+		if(instance == null)
 			instance = new TigerConnection();
-		}
 		return instance;
 	}
 	
@@ -176,8 +173,8 @@ public class TigerConnection {
 		}
 	}
 	
-	public playerDAO getPlayerDAO() {
-		return new playerDAOImplSQL();
+	public PlayerDAO getPlayerDAO() {
+		return new PlayerDAOImplSQL();
 	}
 	
 	@Deprecated

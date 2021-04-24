@@ -23,19 +23,6 @@ public class DailyDataBase {
 			LASTJOIN = "lastjoin",
 			FIRSTJOIN = "firstjoin";
 
-/*
-	old Database create command
-	public DailyDataBase(TigerConnection sql){
-		sql.queryUpdate("CREATE TABLE IF NOT EXISTS dailyjoin (" +
-				"name VARCHAR(23), " +
-				"uuid VARCHAR(63) PRIMARY KEY, " +
-				"day INT, " +
-				"totaldays INT, " +
-				"lastjoin TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, " +
-				"firstjoin TIMESTAMP NOT NULL)");
-	}
-*/
-
 	private DailyDataBase() {
 		checkTable();
 	}
@@ -142,7 +129,6 @@ public class DailyDataBase {
 			try {
 				rs = TigerConnection.conn().getMetaData().getTables(null,null,null, tabletypes);
 				while(rs.next()) {
-					System.out.println("table: " + rs.getString("TABLE_NAME"));
 					if(rs.getString("TABLE_NAME").equalsIgnoreCase(DAILY_JOIN_TABLE))
 						return true;
 				}

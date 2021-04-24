@@ -1,8 +1,13 @@
 package de.bergtiger.dailyjoin.utils;
 
+import de.bergtiger.dailyjoin.dailyjoin;
+import de.bergtiger.dailyjoin.utils.lang.Lang;
+
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
+import java.util.logging.Level;
 
 public class TimeUtils {
 
@@ -20,6 +25,23 @@ public class TimeUtils {
 				cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR);
 	}
 
+	/**
+	 * checks if two Timestamps represent the same day ignoring time.
+	 * @param t1 the first Timestamp
+	 * @param t2 the second Timestamp
+	 * @return true if they represent the same day
+	 */
+	public static boolean isSameDay(Timestamp t1, Timestamp t2) {
+		// get instances
+		Calendar cal1 = Calendar.getInstance();
+		Calendar cal2 = Calendar.getInstance();
+		// set time
+		cal1.setTimeInMillis(t1.getTime());
+		cal2.setTimeInMillis(t2.getTime());
+		// check same day
+		return isSameDay(cal1, cal2);
+	}
+	
 	/**
 	 * checks if a calendar date is today.
 	 * @param cal the calendar
@@ -92,5 +114,22 @@ public class TimeUtils {
 			cal.set(Calendar.MILLISECOND, 0);
 		}
 		return cal;
+	}
+
+	public static String formated(Timestamp t) {
+		return formated(t, Lang.FORMAT_TIME.get());
+	}
+
+	public static String formated(Timestamp t, String format) {
+		if(t != null) {
+			try {
+				DateTimeFormatter.ofPattern(format).format(t.toLocalDateTime());
+			} catch(Exception e) {
+				dailyjoin.getDailyLogger().log(Level.SEVERE, String.format("formated: could not format Timestamp(%s) with format(%s)", t, format),e);
+			}
+		} else {
+			dailyjoin.getDailyLogger().log(Level.WARNING, "formated: Timestamp null");
+		}
+		return "-";
 	}
 }

@@ -6,15 +6,17 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.logging.Level;
 
+import de.bergtiger.dailyjoin.bdo.TigerList;
 import de.bergtiger.dailyjoin.dailyjoin;
 import de.bergtiger.dailyjoin.bdo.DailyPlayer;
 import de.bergtiger.dailyjoin.dao.TigerConnection;
-import de.bergtiger.dailyjoin.dao.playerDAO;
+import de.bergtiger.dailyjoin.dao.PlayerDAO;
 import de.bergtiger.dailyjoin.exception.NoSQLConnectionException;
 import de.bergtiger.dailyjoin.exception.UpdatePlayerException;
+
 import static de.bergtiger.dailyjoin.dao.DailyDataBase.*;
 
-public class playerDAOImplSQL implements playerDAO {
+public class PlayerDAOImplSQL implements PlayerDAO {
 
 	/**
 	 * insert Player in Database.
@@ -95,6 +97,7 @@ public class playerDAOImplSQL implements playerDAO {
 					p.setDaysConsecutive(rs.getInt(DAYS_CONSECUTIVE));
 					p.setFirstjoin(rs.getTimestamp(FIRSTJOIN));
 					p.setLastjoin(rs.getTimestamp(LASTJOIN));
+					return p;
 				}
 			} catch (SQLException e) {
 				dailyjoin.getDailyLogger().log(Level.SEVERE, "getPlayer: " + uuid, e);
@@ -103,6 +106,79 @@ public class playerDAOImplSQL implements playerDAO {
 			}
 		} else {
 			throw new NoSQLConnectionException();
+		}
+		return null;
+	}
+
+	/**
+	 * get players ordered by a given column in a given direction.
+	 * @param column column to order by
+	 * @param order only asc or desc allowed
+	 * @return List of DailyPlayers ordered by given column in given order
+	 * @throws NoSQLConnectionException
+	 */
+	@Override
+	public TigerList<DailyPlayer> getOrderedPlayers(String column, String order) throws NoSQLConnectionException {
+		if(column != null && !column.isEmpty()) {
+			if(order != null && order.toUpperCase().matches("(?i)(ASC|DESC)")) {
+				if (TigerConnection.hasConnection()) {
+					ResultSet rs = null;
+					PreparedStatement st = null;
+					try {
+						st = TigerConnection.conn().prepareStatement(String.format("SELECT * FROM %s ORDER BY %s %s", DAILY_JOIN_TABLE, column, order), ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+						rs = st.executeQuery();
+						TigerList<DailyPlayer> players = new TigerList<>();
+						while (rs.next()) {
+							DailyPlayer p = new DailyPlayer();
+							p.setName(rs.getString(NAME));
+							p.setUuid(rs.getString(UUID));
+							p.setDaysTotal(rs.getInt(DAYS_TOTAL));
+							p.setDaysConsecutive(rs.getInt(DAYS_CONSECUTIVE));
+							p.setFirstjoin(rs.getTimestamp(FIRSTJOIN));
+							p.setLastjoin(rs.getTimestamp(LASTJOIN));
+							players.add(p);
+						}
+						return players;
+					} catch (SQLException e) {
+						dailyjoin.getDailyLogger().log(Level.SEVERE, "getTopPlayers", e);
+					} finally {
+						TigerConnection.closeRessources(rs, st);
+					}
+				} else {
+					throw new NoSQLConnectionException();
+				}
+			} else {
+				dailyjoin.getDailyLogger().log(Level.SEVERE, String.format("getTopPlayers: no richtung(%s)", order));
+			}
+		} else {
+			dailyjoin.getDailyLogger().log(Level.SEVERE, String.format("getTopPlayers: no column(%s)",column));
+		}
+		return null;
+	}
+
+	@Override
+	public String getUUid(String name) throws NoSQLConnectionException {
+		if(name != null) {
+			if(TigerConnection.hasConnection()) {
+				ResultSet rs = null;
+				PreparedStatement st = null;
+				try {
+					st = TigerConnection.conn().prepareStatement("SELECT uuid FROM dailyjoin WHERE name LIKE ?", ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+					st.setString(1, name);
+					rs = st.executeQuery();
+					if(rs.next()) {
+						return rs.getString(1);
+					}
+				} catch (SQLException e) {
+					dailyjoin.getDailyLogger().log(Level.SEVERE, String.format("getUUid(%s)", name), e);
+				} finally {
+					TigerConnection.closeRessources(rs, st);
+				}
+			} else {
+				throw new NoSQLConnectionException();
+			}
+		} else {
+			dailyjoin.getDailyLogger().log(Level.WARNING, "getUUid: You're trying to get a UUid from a player without a name.");
 		}
 		return null;
 	}

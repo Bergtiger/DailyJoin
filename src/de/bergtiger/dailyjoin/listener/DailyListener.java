@@ -1,6 +1,9 @@
-package de.bergtiger.dailyjoin;
+package de.bergtiger.dailyjoin.listener;
 
+import de.bergtiger.dailyjoin.utils.DailyReward;
 import de.bergtiger.dailyjoin.bdo.DailyPlayer;
+import de.bergtiger.dailyjoin.dailyjoin;
+import de.bergtiger.dailyjoin.dao.impl.file.DailyFile;
 import de.bergtiger.dailyjoin.exception.LoadPlayerException;
 import de.bergtiger.dailyjoin.exception.NoSQLConnectionException;
 import de.bergtiger.dailyjoin.exception.SavePlayerException;
@@ -52,7 +55,7 @@ public class DailyListener implements Listener {
 	private void setData() {
 		delay = dailyjoin.inst().getConfig().getInt("config.delay");
 		sql = dailyjoin.inst().getConfig().getString("config.SQL").equalsIgnoreCase("true");
-		rewardOnSQLConnectionLost = dailyjoin.inst().getConfig().getString("cofig.GetRewardOnSQLConnectionLost").equalsIgnoreCase("true");
+		rewardOnSQLConnectionLost = dailyjoin.inst().getConfig().getString("config.GetRewardOnSQLConnectionLost").equalsIgnoreCase("true");
 	}
 
 	@EventHandler

@@ -4,6 +4,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 
 import de.bergtiger.dailyjoin.bdo.TigerList;
@@ -152,6 +154,31 @@ public class PlayerDAOImplSQL implements PlayerDAO {
 			}
 		} else {
 			dailyjoin.getDailyLogger().log(Level.SEVERE, String.format("getTopPlayers: no column(%s)",column));
+		}
+		return null;
+	}
+
+	@Override
+	public List<String> getNames(String args) throws NoSQLConnectionException {
+		if(TigerConnection.hasConnection()) {
+			ResultSet rs = null;
+			PreparedStatement st = null;
+			try {
+				st = TigerConnection.conn().prepareStatement(String.format("SELECT %s FROM %s WHERE %s LIKE ?", NAME, DAILY_JOIN_TABLE, NAME), ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+				st.setString(1, (args + '%'));
+				rs = st.executeQuery();
+				List<String> names = new ArrayList<>();
+				while(rs.next()) {
+					names.add(rs.getString(1));
+				}
+				return names;
+			} catch (SQLException e) {
+				dailyjoin.getDailyLogger().log(Level.SEVERE, "getNames", e);
+			} finally {
+				TigerConnection.closeRessources(rs, st);
+			}
+		} else {
+			throw new NoSQLConnectionException();
 		}
 		return null;
 	}

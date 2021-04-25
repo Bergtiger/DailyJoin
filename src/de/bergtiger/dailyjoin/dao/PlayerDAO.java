@@ -5,6 +5,8 @@ import de.bergtiger.dailyjoin.bdo.TigerList;
 import de.bergtiger.dailyjoin.exception.NoSQLConnectionException;
 import de.bergtiger.dailyjoin.exception.UpdatePlayerException;
 
+import java.util.List;
+
 public interface PlayerDAO {
 
 	/**
@@ -30,6 +32,13 @@ public interface PlayerDAO {
 	 * @throws NoSQLConnectionException
 	 */
 	public TigerList<DailyPlayer> getOrderedPlayers(String column, String richtung) throws NoSQLConnectionException;
+
+	/**
+	 * get all names from Players
+	 * @return
+	 * @throws NoSQLConnectionException
+	 */
+	public List<String> getNames(String args) throws NoSQLConnectionException;
 
 	/**
 	 * get players uuid from database

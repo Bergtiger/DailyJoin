@@ -4,20 +4,16 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import de.bergtiger.dailyjoin.cmd.DailyCommand;
-import de.bergtiger.dailyjoin.dao.impl.file.DailyFile;
 import de.bergtiger.dailyjoin.listener.DailyListener;
+import de.bergtiger.dailyjoin.tab.DailyTabComplete;
 import de.bergtiger.dailyjoin.utils.DailyReward;
-import org.bukkit.plugin.PluginManager;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import de.bergtiger.dailyjoin.dao.TigerConnection;
 
 
 public class dailyjoin extends JavaPlugin{
-	private DailyListener dl;
-	private DailyCommand dc;
-	private DailyReward dr;
-	private DailyFile dFile;
 
 	private static dailyjoin instance;
 
@@ -32,37 +28,21 @@ public class dailyjoin extends JavaPlugin{
 	
 	@Override
 	public void onEnable() {
+		// set instance
 		instance = this;
-
 		getDailyLogger().log(Level.INFO, "Starte DailyJoin...");
-		
-		PluginManager pm = this.getServer().getPluginManager();
-		
+		// load configuration
 		new DailyConfig(this);
-		
+		// start SQLConnection
 		TigerConnection.inst().loadData();
 		TigerConnection.inst().connect();
-//		this.dl = new DailyListener(this);
-		this.dl = DailyListener.inst();
-//		this.dc = new DailyCommand(this);
-		this.dc = new DailyCommand();
-//		this.dr = new DailyReward(this);
-		this.dr = DailyReward.inst();
-		this.dFile = new DailyFile();
-		
-		pm.registerEvents(this.dl, this);
-		
-		this.getCommand("dailyjoin").setExecutor(this.dc);
+		// register Listener
+		Bukkit.getPluginManager().registerEvents(DailyListener.inst(), this);
+		// register Command
+		getCommand("dailyjoin").setExecutor(new DailyCommand());
+		getCommand("dailyjoin").setTabCompleter(new DailyTabComplete());
 	}
-	
-	public DailyReward getDailyReward(){
-		return this.dr;
-	}
-	
-	public DailyFile getDailyFile(){
-		return this.dFile;
-	}
-	
+
 	/**
 	 * Plugin Logger.
 	 * @return

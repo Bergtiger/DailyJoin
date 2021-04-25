@@ -18,9 +18,9 @@ public class DailyCommand implements CommandExecutor {
 			switch (args[0]) {
 				case CMD_TOP: DailyCmdTop.run(cs, args); break;
 
-				case CMD_SET: DailySet.run(cs, args); break;
+				case CMD_SET: DailyCmdSet.run(cs, args); break;
 
-				case CMD_ADD: DailyAdd.run(cs, args); break;
+				case CMD_ADD: DailyCmdAdd.run(cs, args); break;
 
 				case CMD_INFO: DailyCmdPlugin.run(cs); break;
 

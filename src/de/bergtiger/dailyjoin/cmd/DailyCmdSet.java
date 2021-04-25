@@ -6,14 +6,14 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import static de.bergtiger.dailyjoin.utils.TigerPermission.*;
 
-public class DailySet {
+public class DailyCmdSet {
 
     public static final String DAYS_TOTAL = "daysTotal", DAYS_CONSECUTIVE = "daysConsecutive";
 
-    private DailySet(){}
+    private DailyCmdSet(){}
 
     public static void run(CommandSender cs, String[] args) {
-        Bukkit.getScheduler().runTaskAsynchronously(dailyjoin.inst(), () -> new DailySet().setPlayerData(cs, args));
+        Bukkit.getScheduler().runTaskAsynchronously(dailyjoin.inst(), () -> new DailyCmdSet().setPlayerData(cs, args));
     }
 
     /**
@@ -30,13 +30,13 @@ public class DailySet {
                     int value = Integer.valueOf(args[3]);
 
                 } catch (NumberFormatException e) {
-                    cs.spigot().sendMessage(Lang.buildTC(Lang.NoNumber.get().replace(Lang.VALUE, args[3])));
+                    cs.spigot().sendMessage(Lang.buildTC(Lang.NONUMBER.get().replace(Lang.VALUE, args[3])));
                 }
             } else {
-                cs.spigot().sendMessage(Lang.buildTC(Lang.WrongArgument.get()));
+                cs.spigot().sendMessage(Lang.buildTC(Lang.WRONG_ARGUMENT.get()));
             }
         } else {
-            cs.spigot().sendMessage(Lang.buildTC(Lang.NoPermission.get()));
+            cs.spigot().sendMessage(Lang.buildTC(Lang.NOPERMISSION.get()));
         }
     }
 }

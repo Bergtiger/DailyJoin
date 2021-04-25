@@ -7,14 +7,14 @@ import org.bukkit.command.CommandSender;
 
 import static de.bergtiger.dailyjoin.utils.TigerPermission.*;
 
-public class DailyAdd {
+public class DailyCmdAdd {
 
     public static final String DAYS_TOTAL = "daysTotal", DAYS_CONSECUTIVE = "daysConsecutive";
 
-    private DailyAdd(){}
+    private DailyCmdAdd(){}
 
     public static void run(CommandSender cs, String[] args) {
-        Bukkit.getScheduler().runTaskAsynchronously(dailyjoin.inst(), () -> new DailyAdd().setPlayerData(cs, args));
+        Bukkit.getScheduler().runTaskAsynchronously(dailyjoin.inst(), () -> new DailyCmdAdd().setPlayerData(cs, args));
     }
 
     /**

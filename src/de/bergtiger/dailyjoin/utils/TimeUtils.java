@@ -3,7 +3,6 @@ package de.bergtiger.dailyjoin.utils;
 import de.bergtiger.dailyjoin.dailyjoin;
 import de.bergtiger.dailyjoin.utils.lang.Lang;
 
-import java.sql.Time;
 import java.sql.Timestamp;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;

@@ -8,7 +8,9 @@ import de.bergtiger.dailyjoin.dao.impl.sql.PlayerDAOImplSQL;
 import de.bergtiger.dailyjoin.exception.NoSQLConnectionException;
 import de.bergtiger.dailyjoin.exception.UpdatePlayerException;
 
-public class playerDAOimpl implements PlayerDAO {
+import java.util.List;
+
+public class PlayerDAOimpl implements PlayerDAO {
 
     private boolean sql;
     private final PlayerDAOImplSQL daoSQL = new PlayerDAOImplSQL();
@@ -27,6 +29,11 @@ public class playerDAOimpl implements PlayerDAO {
     @Override
     public TigerList<DailyPlayer> getOrderedPlayers(String column, String richtung) throws NoSQLConnectionException {
         return sql ? daoSQL.getOrderedPlayers(column, richtung) : daoFile.getOrderedPlayers(column, richtung);
+    }
+
+    @Override
+    public List<String> getNames(String args) throws NoSQLConnectionException {
+        return sql ? daoSQL.getNames(args) : daoFile.getNames(args);
     }
 
     @Override

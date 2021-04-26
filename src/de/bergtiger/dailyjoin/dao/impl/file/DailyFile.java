@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.logging.Level;
 
 import de.bergtiger.dailyjoin.dailyjoin;
-import de.bergtiger.dailyjoin.exception.LoadPlayerException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;

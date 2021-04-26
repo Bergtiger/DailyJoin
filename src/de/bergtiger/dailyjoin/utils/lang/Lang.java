@@ -11,68 +11,139 @@ import net.md_5.bungee.api.chat.hover.content.Text;
 public enum Lang implements Constants {
 
 	/** CommandSender has no Permission.*/
-	NOPERMISSION("&cNo Permission"),
+	NOPERMISSION
+		("&cNo Permission"),
 	/** TODO*/
-	NOUUID("&7Not a correct UUID or Player is not online."),
+	NOUUID
+		("&7Not a correct UUID or Player is not online."),
 	/** No such file exists (file as VALUE)*/
-	NOFILE(String.format("&7Could not find file '%s'.", VALUE)),
+	NOFILE
+		(String.format("&7Could not find file '%s'.", VALUE)),
 	/** Not a correct Number(shows wrong input as VALUE)*/
-	NONUMBER(String.format("'%s' is not a valid number", VALUE)),
+	NONUMBER
+		(String.format("'%s' is not a valid number", VALUE)),
 	/** No such player (shows input as PLAYER)*/
-	NOPLAYER(String.format("&7No such player '%s' could be found", PLAYER)),
+	NOPLAYER
+		(String.format("&7No such player '%s' could be found", PLAYER)),
 	/** No database connection*/
-	NOCONNECTION("&7Error: SQL-Connection"),
+	NOCONNECTION
+		("&7Error: SQL-Connection"),
 	/** No entries in the database*/
-	NOLIST("No entries in the database"),
+	NOLIST
+		("No entries in the database"),
 
-	WRONG_ARGUMENT("&7Wrong Argument. Please Check your Command."),
+	WRONG_ARGUMENT
+		("&7Wrong Argument. Please Check your Command."),
 
 	/** Time format !WITHOUT COLORS!*/
-	FORMAT_TIME			("dd.MM.yyyy, HH:mm"),
+	FORMAT_TIME
+		("dd.MM.yyyy, HH:mm"),
 	//TODO
-	ONLY_SQL("&7This Command works only with SQL."),
+	ONLY_SQL
+		("&7This Command works only with SQL."),
 	
-	REWARD_DAILY("&7Du hast dich bereits den &e-day-&7. Tag in Folge eingeloggt."),
-	REWARD_BIRTHDAY("&e" + PLAYER + " &7hat heute seinen Server-Geburtstag."),
-	REWARD_DAYS_CONSECUTIVE("&e" + PLAYER + " &7ist bereits &e" + VALUE + " &7Tage in Folge auf dem Server."),
-	REWARD_DAYS_TOTAL("&e" + PLAYER + " &7ist bereits insgesamt &e" + VALUE + " &7Tage auf dem Server."),
+	/** join message days as VALUE*/
+	REWARD_DAILY
+		(String.format("&7Du hast dich bereits den &e%s&7. Tag in Folge eingeloggt.", VALUE)),
+	/** broadcast birthday player as PLAYER*/
+	REWARD_BIRTHDAY
+		(String.format("&e%s&7hat heute seinen Server-Geburtstag.", PLAYER)),
+	/** broadcast player as PLAYER, days as VALUE*/
+	REWARD_DAYS_CONSECUTIVE
+		(String.format("&e%s&7ist bereits &e%s &7Tage in Folge auf dem Server.", PLAYER, VALUE)),
+	/** broadcast player as PLAYER, days as VALUE*/
+	REWARD_DAYS_TOTAL
+		(String.format("&e%s &7ist bereits insgesamt &e%s &7Tage auf dem Server.", PLAYER, VALUE)),
 	
-	DailyInfo("&b/daily  -  &7zeigt alle g¸ltigen Befehle"),
-	DailyInfoTop("&b/daily top [day, totaldays] [value] -  &7zeigt top Liste"),
-	DailyInfoSet("&b/daily set [player, uuid] [day, totaldays] [value]  -  &7Setzt dem Spieler day/totaldays value"),
-	DailyInfoAdd("&b/daily add [player, uuid] [day, totaldays] [value]  -  &7Addiert dem Spieler day/totaldays value"),
-	DailyInfoInfo("&b/daily info  -  &7zeigt Plugin version"),
-	DailyInfoReload("&b/daily reload  -  &7l‰dt config neu"),
-	DailyInfoPlayer("&b/daily player [player, uuid]  -  &7zeigt die Daten des Spielers"),
-	DailyInfoConfig("&b/daily config [ma/system/reward/oldfiles/delay] [true/false/in case of delay number]  -  &7‰ndert die config"),
+	DAILY_INFO_CMD
+		("&b/daily  -  &7zeigt alle g√ºltigen Befehle"),
+	DAILY_INFO_TOP
+		("&b/daily top [day, totaldays] [value] -  &7zeigt top Liste"),
+	DAILY_INFO_SET
+		("&b/daily set [player, uuid] [day, totaldays] [value]  -  &7Setzt dem Spieler day/totaldays value"),
+	DAILY_INFO_ADD
+		("&b/daily add [player, uuid] [day, totaldays] [value]  -  &7Addiert dem Spieler day/totaldays value"),
+	DAILY_INFO_INFO
+		("&b/daily info  -  &7zeigt Plugin version"),
+	DAILY_INFO_RELOAD
+		("&b/daily reload  -  &7l√§dt config neu"),
+	DAILY_INFO_PLAYER
+		("&b/daily player [player, uuid]  -  &7zeigt die Daten des Spielers"),
+	DAILY_INFO_CONFIG
+		("&b/daily config [ma/system/reward/oldfiles/delay] [true/false/in case of delay number]  -  &7√§ndert die config"),
 	
-	DailyAdd("&7/daily add [player/uuid] [day, totaldays] [value]"),
-	DailyAddData("&aBei dem Spieler mit der UUID: &e-player- &awurde &e-data- &aum &e-value- &aerh?ht."),
+//	DailyAdd
+//		("&7/daily add [player/uuid] [day, totaldays] [value]"),
+	/** player as PLAYER, column/type as DATA, value/days as VALUE*/
+	DAILY_ADD_SUCCESS
+		(String.format("&aBei dem Spieler mit der UUID: &e%s &awurde &e%s &aum &e%s &aerh√∂ht.", PLAYER, DATA, VALUE)),
+	/** player as PLAYER, column/type as DATA, value/days as VALUE*/
+	DAILY_ADD_ERROR
+		(String.format("Could not add ", PLAYER, DATA, VALUE)),
 
-	DailySet("&7/daily set [player/uuid] [day, totaldays] [value]"),
-	DailySetData("&aBei dem Spieler mit der UUID: &e-player- &awurde &e-data- &aauf &e-value- &agesetzt."),
+//	DailySet
+//		("&7/daily set [player/uuid] [day, totaldays] [value]"),
+	/** player as PLAYER, column/type as DATA, value/days as VALUE*/
+	DAILY_SET_SUCCESS
+		(String.format("&aBei dem Spieler mit der UUID: &e%s &awurde &e%s &aauf &e%s &agesetzt.", PLAYER, DATA, VALUE)),
+	/** player as PLAYER, column/type as DATA, value/days as VALUE */
+	DAILY_SET_ERROR
+		(String.format("Could not save ", PLAYER, DATA, VALUE)),
 
-	DailyReload("&7DailyJoin reloaded."),
+	DAILY_RELOAD
+		("&7DailyJoin reloaded."),
 
-	TopPlayerDay("&a----<[&6Top Day&a]>----"),
-	TopPlayerTotalDays("&a----<[&6Top Totaldays&a]>----"),
-	TopPlayerList("&e-player-: &7-days-"),
+	TOP_PLAYER_DAYS_CONSECUTIVE
+		("&a----<[&6Top Day&a]>----"),
+	TOP_PLAYER_DAYS_TOTAL
+		("&a----<[&6Top Totaldays&a]>----"),
+	/** top list player as PLAYER, VALUE*/
+	TOP_PLAYER_LIST
+		(String.format("&e%s: &7%s", PLAYER, VALUE)),
 
-	PluginHeader("&a----<[&6DailyJoin&a]>----"),
-	PluginFooter("&a---------------------"),
-	PluginVersion("&eVersion: &7-version-"),
-	PluginMonatsAnzeige("&eMonatsAnzeige: &7-status-"),
-	PluginSystem("&eSystem: &7-status-"),
-	PluginRewardReconnection("&eReward on Reconnection: &7-status-"),
-	PluginDelay("&eRewardDelay: &7-delay-"),
-	PluginTopPlayer("&eTopPlayer: &7-amount-"),
+	/** plugin statistic menu header*/
+	PLUGIN_HEADER
+		("&a----<[&6DailyJoin&a]>----"),
+	/** plugin statistic menu footer*/
+	PLUGIN_FOOTER
+		("&a---------------------"),
+	/** plugin statistic version as VALUE*/
+	PLUGIN_VERSION
+		(String.format("&eVersion: &7%s", VALUE)),
+	/** plugin statistic time format as VALUE*/
+	PLUGIN_TIMEFORMAT
+		(String.format("&eTimeFormat: &7%s", VALUE)),
+	/** plugin statistic file or sql as VALUE*/
+	PLUGIN_SYSTEM
+		(String.format("&eSystem: &7%s", VALUE)),
+	/** plugin statistic reward as VALUE*/
+	PLUGIN_REWARD_RECONNECTION
+		(String.format("&eReward on Reconnection: &7%s", VALUE)),
+	/** plugin statistic reward delay as VALUE*/
+	PLUGIN_DELAY
+		(String.format("&eRewardDelay: &7%s", VALUE)),
+	/** plugin statistic rewards */
+	PLUGIN_PAGE_SIZE
+		(String.format("&eTopPlayer: &7%s", VALUE)),
 
-	PlayerHeader("&a----<[&6-player-&a]>----"),
-	PlayerFooter("&a--------------------"),
-	PlayerFirstJoin("&eFirstJoin: &7Day Month Year"),
-	PlayerLastJoin("&eLastJoin: &7Day Month Year"),
-	PlayerDay("&eDay: &7-day-"),
-	PlayerTotalDays("&eTotalDays: &7-day-");
+	/** player statistic header player name as PLAYER*/
+	PLAYER_HEADER
+		(String.format("&a----<[&6%s&a]>----", PLAYER)),
+	/** player statistic footer*/
+	PLAYER_FOOTER
+		("&a--------------------"),
+	/** player statistic first join as VALUE*/
+	PLAYER_JOIN_FIRST
+		(String.format("&eFirstJoin: &7%s", VALUE)),
+	/** player statistic last join as VALUE*/
+	PLAYER_JOIN_LAST
+		(String.format("&eLastJoin: &7%s", VALUE)),
+	/** player statistic days consecutive as VALUE*/
+	PLAYER_DAYS_CONSECUTIVE
+		(String.format("&eDay: &7%s", VALUE)),
+	/** player statistic days total as VALUE*/
+	PLAYER_DAYS_TOTAL
+		(String.format("&eTotalDays: &7%s", VALUE));
 	
 	private String message;
 	
@@ -82,6 +153,10 @@ public enum Lang implements Constants {
 	
 	public String get() {
 		return message;
+	}
+
+	public void set(String message) {
+		this.message = message;
 	}
 	
 	public String colored() {
@@ -93,8 +168,8 @@ public enum Lang implements Constants {
 	 * @param args - Text
 	 * @return TextComponent
 	 */
-	public static TextComponent buildTC(String args) {
-		return buildTC(args, null, null, null);
+	public static TextComponent build(String args) {
+		return build(args, null, null, null);
 	}
 	
 	/**
@@ -105,7 +180,7 @@ public enum Lang implements Constants {
 	 * @param cmd_suggestion - onClick suggestion
 	 * @return TextComponent
 	 */
-	public static TextComponent buildTC(String args, String cmd, String hover, String cmd_suggestion) {
+	public static TextComponent build(String args, String cmd, String hover, String cmd_suggestion) {
 		return buildTC2(args, cmd, hover != null ? rgbColor(new TextComponent(hover), null) : null, cmd_suggestion);
 	}
 	

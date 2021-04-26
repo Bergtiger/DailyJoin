@@ -114,7 +114,7 @@ public class DailyReward {
 	private void giveDaily(Player p, int day){
 		if((daily != null) && (!daily.isEmpty())){
 			performCmds(p, daily);
-			p.spigot().sendMessage(Lang.buildTC(Lang.REWARD_DAILY.get().replace(Lang.VALUE, Integer.toString(day))));
+			p.spigot().sendMessage(Lang.build(Lang.REWARD_DAILY.get().replace(Lang.VALUE, Integer.toString(day))));
 		}
 	}
 	
@@ -126,7 +126,7 @@ public class DailyReward {
 	private void giveDaysConsecutive(Player p, int day){
 		if((rewardsConsecutive != null) && rewardsConsecutive.containsKey(day)){
 			performCmds(p, rewardsConsecutive.get(day));
-			Bukkit.spigot().broadcast(Lang.buildTC(Lang.REWARD_DAYS_CONSECUTIVE.get().replace(Lang.VALUE, Integer.toString(day)).replace(Lang.PLAYER, p.getName())));
+			Bukkit.spigot().broadcast(Lang.build(Lang.REWARD_DAYS_CONSECUTIVE.get().replace(Lang.VALUE, Integer.toString(day)).replace(Lang.PLAYER, p.getName())));
 		}
 	}
 	
@@ -138,7 +138,7 @@ public class DailyReward {
 	private void giveDaysTotal(Player p, int totaldays){
 		if((rewardsTotal != null) && rewardsTotal.containsKey(totaldays)){
 			performCmds(p, rewardsTotal.get(totaldays));
-			Bukkit.spigot().broadcast(Lang.buildTC(Lang.REWARD_DAYS_TOTAL.get().replace(Lang.VALUE, Integer.toString(totaldays)).replace(Lang.PLAYER, p.getName())));
+			Bukkit.spigot().broadcast(Lang.build(Lang.REWARD_DAYS_TOTAL.get().replace(Lang.VALUE, Integer.toString(totaldays)).replace(Lang.PLAYER, p.getName())));
 		}
 	}
 	
@@ -155,7 +155,7 @@ public class DailyReward {
 			time.setTimeInMillis(t.getTime());
 			if((time.get(Calendar.YEAR)!=today.get(Calendar.YEAR))&&((time.get(Calendar.DAY_OF_MONTH) == today.get(Calendar.DAY_OF_MONTH))&&(time.get(Calendar.MONTH)==today.get(Calendar.MONTH)))){
 				performCmds(p, this.birthday);
-				Bukkit.spigot().broadcast(Lang.buildTC(Lang.REWARD_BIRTHDAY.get().replace(Lang.VALUE, Integer.toString(totaldays)).replace(Lang.PLAYER, p.getName())));
+				Bukkit.spigot().broadcast(Lang.build(Lang.REWARD_BIRTHDAY.get().replace(Lang.VALUE, Integer.toString(totaldays)).replace(Lang.PLAYER, p.getName())));
 			}
 		}
 	}

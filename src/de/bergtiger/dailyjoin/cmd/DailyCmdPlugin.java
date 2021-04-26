@@ -18,21 +18,21 @@ public class DailyCmdPlugin {
     private void showPlugin(CommandSender cs) {
         if(hasPermission(cs, ADMIN, PLUGIN)){
             //plugin info
-            cs.spigot().sendMessage(Lang.buildTC(Lang.PluginHeader.get()));
-            cs.spigot().sendMessage(Lang.buildTC(Lang.PluginVersion.get().replace(Lang.VALUE, dailyjoin.inst().getDescription().getVersion())));
+            cs.spigot().sendMessage(Lang.build(Lang.PLUGIN_HEADER.get()));
+            cs.spigot().sendMessage(Lang.build(Lang.PLUGIN_VERSION.get().replace(Lang.VALUE, dailyjoin.inst().getDescription().getVersion())));
             //config
-            cs.spigot().sendMessage(Lang.buildTC(Lang.PluginMonatsAnzeige.get().replace(Lang.VALUE, dailyjoin.inst().getConfig().getString("config.MonatsAnzeige"))));
+            cs.spigot().sendMessage(Lang.build(Lang.PLUGIN_TIMEFORMAT.get().replace(Lang.VALUE, Lang.FORMAT_TIME.get())));
             if(dailyjoin.inst().getConfig().getString("config.SQL").equalsIgnoreCase("true")){
-                cs.spigot().sendMessage(Lang.buildTC(Lang.PluginSystem.get().replace(Lang.VALUE, "SQL")));
-                cs.spigot().sendMessage(Lang.buildTC(Lang.PluginRewardReconnection.get().replace(Lang.VALUE, dailyjoin.inst().getConfig().getString("config.GetRewardOnSQLConnectionLost"))));
+                cs.spigot().sendMessage(Lang.build(Lang.PLUGIN_SYSTEM.get().replace(Lang.VALUE, "SQL")));
+                cs.spigot().sendMessage(Lang.build(Lang.PLUGIN_REWARD_RECONNECTION.get().replace(Lang.VALUE, dailyjoin.inst().getConfig().getString("config.GetRewardOnSQLConnectionLost"))));
             } else {
-                cs.spigot().sendMessage(Lang.buildTC(Lang.PluginSystem.get().replace(Lang.VALUE, "File")));
+                cs.spigot().sendMessage(Lang.build(Lang.PLUGIN_SYSTEM.get().replace(Lang.VALUE, "File")));
             }
-            cs.spigot().sendMessage(Lang.buildTC(Lang.PluginDelay.get().replace(Lang.VALUE, Integer.toString(dailyjoin.inst().getConfig().getInt("config.delay")))));
-            cs.spigot().sendMessage(Lang.buildTC(Lang.PluginTopPlayer.get().replace(Lang.VALUE, Integer.toString(dailyjoin.inst().getConfig().getInt("config.TopPlayer")))));
-            cs.spigot().sendMessage(Lang.buildTC(Lang.PluginFooter.get()));
+            cs.spigot().sendMessage(Lang.build(Lang.PLUGIN_DELAY.get().replace(Lang.VALUE, Integer.toString(dailyjoin.inst().getConfig().getInt("config.delay")))));
+            cs.spigot().sendMessage(Lang.build(Lang.PLUGIN_PAGE_SIZE.get().replace(Lang.VALUE, Integer.toString(dailyjoin.inst().getConfig().getInt("config.TopPlayer")))));
+            cs.spigot().sendMessage(Lang.build(Lang.PLUGIN_FOOTER.get()));
         } else {
-            cs.spigot().sendMessage(Lang.buildTC(Lang.NOPERMISSION.get()));
+            cs.spigot().sendMessage(Lang.build(Lang.NOPERMISSION.get()));
         }
     }
 }

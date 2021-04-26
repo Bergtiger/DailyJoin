@@ -24,9 +24,9 @@ public class DailyCommand implements CommandExecutor {
 
 				case CMD_INFO: DailyCmdPlugin.run(cs); break;
 
-				case CMD_RELOAD: daily_reload(cs);break;
+				case CMD_RELOAD: daily_reload(cs); break;
 
-				case CMD_PLAYER: DailyCmdPlayer.run(cs, args);
+				case CMD_PLAYER: DailyCmdPlayer.run(cs, args); break;
 
 		//		case "config": daily_config(cs, args);break;
 				default: {
@@ -46,24 +46,26 @@ public class DailyCommand implements CommandExecutor {
 	 */
 	private void daily_command(CommandSender cs){
 		if(hasPermission(cs, ADMIN, CMD)){
-			cs.spigot().sendMessage(Lang.buildTC(Lang.DailyInfo.get()));
-			cs.spigot().sendMessage(Lang.buildTC(Lang.DailyInfoTop.get(), null, null, CMD_CMD + " " + CMD_TOP));
+			String cmdShort = String.format("/%s %s", CMD_CMD, "%s");
+			String cmdLong = String.format("/%s %s ", CMD_CMD, "%s");
+			cs.spigot().sendMessage(Lang.build(Lang.DAILY_INFO_CMD.get()));
+			cs.spigot().sendMessage(Lang.build(Lang.DAILY_INFO_TOP.get(), null, null, String.format(cmdShort, CMD_TOP)));
 			// Set
 			if(hasPermission(cs, ADMIN, SET)) {
-				cs.spigot().sendMessage(Lang.buildTC(Lang.DailyInfoSet.get(), null, null, CMD_CMD + " " + CMD_SET + " "));
-				cs.spigot().sendMessage(Lang.buildTC(Lang.DailyInfoAdd.get(), null, null, CMD_CMD + " " + CMD_ADD + " "));
+				cs.spigot().sendMessage(Lang.build(Lang.DAILY_INFO_SET.get(), null, null, String.format(cmdLong, CMD_SET)));
+				cs.spigot().sendMessage(Lang.build(Lang.DAILY_INFO_ADD.get(), null, null, String.format(cmdLong, CMD_ADD)));
 			}
 			// PluginInfo
 			if(hasPermission(cs, ADMIN, PLUGIN))
-				cs.spigot().sendMessage(Lang.buildTC(Lang.DailyInfoInfo.get(), CMD_CMD + " " + CMD_INFO, null, null));
+				cs.spigot().sendMessage(Lang.build(Lang.DAILY_INFO_INFO.get(), String.format(cmdShort, CMD_INFO), null, null));
 			// Reload
 			if(hasPermission(cs, ADMIN, RELOAD))
-				cs.spigot().sendMessage(Lang.buildTC(Lang.DailyInfoReload.get(), CMD_CMD + " " + CMD_RELOAD, null, null));
+				cs.spigot().sendMessage(Lang.build(Lang.DAILY_INFO_RELOAD.get(), String.format(cmdShort, CMD_RELOAD), null, null));
 			// Player
 			if(hasPermission(cs, ADMIN, PLAYER))
-				cs.spigot().sendMessage(Lang.buildTC(Lang.DailyInfoPlayer.get(), null, null, CMD_CMD + " " + CMD_PLAYER + " "));
+				cs.spigot().sendMessage(Lang.build(Lang.DAILY_INFO_PLAYER.get(), null, null, String.format(cmdLong, CMD_PLAYER)));
 		} else {
-			cs.spigot().sendMessage(Lang.buildTC(Lang.NOPERMISSION.get()));
+			cs.spigot().sendMessage(Lang.build(Lang.NOPERMISSION.get()));
 		}
 	}
 
@@ -74,9 +76,9 @@ public class DailyCommand implements CommandExecutor {
 	private void daily_reload(CommandSender cs){
 		if(hasPermission(cs, ADMIN, RELOAD)){
 			dailyjoin.inst().reload();
-			cs.spigot().sendMessage(Lang.buildTC(Lang.DailyReload.get()));
+			cs.spigot().sendMessage(Lang.build(Lang.DAILY_RELOAD.get()));
 		} else {
-			cs.spigot().sendMessage(Lang.buildTC(Lang.NOPERMISSION.get()));
+			cs.spigot().sendMessage(Lang.build(Lang.NOPERMISSION.get()));
 		}
 	}
 }

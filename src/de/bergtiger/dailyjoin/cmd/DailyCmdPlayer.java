@@ -40,10 +40,10 @@ public class DailyCmdPlayer {
 			if ((dp = getPlayer(uuid)) != null) {
 				showPlayer(cs, dp);
 			} else {
-				cs.spigot().sendMessage(Lang.buildTC(Lang.NOPLAYER.get().replace(Lang.PLAYER, uuid)));
+				cs.spigot().sendMessage(Lang.build(Lang.NOPLAYER.get().replace(Lang.PLAYER, uuid)));
 			}
 		} else {
-			cs.spigot().sendMessage(Lang.buildTC(Lang.NOPERMISSION.get()));
+			cs.spigot().sendMessage(Lang.build(Lang.NOPERMISSION.get()));
 		}
 	}
 
@@ -63,13 +63,13 @@ public class DailyCmdPlayer {
      */
 	private void showPlayer(@Nonnull CommandSender cs, @Nonnull DailyPlayer dp) {
 		// Header
-		cs.spigot().sendMessage(Lang.buildTC(Lang.PlayerHeader.get().replace(Lang.PLAYER, dp.getName())));
+		cs.spigot().sendMessage(Lang.build(Lang.PLAYER_HEADER.get().replace(Lang.PLAYER, dp.getName())));
 		// Data
-		cs.spigot().sendMessage(Lang.buildTC(Lang.PlayerFirstJoin.get().replace(Lang.VALUE, TimeUtils.formated(dp.getFirstjoin()))));
-		cs.spigot().sendMessage(Lang.buildTC(Lang.PlayerLastJoin.get().replace(Lang.VALUE, TimeUtils.formated(dp.getLastjoin()))));
-		cs.spigot().sendMessage(Lang.buildTC(Lang.PlayerDay.get().replace(Lang.VALUE, Integer.toString(dp.getDaysConsecutive()))));
-		cs.spigot().sendMessage(Lang.buildTC(Lang.PlayerTotalDays.get().replace(Lang.VALUE, Integer.toString(dp.getDaysTotal()))));
+		cs.spigot().sendMessage(Lang.build(Lang.PLAYER_JOIN_FIRST.get().replace(Lang.VALUE, TimeUtils.formated(dp.getFirstjoin()))));
+		cs.spigot().sendMessage(Lang.build(Lang.PLAYER_JOIN_LAST.get().replace(Lang.VALUE, TimeUtils.formated(dp.getLastjoin()))));
+		cs.spigot().sendMessage(Lang.build(Lang.PLAYER_DAYS_CONSECUTIVE.get().replace(Lang.VALUE, Integer.toString(dp.getDaysConsecutive()))));
+		cs.spigot().sendMessage(Lang.build(Lang.PLAYER_DAYS_TOTAL.get().replace(Lang.VALUE, Integer.toString(dp.getDaysTotal()))));
 		// Footer
-		cs.spigot().sendMessage(Lang.buildTC(Lang.PlayerFooter.get()));
+		cs.spigot().sendMessage(Lang.build(Lang.PLAYER_FOOTER.get()));
 	}
 }

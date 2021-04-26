@@ -1,6 +1,10 @@
 package de.bergtiger.dailyjoin.cmd;
 
 import de.bergtiger.dailyjoin.dailyjoin;
+import de.bergtiger.dailyjoin.bdo.DailyPlayer;
+import de.bergtiger.dailyjoin.dao.TigerConnection;
+import de.bergtiger.dailyjoin.exception.NoSQLConnectionException;
+import de.bergtiger.dailyjoin.exception.UpdatePlayerException;
 import de.bergtiger.dailyjoin.utils.lang.Lang;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -28,15 +32,43 @@ public class DailyCmdSet {
                     String uuid = args[1];
                     String type = args[2];
                     int value = Integer.valueOf(args[3]);
-
+                    // get Player
+                    try {
+						DailyPlayer dp = TigerConnection.inst().getPlayerDAO().getPlayer(uuid);
+						if(dp != null) {
+							// set player value
+							if(type.equalsIgnoreCase(DAYS_TOTAL)) {
+								dp.setDaysTotal(value);
+							} else if (type.equalsIgnoreCase(DAYS_CONSECUTIVE)) {
+								dp.setDaysConsecutive(value);
+							} else {
+								cs.spigot().sendMessage(Lang.build(Lang.WRONG_ARGUMENT.get()));
+								return;
+							}
+							// save player value
+							TigerConnection.inst().getPlayerDAO().updatePlayer(dp);
+							cs.spigot().sendMessage(Lang.build(
+									Lang.DAILY_SET_SUCCESS.get().replace(Lang.PLAYER, uuid).replace(Lang.DATA, type).replace(Lang.VALUE, Integer.toString(value)),
+									String.format("/%s %s %s", DailyCommand.CMD_CMD, DailyCommand.CMD_PLAYER, uuid),
+									null,
+									null));
+						} else {
+							cs.spigot().sendMessage(Lang.build(Lang.NOPLAYER.get().replace(Lang.PLAYER, uuid)));
+						}
+					} catch (NoSQLConnectionException e) {
+						cs.spigot().sendMessage(Lang.build(Lang.NOCONNECTION.get()));
+						TigerConnection.noConnection();
+					} catch (UpdatePlayerException e) {
+						cs.spigot().sendMessage(Lang.build(Lang.DAILY_SET_ERROR.get().replace(Lang.PLAYER, uuid).replace(Lang.DATA, type).replace(Lang.VALUE, Integer.toString(value))));
+					}
                 } catch (NumberFormatException e) {
-                    cs.spigot().sendMessage(Lang.buildTC(Lang.NONUMBER.get().replace(Lang.VALUE, args[3])));
+                    cs.spigot().sendMessage(Lang.build(Lang.NONUMBER.get().replace(Lang.VALUE, args[3])));
                 }
             } else {
-                cs.spigot().sendMessage(Lang.buildTC(Lang.WRONG_ARGUMENT.get()));
+                cs.spigot().sendMessage(Lang.build(Lang.WRONG_ARGUMENT.get()));
             }
         } else {
-            cs.spigot().sendMessage(Lang.buildTC(Lang.NOPERMISSION.get()));
+            cs.spigot().sendMessage(Lang.build(Lang.NOPERMISSION.get()));
         }
     }
 }

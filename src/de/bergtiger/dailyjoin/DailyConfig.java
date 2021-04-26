@@ -3,8 +3,11 @@ package de.bergtiger.dailyjoin;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.logging.Level;
 
+import de.bergtiger.dailyjoin.utils.lang.Lang;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 
 public class DailyConfig {
 	
@@ -174,6 +177,33 @@ public class DailyConfig {
 			} catch (IOException e){
 				System.out.println("Error Create File: " + name);
 			}
+		}
+	}
+
+	private void handleLanguage() {
+		try {
+			// language file
+			File file = new File("plugins/DailyJoin", "lang.yml");
+			YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
+			// path for each enum
+			String path;
+			// go threw each enum
+			for(Lang l : Lang.values()) {
+				path = l.name().replaceAll("_", ".");
+				// if enum exists load, else save
+				if(cfg.contains(path))
+					l.set(cfg.getString(path));
+				else
+					cfg.addDefault(path, l.get());
+			}
+			// options
+			cfg.options().header("Language file for DailyJoin");
+			cfg.options().copyHeader(true);
+			cfg.options().copyDefaults(true);
+			// save file
+			cfg.save(file);
+		} catch (IOException e) {
+			dailyjoin.getDailyLogger().log(Level.SEVERE, "´handleLanguage: could not save language file", e);
 		}
 	}
 }

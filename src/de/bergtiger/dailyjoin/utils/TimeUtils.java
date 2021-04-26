@@ -115,14 +115,25 @@ public class TimeUtils {
 		return cal;
 	}
 
+	/**
+	 * Timestamp as String formated with default time format.
+	 * @param t Timestamp
+	 * @return String
+	 */
 	public static String formated(Timestamp t) {
 		return formated(t, Lang.FORMAT_TIME.get());
 	}
 
+	/**
+	 * Timestamp as String formated with given time format.
+	 * @param t Timestamp
+	 * @param format time format as String
+	 * @return String
+	 */
 	public static String formated(Timestamp t, String format) {
 		if(t != null) {
 			try {
-				DateTimeFormatter.ofPattern(format).format(t.toLocalDateTime());
+				return DateTimeFormatter.ofPattern(format).format(t.toLocalDateTime());
 			} catch(Exception e) {
 				dailyjoin.getDailyLogger().log(Level.SEVERE, String.format("formated: could not format Timestamp(%s) with format(%s)", t, format),e);
 			}

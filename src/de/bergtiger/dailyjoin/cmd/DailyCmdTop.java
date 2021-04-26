@@ -57,7 +57,7 @@ public class DailyCmdTop {
                 try {
                     page = Integer.valueOf(args[2]);
                 } catch (NumberFormatException e) {
-                    cs.spigot().sendMessage(Lang.buildTC(Lang.NONUMBER.get().replace(Lang.VALUE, args[2])));
+                    cs.spigot().sendMessage(Lang.build(Lang.NONUMBER.get().replace(Lang.VALUE, args[2])));
                     return;
                 }
             }
@@ -71,10 +71,10 @@ public class DailyCmdTop {
                 showPage(cs, players);
             } else {
                 // no player
-                cs.spigot().sendMessage(Lang.buildTC(Lang.NOPLAYER.get()));
+                cs.spigot().sendMessage(Lang.build(Lang.NOPLAYER.get()));
             }
 		} else {
-			cs.spigot().sendMessage(Lang.buildTC(Lang.NOPERMISSION.get()));
+			cs.spigot().sendMessage(Lang.build(Lang.NOPERMISSION.get()));
 		}
 	}
 
@@ -97,17 +97,17 @@ public class DailyCmdTop {
 		if (cs != null) {
 			if (players != null && !players.isEmpty()) {
 				// header
-				cs.spigot().sendMessage(Lang.buildTC("header"));
+				cs.spigot().sendMessage(Lang.build("header"));
 				// show page
 				for (int i = 0; i < players.getPageSize(); i++) {
 					DailyPlayer dp = players.get(i);
-					cs.spigot().sendMessage(Lang.buildTC("player".replace(Lang.PLAYER, dp.getName()).replace(Lang.VALUE, Integer.toString(dp.getDaysTotal()))));
+					cs.spigot().sendMessage(Lang.build("player".replace(Lang.PLAYER, dp.getName()).replace(Lang.VALUE, Integer.toString(dp.getDaysTotal()))));
 				}
 				// footer
-				cs.spigot().sendMessage(Lang.buildTC("prev"), Lang.buildTC("footer"), Lang.buildTC("next"));
+				cs.spigot().sendMessage(Lang.build("prev"), Lang.build("footer"), Lang.build("next"));
 			} else {
 				// no player
-				cs.spigot().sendMessage(Lang.buildTC(Lang.NOLIST.get()));
+				cs.spigot().sendMessage(Lang.build(Lang.NOLIST.get()));
 			}
 		}
 	}

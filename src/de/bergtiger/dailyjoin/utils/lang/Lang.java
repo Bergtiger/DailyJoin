@@ -116,6 +116,9 @@ public enum Lang implements Constants {
 	/** plugin statistic file or sql as VALUE*/
 	PLUGIN_SYSTEM
 		(String.format("&eSystem: &7%s", VALUE)),
+	/** plugin statistic sql connected as VALUE*/
+	PLUGIN_CONNECTED
+		(String.format("&eConnected: &7%s", VALUE)),
 	/** plugin statistic reward as VALUE*/
 	PLUGIN_REWARD_RECONNECTION
 		(String.format("&eReward on Reconnection: &7%s", VALUE)),
@@ -124,7 +127,7 @@ public enum Lang implements Constants {
 		(String.format("&eRewardDelay: &7%s", VALUE)),
 	/** plugin statistic rewards */
 	PLUGIN_PAGE_SIZE
-		(String.format("&eTopPlayer: &7%s", VALUE)),
+		(String.format("&ePageSize: &7%s", VALUE)),
 
 	/** player statistic header player name as PLAYER*/
 	PLAYER_HEADER

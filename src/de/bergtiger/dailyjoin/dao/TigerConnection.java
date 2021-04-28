@@ -1,5 +1,7 @@
 package de.bergtiger.dailyjoin.dao;
 
+import static de.bergtiger.dailyjoin.utils.config.DailyConfig.*;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -8,11 +10,11 @@ import java.sql.SQLException;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
-import org.bukkit.configuration.file.FileConfiguration;
 
 import de.bergtiger.dailyjoin.DailyFileToSQL;
 import de.bergtiger.dailyjoin.dailyjoin;
 import de.bergtiger.dailyjoin.dao.impl.sql.PlayerDAOImplSQL;
+import de.bergtiger.dailyjoin.utils.config.DailyConfig;
 
 public class TigerConnection {
 	
@@ -33,15 +35,38 @@ public class TigerConnection {
 	private TigerConnection() {}
 
 	public void loadData() {
-		FileConfiguration cfg = dailyjoin.inst().getConfig();
-		if(cfg.getString("config.SQL").equalsIgnoreCase("true")){
-			String db = "database.";
-		
-			host = cfg.getString(db + "host");
-			port = cfg.getInt(db + "port");
-			user = cfg.getString(db + "user");
-			password = cfg.getString(db + "password");
-			database = cfg.getString(db + "database");
+		DailyConfig c = DailyConfig.inst();
+		if(c.hasValue(DATA_FORMAT_SQL) && c.getBoolean(DATA_FORMAT_SQL)) {
+//		if(c.hasValue(DATA_FORMAT) && c.getValue(DATA_FORMAT).equalsIgnoreCase(DATA_SQL)) {
+			// host
+			if(c.hasValue(HOST))
+				host = c.getValue(HOST);
+			else
+				dailyjoin.getDailyLogger().log(Level.SEVERE, "Missing value for " + HOST);
+			// user
+			if(c.hasValue(USER))
+				user = c.getValue(USER);
+			else
+				dailyjoin.getDailyLogger().log(Level.SEVERE, "Missing value for " + USER);
+			// password
+			if(c.hasValue(PASSWORD))
+				password = c.getValue(PASSWORD);
+			else
+				dailyjoin.getDailyLogger().log(Level.SEVERE, "Missing value for " + PASSWORD);
+			// database
+			if(c.hasValue(DATABASE))
+				database = c.getValue(DATABASE);
+			else
+				dailyjoin.getDailyLogger().log(Level.SEVERE, "Missing value for " + DATABASE);
+			// port
+			if(c.hasValue(PORT))
+				try {
+					port = Integer.valueOf(c.getValue(PORT));
+				} catch (NumberFormatException e) {
+					dailyjoin.getDailyLogger().log(Level.SEVERE, "Wrong value for database.Port, has to be a number");
+				}
+			else
+				dailyjoin.getDailyLogger().log(Level.SEVERE, "Missing value for " + PORT);
 		}
 	}
 	
@@ -64,7 +89,7 @@ public class TigerConnection {
 			this.thread = Bukkit.getScheduler().scheduleSyncDelayedTask(dailyjoin.inst(), new Runnable(){
 				@Override
 				public void run() {
-					reconnect();
+					noConnection();
 			}}, 30*20L);
 		}
 	}
@@ -76,7 +101,7 @@ public class TigerConnection {
 		if(hasConnection())
 			closeConnection();
 		// if sql is set
-		if(dailyjoin.inst().getConfig().getString("config.SQL").equalsIgnoreCase("true")) {
+		if(DailyConfig.inst().getBoolean(DATA_FORMAT_SQL)) {
 			// load new Data
 			loadData();
 			// connect
@@ -84,17 +109,7 @@ public class TigerConnection {
 		}
 	}
 	
-	public void reconnect(){
-		// if Thread exists stop
-		closeThread();
-		// if connection exits stop
-		if(hasConnection())
-			return;
-		// connect
-		connect();
-	}
-	
-	public void closeThread(){
+	private void closeThread(){
 		if(this.thread != -1){
 			Bukkit.getScheduler().cancelTask(this.thread);
 			this.thread = -1;
@@ -131,7 +146,12 @@ public class TigerConnection {
 	 * 
 	 */
 	public static void noConnection() {
-		// TODO
+		// if Thread exists stop Thread
+		instance.closeThread();
+		// if has no Connection try new
+		if (!hasConnection())
+			// connect
+			instance.connect();
 	}
 	
 	/**
@@ -162,6 +182,7 @@ public class TigerConnection {
 	 */
 	public void closeConnection() {
 		try {
+			closeThread();
 			if(hasConnection()) {
 				conn.close();
 				dailyjoin.getDailyLogger().log(Level.INFO, "Logout");
@@ -173,20 +194,11 @@ public class TigerConnection {
 		}
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	public PlayerDAO getPlayerDAO() {
 		return new PlayerDAOImplSQL();
-	}
-	
-	@Deprecated
-	public void queryUpdate(String query) {
-		PreparedStatement st = null;
-		try {
-			st = conn.prepareStatement(query);
-			st.executeUpdate();
-		} catch (SQLException e) {
-			System.err.println("Failed to sendupdate '" + query + "'.");
-		} finally {
-			closeRessources(null, st);
-		}
 	}
 }

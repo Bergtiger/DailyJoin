@@ -10,6 +10,8 @@ import de.bergtiger.dailyjoin.exception.SavePlayerException;
 import de.bergtiger.dailyjoin.exception.UpdatePlayerException;
 import de.bergtiger.dailyjoin.utils.TigerPermission;
 import de.bergtiger.dailyjoin.utils.TimeUtils;
+import de.bergtiger.dailyjoin.utils.config.DailyConfig;
+
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -53,9 +55,22 @@ public class DailyListener implements Listener {
 	 * set configuration data. (delay and saveAsSQL)
 	 */
 	private void setData() {
-		delay = dailyjoin.inst().getConfig().getInt("config.delay");
-		sql = dailyjoin.inst().getConfig().getString("config.SQL").equalsIgnoreCase("true");
-		rewardOnSQLConnectionLost = dailyjoin.inst().getConfig().getString("config.GetRewardOnSQLConnectionLost").equalsIgnoreCase("true");
+		DailyConfig dc = DailyConfig.inst();
+		// delay
+		if(dc.hasValue(DailyConfig.DELAY))
+			delay = dc.getInteger(DailyConfig.DELAY);
+		else
+			dailyjoin.getDailyLogger().log(Level.SEVERE, "Missing value for " + DailyConfig.DELAY);
+		// data type
+		if(dc.hasValue(DailyConfig.DATA_FORMAT))
+			sql = dc.getBoolean(DailyConfig.DATA_FORMAT_SQL);
+		else
+			dailyjoin.getDailyLogger().log(Level.SEVERE, "Missing value for " + DailyConfig.DATA_FORMAT);
+		// rewardOnSQL
+		if(dc.hasValue(DailyConfig.REWARD_ON_SQL_CONNECTION_LOST))
+			rewardOnSQLConnectionLost = dc.getBoolean(DailyConfig.REWARD_ON_SQL_CONNECTION_LOST);
+		else
+			dailyjoin.getDailyLogger().log(Level.SEVERE, "Missing value for " + DailyConfig.REWARD_ON_SQL_CONNECTION_LOST);
 	}
 
 	@EventHandler

@@ -7,6 +7,8 @@ import de.bergtiger.dailyjoin.cmd.DailyCommand;
 import de.bergtiger.dailyjoin.listener.DailyListener;
 import de.bergtiger.dailyjoin.tab.DailyTabComplete;
 import de.bergtiger.dailyjoin.utils.DailyReward;
+import de.bergtiger.dailyjoin.utils.config.DailyConfig;
+
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -32,7 +34,7 @@ public class dailyjoin extends JavaPlugin{
 		instance = this;
 		getDailyLogger().log(Level.INFO, "Starte DailyJoin...");
 		// load configuration
-		new DailyConfig(this);
+		DailyConfig.load();
 		// start SQLConnection
 		TigerConnection.inst().loadData();
 		TigerConnection.inst().connect();
@@ -52,8 +54,9 @@ public class dailyjoin extends JavaPlugin{
 	}
 	
 	public void reload() {
-		this.reloadConfig();
-
+		reloadConfig();
+		DailyConfig.load();
+		
 		TigerConnection.inst().reload();
 		DailyListener.inst().reload();
 		DailyReward.inst().reload();
@@ -63,6 +66,5 @@ public class dailyjoin extends JavaPlugin{
 	public void onDisable() {
 		getDailyLogger().log(Level.INFO, "DailyJoin beendet.");
 		TigerConnection.inst().closeConnection();
-		TigerConnection.inst().closeThread();	
 	}
 }

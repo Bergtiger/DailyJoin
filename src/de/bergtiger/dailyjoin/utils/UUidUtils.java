@@ -3,6 +3,8 @@ package de.bergtiger.dailyjoin.utils;
 import de.bergtiger.dailyjoin.dao.TigerConnection;
 import de.bergtiger.dailyjoin.dao.impl.file.DailyFile;
 import de.bergtiger.dailyjoin.exception.NoSQLConnectionException;
+import de.bergtiger.dailyjoin.utils.config.DailyConfig;
+
 import org.apache.commons.lang.NotImplementedException;
 
 import java.util.HashMap;
@@ -17,18 +19,20 @@ public class UUidUtils {
 	private static UUidUtils instance;
 
 	public static UUidUtils inst() {
-	    if(instance == null)
-	        instance = new UUidUtils();
-	    return instance;
-    }
+		if (instance == null)
+			instance = new UUidUtils();
+		return instance;
+	}
 
-	private UUidUtils() {}
+	private UUidUtils() {
+	}
 
-    /**
-     * get a uuid from a name.
-     * @param uuid name of searched player
-     * @return uuid or null
-     */
+	/**
+	 * get a uuid from a name.
+	 * 
+	 * @param uuid name of searched player
+	 * @return uuid or null
+	 */
 	public static String getUUid(String uuid) {
 		if (uuid.length() <= 16) {
 			// uuid in range of name
@@ -44,7 +48,7 @@ public class UUidUtils {
 		String uuid;
 		// tigerlist implemented
 		// sql active
-		if (true)
+		if (DailyConfig.inst().getBoolean(DailyConfig.DATA_FORMAT_SQL))
 			uuid = getUUidFromDatabase(name);
 		else
 			uuid = getUUidFromFile(name);
@@ -53,12 +57,13 @@ public class UUidUtils {
 		return null;
 	}
 
-    /**
-     * get a uuid from a name from database.
-     * if connection lost will try to get from file.
-     * @param name name of searched player
-     * @return uuid if player exists in database
-     */
+	/**
+	 * get a uuid from a name from database. if connection lost will try to get from
+	 * file.
+	 * 
+	 * @param name name of searched player
+	 * @return uuid if player exists in database
+	 */
 	private String getUUidFromDatabase(String name) {
 		try {
 			return TigerConnection.inst().getPlayerDAO().getUUid(name);
@@ -68,20 +73,22 @@ public class UUidUtils {
 		}
 	}
 
-    /**
-     * get a uuid from a name from file.
-     * @param name name of searched player
-     * @return uuid if player exists in file
-     */
+	/**
+	 * get a uuid from a name from file.
+	 * 
+	 * @param name name of searched player
+	 * @return uuid if player exists in file
+	 */
 	private String getUUidFromFile(String name) {
 		return DailyFile.getUUid(name);
 	}
 
-    /**
-     * get a uuid from a name from tigerlist plugin.
-     * @param name name of searched player
-     * @return uuid if player exists in tigerlist database
-     */
+	/**
+	 * get a uuid from a name from tigerlist plugin.
+	 * 
+	 * @param name name of searched player
+	 * @return uuid if player exists in tigerlist database
+	 */
 	private String getUUidFromTigerList(String name) {
 		throw new NotImplementedException();
 	}

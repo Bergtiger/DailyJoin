@@ -55,7 +55,13 @@ public class DailyCmdTop {
 			String column = DailyDataBase.DAYS_TOTAL, order = ASC;
 			// set column
 			if (args.length >= 2) {
-				column = args[1];
+				// check column allowed
+				if(args[1].matches(String.format("(?i)(%s|%s|%s|%s)", DailyDataBase.DAYS_TOTAL, DailyDataBase.DAYS_CONSECUTIVE, DailyDataBase.LASTJOIN, DailyDataBase.FIRSTJOIN))) {
+					column = args[1];
+				} else {
+					cs.spigot().sendMessage(Lang.build(Lang.WRONG_ARGUMENT.get()));
+					return;
+				}
 			}
 			// set page
 			if (args.length >= 3) {
@@ -68,7 +74,13 @@ public class DailyCmdTop {
 			}
 			// set order
 			if (args.length >= 4) {
-				order = args[3];
+				// check order allowed
+				if(args[3].matches(String.format("(?i)(%s|%s)", ASC, DESC))) {
+					order = args[3];
+				} else {
+					cs.spigot().sendMessage(Lang.build(Lang.WRONG_ARGUMENT.get()));
+					return;
+				}
 			}
 			TigerList<DailyPlayer> players = getPlayers(cs.getName(), column, order);
 			if (players != null && !players.isEmpty()) {
@@ -142,11 +154,12 @@ public class DailyCmdTop {
 	private String getValue(DailyPlayer dp, Function<? super DailyPlayer, ? extends Object> f) {
 		if (dp != null) {
 			Object o = f.apply(dp);
-			if (o instanceof Timestamp)
-				return TimeUtils.formated((Timestamp) o);
 			// Integer
 			if (o instanceof Integer)
 				return ((Integer) o).toString();
+			// Timestamp
+			if (o instanceof Timestamp)
+				return TimeUtils.formated((Timestamp) o);
 			// String ?
 			return o.toString();
 		}

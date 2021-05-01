@@ -70,8 +70,6 @@ public class PlayerDAOimpl implements PlayerDAO {
 	 * @throws NoSQLConnectionException
 	 */
 	public DailyPlayer getPlayer(String uuid, boolean useSQL) throws NoSQLConnectionException {
-		System.out.println("uuid: " + uuid + ", useSQL: " + useSQL);
-		System.out.println("player: " + (useSQL ? daoSQL.getPlayer(uuid) : daoFile.getPlayer(uuid)));
 		return useSQL ? daoSQL.getPlayer(uuid) : daoFile.getPlayer(uuid);
 	}
 

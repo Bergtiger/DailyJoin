@@ -225,11 +225,10 @@ public class PlayerDAOImplFile implements PlayerDAO {
 			FileConfiguration cfg = YamlConfiguration.loadConfiguration(file);
 			if (cfg.contains(PLAYER_PATH)) {
 				return new TigerList<>(cfg.getConfigurationSection(PLAYER_PATH).getKeys(false).stream().map(k -> {
-					String uuid = k.substring(PLAYER_PATH.length() + 1);
-					String path = String.format(PLAYER_PATH_FORMAT, uuid);
+					String path = String.format(PLAYER_PATH_FORMAT, k);
 					DailyPlayer dp = new DailyPlayer();
 					// set UUid
-					dp.setUuid(uuid);
+					dp.setUuid(k);
 					// set name
 					if (cfg.contains(path + NAME))
 						dp.setName(cfg.getString(path + NAME));

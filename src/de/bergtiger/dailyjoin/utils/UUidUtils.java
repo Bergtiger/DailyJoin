@@ -1,13 +1,15 @@
 package de.bergtiger.dailyjoin.utils;
 
-import de.bergtiger.dailyjoin.dao.TigerConnection;
-import de.bergtiger.dailyjoin.dao.impl.file.DailyFile;
+import de.bergtiger.dailyjoin.dailyjoin;
+import de.bergtiger.dailyjoin.dao.impl.PlayerDAOimpl;
+import de.bergtiger.dailyjoin.dao.impl.file.PlayerDAOImplFile;
 import de.bergtiger.dailyjoin.exception.NoSQLConnectionException;
-import de.bergtiger.dailyjoin.utils.config.DailyConfig;
 
 import org.apache.commons.lang.NotImplementedException;
+import org.bukkit.Bukkit;
 
 import java.util.HashMap;
+import java.util.logging.Level;
 
 public class UUidUtils {
 
@@ -41,46 +43,32 @@ public class UUidUtils {
 		return uuid;
 	}
 
+	/**
+	 * get UUid from a player name.
+	 * @param name of the searched player
+	 * @return 
+	 */
 	private String findUUidFromName(String name) {
 		// uuid was searched before
 		if (storedUUids.containsKey(name))
 			return storedUUids.get(name);
-		String uuid;
+		String uuid = null;
 		// tigerlist implemented
-		// sql active
-		if (DailyConfig.inst().getBoolean(DailyConfig.DATA_FORMAT_SQL))
-			uuid = getUUidFromDatabase(name);
-		else
-			uuid = getUUidFromFile(name);
-		if (uuid != null)
-			return storedUUids.put(name, uuid);
-		return null;
-	}
-
-	/**
-	 * get a uuid from a name from database. if connection lost will try to get from
-	 * file.
-	 * 
-	 * @param name name of searched player
-	 * @return uuid if player exists in database
-	 */
-	private String getUUidFromDatabase(String name) {
 		try {
-			return TigerConnection.inst().getPlayerDAO().getUUid(name);
-		} catch (NoSQLConnectionException e) {
-			// sql not available
-			return getUUidFromFile(name);
+			if (Bukkit.getPluginManager().isPluginEnabled("TigerList"))
+				uuid = getUUidFromTigerList(name);
+		} catch (Exception e) {
+			dailyjoin.getDailyLogger().log(Level.WARNING, String.format("findUUidFromName: TigerList (%s)", name) ,e);
 		}
-	}
-
-	/**
-	 * get a uuid from a name from file.
-	 * 
-	 * @param name name of searched player
-	 * @return uuid if player exists in file
-	 */
-	private String getUUidFromFile(String name) {
-		return DailyFile.getUUid(name);
+		try {
+			uuid = PlayerDAOimpl.inst().getUUid(name);
+		} catch (NoSQLConnectionException e) {
+			// explicit File
+			uuid = new PlayerDAOImplFile().getUUid(name);
+		}
+		if (uuid != null)
+			storedUUids.put(name, uuid);
+		return storedUUids.get(name);
 	}
 
 	/**

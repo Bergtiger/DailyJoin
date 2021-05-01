@@ -3,6 +3,7 @@ package de.bergtiger.dailyjoin.cmd;
 import de.bergtiger.dailyjoin.dailyjoin;
 import de.bergtiger.dailyjoin.bdo.DailyPlayer;
 import de.bergtiger.dailyjoin.dao.TigerConnection;
+import de.bergtiger.dailyjoin.dao.impl.PlayerDAOimpl;
 import de.bergtiger.dailyjoin.exception.NoSQLConnectionException;
 import de.bergtiger.dailyjoin.exception.UpdatePlayerException;
 import de.bergtiger.dailyjoin.utils.lang.Lang;
@@ -35,7 +36,9 @@ public class DailyCmdAdd {
                     int value = Integer.valueOf(args[3]);
                     // get Player
                     try {
-						DailyPlayer dp = TigerConnection.inst().getPlayerDAO().getPlayer(uuid);
+                    	// TODO
+//						DailyPlayer dp = TigerConnection.inst().getPlayerDAO().getPlayer(uuid);
+						DailyPlayer dp = PlayerDAOimpl.inst().getPlayer(uuid);
 						if(dp != null) {
 							// set player value
 							if(type.equalsIgnoreCase(DAYS_TOTAL)) {
@@ -47,7 +50,9 @@ public class DailyCmdAdd {
 								return;
 							}
 							// save player value
-							TigerConnection.inst().getPlayerDAO().updatePlayer(dp);
+							// TODO
+//							TigerConnection.inst().getPlayerDAO().updatePlayer(dp);
+							PlayerDAOimpl.inst().updatePlayer(dp);
 							cs.spigot().sendMessage(Lang.build(
 									Lang.DAILY_ADD_SUCCESS.get().replace(Lang.PLAYER, uuid).replace(Lang.DATA, type).replace(Lang.VALUE, Integer.toString(value)),
 									String.format("/%s %s %s", DailyCommand.CMD_CMD, DailyCommand.CMD_PLAYER, uuid),

@@ -10,13 +10,14 @@ import java.util.List;
 import java.util.logging.Level;
 
 import de.bergtiger.dailyjoin.dailyjoin;
+import de.bergtiger.dailyjoin.exception.UpdatePlayerException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
 import de.bergtiger.dailyjoin.bdo.DailyPlayer;
-import de.bergtiger.dailyjoin.exception.SavePlayerException;
 
+@Deprecated
 public class DailyFile {
 
 	public static final String 
@@ -31,9 +32,10 @@ public class DailyFile {
 	 * Save new Player
 	 * 
 	 * @param p Player to save
-	 * @throws SavePlayerException
+	 * @throws UpdatePlayerException
 	 */
-	public void save(Player p) throws SavePlayerException {
+	@Deprecated
+	public void save(Player p) throws UpdatePlayerException {
 		save(new DailyPlayer(p.getName(), p.getUniqueId().toString()));
 	}
 
@@ -41,9 +43,10 @@ public class DailyFile {
 	 * Save DailyPlayer
 	 * 
 	 * @param dp DailyPlayer to save
-	 * @throws SavePlayerException
+	 * @throws UpdatePlayerException
 	 */
-	public void save(DailyPlayer dp) throws SavePlayerException {
+	@Deprecated
+	public void save(DailyPlayer dp) throws UpdatePlayerException {
 		// load file
 		File file = new File(FILE_DIRECTORY, FILE_NAME);
 		FileConfiguration cfg = YamlConfiguration.loadConfiguration(file);
@@ -81,7 +84,7 @@ public class DailyFile {
 			dailyjoin.getDailyLogger().log(Level.INFO, "Save File");
 		} catch (IOException e) {
 			dailyjoin.getDailyLogger().log(Level.INFO, "Error on save file");
-			throw new SavePlayerException(false, dp);
+			throw new UpdatePlayerException(false, dp);
 		}
 	}
 
@@ -91,6 +94,7 @@ public class DailyFile {
 	 * @param p Player to load
 	 * @return DailyPlayer from p
 	 */
+	@Deprecated
 	public DailyPlayer load(Player p) {
 		return p != null ? load(p.getUniqueId().toString()) : null;
 	}
@@ -101,6 +105,7 @@ public class DailyFile {
 	 * @param uuid UUid from player
 	 * @return DailyPlayer from p
 	 */
+	@Deprecated
 	public DailyPlayer load(String uuid) {
 		if (uuid != null) {
 			// load file
@@ -147,6 +152,7 @@ public class DailyFile {
 	 * 
 	 * @return List of all DailyPlayer in file
 	 */
+	@Deprecated
 	public static List<DailyPlayer> loadAll() {
 		File file = new File(DailyFile.FILE_DIRECTORY, DailyFile.FILE_NAME);
 		if (file.exists()) {
@@ -204,6 +210,7 @@ public class DailyFile {
 	 * 
 	 * @param players List of Player to save
 	 */
+	@Deprecated
 	public static void saveAll(List<DailyPlayer> players) {
 		File file = new File(FILE_DIRECTORY, FILE_NAME);
 		// delte existing file
@@ -244,6 +251,7 @@ public class DailyFile {
 	 * @param name
 	 * @return
 	 */
+	@Deprecated
 	public static String getUUid(String name) {
 		File file = new File(FILE_DIRECTORY, FILE_NAME);
 		// check if file exists

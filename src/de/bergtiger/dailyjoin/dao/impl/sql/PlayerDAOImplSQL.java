@@ -59,7 +59,7 @@ public class PlayerDAOImplSQL implements PlayerDAO {
 					}
 				} catch (SQLException e) {
 					dailyjoin.getDailyLogger().log(Level.SEVERE, "updatePlayer: " + p, e);
-					throw new UpdatePlayerException(p);
+					throw new UpdatePlayerException(true, p);
 				} finally {
 					TigerConnection.closeRessources(rs, st);
 				}

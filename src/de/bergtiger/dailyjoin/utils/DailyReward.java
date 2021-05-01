@@ -48,9 +48,8 @@ public class DailyReward {
 	 * load configuration for consecutive days rewards.
 	 */
 	private void loadDaysConsecutive() {
-//		File file = new File("plugins/DailyJoin/", dailyjoin.inst().getConfig().getString("config.FileDay"));
 		if (DailyConfig.inst().hasValue(DailyConfig.FILE_DAYS_CONSECUTIVE)) {
-			File file = new File("plugins/DailyJoin/", DailyConfig.inst().getValue(DailyConfig.FILE_DAYS_CONSECUTIVE));
+			File file = new File(DailyConfig.PLUGIN_DIRECTORY, DailyConfig.inst().getValue(DailyConfig.FILE_DAYS_CONSECUTIVE));
 			if (file.exists()) {
 				rewardsConsecutive.clear();
 				FileConfiguration cfg = YamlConfiguration.loadConfiguration(file);
@@ -81,7 +80,7 @@ public class DailyReward {
 	 */
 	private void loadDaysTotal() {
 		if (DailyConfig.inst().hasValue(DailyConfig.FILE_DAYS_TOTAL)) {
-			File file = new File("plugins/DailyJoin/", DailyConfig.inst().getValue(DailyConfig.FILE_DAYS_TOTAL));
+			File file = new File(DailyConfig.PLUGIN_DIRECTORY, DailyConfig.inst().getValue(DailyConfig.FILE_DAYS_TOTAL));
 			if (file.exists()) {
 				rewardsTotal.clear();
 				FileConfiguration cfg = YamlConfiguration.loadConfiguration(file);

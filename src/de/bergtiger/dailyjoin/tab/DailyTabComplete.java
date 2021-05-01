@@ -4,6 +4,7 @@ import de.bergtiger.dailyjoin.cmd.DailyCmdSet;
 import de.bergtiger.dailyjoin.cmd.DailyCmdTop;
 import de.bergtiger.dailyjoin.dao.DailyDataBase;
 import de.bergtiger.dailyjoin.dao.TigerConnection;
+import de.bergtiger.dailyjoin.dao.impl.PlayerDAOimpl;
 import de.bergtiger.dailyjoin.exception.NoSQLConnectionException;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -99,7 +100,7 @@ public class DailyTabComplete implements TabCompleter {
     private List<String> getNames(String args) {
         // player
         try {
-            return TigerConnection.inst().getPlayerDAO().getNames(args);
+        	return PlayerDAOimpl.inst().getNames(args);
         } catch (NoSQLConnectionException e) {
             TigerConnection.noConnection();
         }

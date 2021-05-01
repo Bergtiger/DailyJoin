@@ -2,6 +2,7 @@ package de.bergtiger.dailyjoin.exception;
 
 import de.bergtiger.dailyjoin.bdo.DailyPlayer;
 
+@Deprecated
 public class SavePlayerException extends Exception {
 
     /**

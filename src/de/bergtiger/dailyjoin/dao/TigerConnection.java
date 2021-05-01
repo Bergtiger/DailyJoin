@@ -10,10 +10,10 @@ import java.sql.SQLException;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
+import org.bukkit.scheduler.BukkitTask;
 
 import de.bergtiger.dailyjoin.DailyFileToSQL;
 import de.bergtiger.dailyjoin.dailyjoin;
-import de.bergtiger.dailyjoin.dao.impl.sql.PlayerDAOImplSQL;
 import de.bergtiger.dailyjoin.utils.config.DailyConfig;
 
 public class TigerConnection {
@@ -23,7 +23,7 @@ public class TigerConnection {
 	
 	private String host, user, password, database;
 	private int port;
-	private int thread = -1;
+	private BukkitTask thread = null;
 
 	
 	public static TigerConnection inst() {
@@ -37,7 +37,6 @@ public class TigerConnection {
 	public void loadData() {
 		DailyConfig c = DailyConfig.inst();
 		if(c.hasValue(DATA_FORMAT_SQL) && c.getBoolean(DATA_FORMAT_SQL)) {
-//		if(c.hasValue(DATA_FORMAT) && c.getValue(DATA_FORMAT).equalsIgnoreCase(DATA_SQL)) {
 			// host
 			if(c.hasValue(HOST))
 				host = c.getValue(HOST);
@@ -70,7 +69,7 @@ public class TigerConnection {
 		}
 	}
 	
-	public void connect() {
+	private void connect() {
 		// if Thread exists stop
 		closeThread();
 		// if connection exists stop
@@ -86,11 +85,7 @@ public class TigerConnection {
 		} catch (Exception e) {
 			System.out.println("[DailyJoin] Error No Connection");
 			System.out.println("[DailyJoin] Try SQL-Reconnection in 30 seconds.");
-			this.thread = Bukkit.getScheduler().scheduleSyncDelayedTask(dailyjoin.inst(), new Runnable(){
-				@Override
-				public void run() {
-					noConnection();
-			}}, 30*20L);
+			thread = Bukkit.getScheduler().runTaskLaterAsynchronously(dailyjoin.inst(), () -> connect(), 30*20L);
 		}
 	}
 	
@@ -110,15 +105,17 @@ public class TigerConnection {
 	}
 	
 	private void closeThread(){
-		if(this.thread != -1){
-			Bukkit.getScheduler().cancelTask(this.thread);
-			this.thread = -1;
+		if(thread != null){
+			thread.cancel();
+			thread = null;
 		}
 	}
 	
 	private Connection openConnection() throws Exception{
 		Class.forName("com.mysql.jdbc.Driver");
-		conn = DriverManager.getConnection("jdbc:mysql://" + this.host + ":" + this.port + "/" + this.database, this.user, this.password);
+		
+		//Class.forName("com.mysql.cj.jdbc.Driver");
+		conn = DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/" + database, user, password);
 		return conn;
 	}
 	
@@ -192,13 +189,5 @@ public class TigerConnection {
 		} finally {
 			conn = null;
 		}
-	}
-	
-	/**
-	 * 
-	 * @return
-	 */
-	public PlayerDAO getPlayerDAO() {
-		return new PlayerDAOImplSQL();
 	}
 }

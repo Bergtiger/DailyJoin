@@ -3,6 +3,7 @@ package de.bergtiger.dailyjoin.cmd;
 import de.bergtiger.dailyjoin.bdo.DailyPlayer;
 import de.bergtiger.dailyjoin.dailyjoin;
 import de.bergtiger.dailyjoin.dao.TigerConnection;
+import de.bergtiger.dailyjoin.dao.impl.PlayerDAOimpl;
 import de.bergtiger.dailyjoin.exception.NoSQLConnectionException;
 import de.bergtiger.dailyjoin.utils.TimeUtils;
 import de.bergtiger.dailyjoin.utils.lang.Lang;
@@ -49,7 +50,9 @@ public class DailyCmdPlayer {
 
 	private DailyPlayer getPlayer(String uuid) {
 		try {
-			return TigerConnection.inst().getPlayerDAO().getPlayer(uuid);
+// TODO
+//			return TigerConnection.inst().getPlayerDAO().getPlayer(uuid);
+			return PlayerDAOimpl.inst().getPlayer(uuid);
 		} catch (NoSQLConnectionException e) {
 			TigerConnection.noConnection();
 		}

@@ -3,10 +3,11 @@ package de.bergtiger.dailyjoin.dao.impl;
 import de.bergtiger.dailyjoin.bdo.DailyPlayer;
 import de.bergtiger.dailyjoin.bdo.TigerList;
 import de.bergtiger.dailyjoin.dao.PlayerDAO;
-import de.bergtiger.dailyjoin.dao.impl.file.PlayerDaoImplFile;
+import de.bergtiger.dailyjoin.dao.impl.file.PlayerDAOImplFile;
 import de.bergtiger.dailyjoin.dao.impl.sql.PlayerDAOImplSQL;
 import de.bergtiger.dailyjoin.exception.NoSQLConnectionException;
 import de.bergtiger.dailyjoin.exception.UpdatePlayerException;
+import de.bergtiger.dailyjoin.utils.config.DailyConfig;
 
 import java.util.List;
 
@@ -14,7 +15,29 @@ public class PlayerDAOimpl implements PlayerDAO {
 
     private boolean sql;
     private final PlayerDAOImplSQL daoSQL = new PlayerDAOImplSQL();
-    private final PlayerDaoImplFile daoFile = new PlayerDaoImplFile();
+    private final PlayerDAOImplFile daoFile = new PlayerDAOImplFile();
+
+    private static PlayerDAOimpl instance;
+
+    public static PlayerDAOimpl inst() {
+        if(instance == null)
+            instance = new PlayerDAOimpl();
+        return instance;
+    }
+
+    private PlayerDAOimpl() {
+        setSQL();
+    }
+
+    private void setSQL() {
+        if(DailyConfig.inst().hasValue(DailyConfig.DATA_FORMAT_SQL))
+            sql = DailyConfig.inst().getBoolean(DailyConfig.DATA_FORMAT_SQL);
+        sql = false;
+    }
+
+    public void reload() {
+        setSQL();
+    }
 
     @Override
     public Integer updatePlayer(DailyPlayer p) throws NoSQLConnectionException, UpdatePlayerException {

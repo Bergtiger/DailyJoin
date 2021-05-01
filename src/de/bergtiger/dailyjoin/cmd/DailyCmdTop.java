@@ -4,7 +4,7 @@ import de.bergtiger.dailyjoin.bdo.DailyPlayer;
 import de.bergtiger.dailyjoin.bdo.TigerList;
 import de.bergtiger.dailyjoin.dailyjoin;
 import de.bergtiger.dailyjoin.dao.DailyDataBase;
-import de.bergtiger.dailyjoin.dao.TigerConnection;
+import de.bergtiger.dailyjoin.dao.impl.PlayerDAOimpl;
 import de.bergtiger.dailyjoin.exception.NoSQLConnectionException;
 import de.bergtiger.dailyjoin.utils.lang.Lang;
 import org.bukkit.Bukkit;
@@ -85,7 +85,9 @@ public class DailyCmdTop {
 			// add to players if not exists
 		}
 		try {
-			TigerList<DailyPlayer> list = TigerConnection.inst().getPlayerDAO().getOrderedPlayers(column, order);
+			// TODO
+//			TigerList<DailyPlayer> list = TigerConnection.inst().getPlayerDAO().getOrderedPlayers(column, order);
+			TigerList<DailyPlayer> list = PlayerDAOimpl.inst().getOrderedPlayers(column, order);
 			return players.put(uuid, list);
 		} catch (NoSQLConnectionException e) {
 			e.printStackTrace();

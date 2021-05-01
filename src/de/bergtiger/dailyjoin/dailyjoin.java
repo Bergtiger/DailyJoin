@@ -4,6 +4,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import de.bergtiger.dailyjoin.cmd.DailyCommand;
+import de.bergtiger.dailyjoin.dao.impl.PlayerDAOimpl;
 import de.bergtiger.dailyjoin.listener.DailyListener;
 import de.bergtiger.dailyjoin.tab.DailyTabComplete;
 import de.bergtiger.dailyjoin.utils.DailyReward;
@@ -36,8 +37,7 @@ public class dailyjoin extends JavaPlugin{
 		// load configuration
 		DailyConfig.load();
 		// start SQLConnection
-		TigerConnection.inst().loadData();
-		TigerConnection.inst().connect();
+		TigerConnection.inst().reload();
 		// register Listener
 		Bukkit.getPluginManager().registerEvents(DailyListener.inst(), this);
 		// register Command
@@ -56,9 +56,13 @@ public class dailyjoin extends JavaPlugin{
 	public void reload() {
 		reloadConfig();
 		DailyConfig.load();
-		
+		// reload connection
 		TigerConnection.inst().reload();
+		// reload dao
+		PlayerDAOimpl.inst().reload();
+		// reload listener
 		DailyListener.inst().reload();
+		// reload reward
 		DailyReward.inst().reload();
 	}
 	

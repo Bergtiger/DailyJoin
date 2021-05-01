@@ -9,7 +9,24 @@ public class UpdatePlayerException extends Exception {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public UpdatePlayerException(DailyPlayer player) {
-		super("UpdatePlayerException: " + player != null ? player.toString() : null);
+	private final boolean sql;
+	private final DailyPlayer dp;
+
+	public UpdatePlayerException(boolean sql, DailyPlayer dp) {
+		super("updatePlayerException: type: " + (sql ? "sql" : "file") + ", player: " + dp.getName());
+		this.sql = sql;
+		this.dp = dp;
+	}
+
+	public boolean isSQL() {
+		return sql;
+	}
+
+	public boolean isFile() {
+		return !sql;
+	}
+
+	public DailyPlayer getDp() {
+		return dp;
 	}
 }

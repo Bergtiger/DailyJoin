@@ -7,6 +7,7 @@ import java.util.logging.Level;
 import de.bergtiger.dailyjoin.bdo.DailyPlayer;
 import de.bergtiger.dailyjoin.dao.TigerConnection;
 import de.bergtiger.dailyjoin.dao.impl.file.DailyFile;
+import de.bergtiger.dailyjoin.dao.impl.sql.PlayerDAOImplSQL;
 import de.bergtiger.dailyjoin.exception.NoSQLConnectionException;
 import de.bergtiger.dailyjoin.exception.UpdatePlayerException;
 import de.bergtiger.dailyjoin.utils.TimeUtils;
@@ -24,7 +25,8 @@ public class DailyFileToSQL {
 				for (int i = 0; i < players.size(); i++) {
 					try {
 						DailyPlayer pFile = players.get(i);
-						DailyPlayer pSQL = TigerConnection.inst().getPlayerDAO().getPlayer(pFile.getUuid());
+						// explicit SQL
+						DailyPlayer pSQL = new PlayerDAOImplSQL().getPlayer(pFile.getUuid());
 						// check if existing Player
 						if (pSQL != null) {
 							// existing Player -> merge
@@ -51,7 +53,8 @@ public class DailyFileToSQL {
 							}
 						}
 						// update or insert Player
-						TigerConnection.inst().getPlayerDAO().updatePlayer(pFile);
+						// explicit SQL
+						new PlayerDAOImplSQL().updatePlayer(pFile);
 						// remove from working list
 						players.remove(i);
 						i--;

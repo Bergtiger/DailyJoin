@@ -1,6 +1,6 @@
 package de.bergtiger.dailyjoin.cmd;
 
-import de.bergtiger.dailyjoin.dailyjoin;
+import de.bergtiger.dailyjoin.DailyJoin;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -75,7 +75,7 @@ public class DailyCommand implements CommandExecutor {
 	 */
 	private void daily_reload(CommandSender cs){
 		if(hasPermission(cs, ADMIN, RELOAD)){
-			dailyjoin.inst().reload();
+			DailyJoin.inst().reload();
 			cs.spigot().sendMessage(Lang.build(Lang.DAILY_RELOAD.get()));
 		} else {
 			cs.spigot().sendMessage(Lang.build(Lang.NOPERMISSION.get()));

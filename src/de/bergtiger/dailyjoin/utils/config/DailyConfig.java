@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.logging.Level;
 
-import de.bergtiger.dailyjoin.dailyjoin;
+import de.bergtiger.dailyjoin.DailyJoin;
 import de.bergtiger.dailyjoin.utils.lang.Lang;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -53,12 +53,12 @@ public class DailyConfig {
 		// empty cache
 		values.clear();
 		// config
-		FileConfiguration cfg = dailyjoin.inst().getConfig();
+		FileConfiguration cfg = DailyJoin.inst().getConfig();
 		// delay
 		if (cfg.contains(DELAY)) {
 			// check matching integer (\\d*)
 			if (!cfg.getString(DELAY).matches("\\d*")) {
-				dailyjoin.getDailyLogger().log(Level.WARNING, "delay no integer");
+				DailyJoin.getDailyLogger().log(Level.WARNING, "delay no integer");
 				cfg.set(DELAY, 30);
 			}
 		} else {
@@ -68,7 +68,7 @@ public class DailyConfig {
 		if (cfg.contains(PAGE_SIZE)) {
 			// check matching integer (\\d*)
 			if (!cfg.getString(PAGE_SIZE).matches("\\d*")) {
-				dailyjoin.getDailyLogger().log(Level.WARNING, "page_size no integer");
+				DailyJoin.getDailyLogger().log(Level.WARNING, "page_size no integer");
 				cfg.set(PAGE_SIZE, 15);
 			}
 		} else {
@@ -78,7 +78,7 @@ public class DailyConfig {
 		if (cfg.contains(FILE_DAYS_TOTAL)) {
 			// check matching yaml (^.+\\.yml$)
 			if (!cfg.getString(FILE_DAYS_TOTAL).matches(".+\\.yml")) {
-				dailyjoin.getDailyLogger().log(Level.WARNING, "File_Days_total no yaml file");
+				DailyJoin.getDailyLogger().log(Level.WARNING, "File_Days_total no yaml file");
 				cfg.set(FILE_DAYS_TOTAL, "TotalDays.yml");
 			}
 		} else {
@@ -88,7 +88,7 @@ public class DailyConfig {
 		if (cfg.contains(FILE_DAYS_CONSECUTIVE)) {
 			// check matching yaml (^.+\\.yml$)
 			if (!cfg.getString(FILE_DAYS_CONSECUTIVE).matches(".+\\.yml")) {
-				dailyjoin.getDailyLogger().log(Level.WARNING, "File_Days_consecutive no yaml file");
+				DailyJoin.getDailyLogger().log(Level.WARNING, "File_Days_consecutive no yaml file");
 				cfg.set(FILE_DAYS_CONSECUTIVE, "Day.yml");
 			}
 		} else {
@@ -96,7 +96,7 @@ public class DailyConfig {
 		}
 		// check if total and consecutive files are equal -> warning
 		if (cfg.getString(FILE_DAYS_TOTAL).equals(cfg.getString(FILE_DAYS_CONSECUTIVE))) {
-			dailyjoin.getDailyLogger().log(Level.WARNING, "days total and days consecutive share same file");
+			DailyJoin.getDailyLogger().log(Level.WARNING, "days total and days consecutive share same file");
 		}
 
 		// data format (SQL/File)
@@ -104,7 +104,7 @@ public class DailyConfig {
 			// check matching sql|file
 			if (!cfg.getString(DATA_FORMAT).matches(String.format("(?i)(%s|%s)", DATA_SQL, DATA_FILE))) {
 				// no allowed data format
-				dailyjoin.getDailyLogger().log(Level.SEVERE, "data format has to be file or sql");
+				DailyJoin.getDailyLogger().log(Level.SEVERE, "data format has to be file or sql");
 				cfg.set(DATA_FORMAT, DATA_FILE);
 			} else {
 				// load
@@ -118,7 +118,7 @@ public class DailyConfig {
 						// check matching true|false
 						if (!cfg.getString(REWARD_ON_SQL_CONNECTION_LOST).matches("(?i)(true|false)")) {
 							// not allowed value
-							dailyjoin.getDailyLogger().log(Level.WARNING,
+							DailyJoin.getDailyLogger().log(Level.WARNING,
 									"reward on sql connection lost has to be true or false");
 							cfg.set(REWARD_ON_SQL_CONNECTION_LOST, true);
 						}
@@ -154,7 +154,7 @@ public class DailyConfig {
 		cfg.options().header("DailyJoin");
 		cfg.options().copyHeader(true);
 		cfg.options().copyDefaults(true);
-		dailyjoin.inst().saveConfig();
+		DailyJoin.inst().saveConfig();
 	}
 
 	// name = plugin.getConfig().getString("config.FileDay")
@@ -174,7 +174,7 @@ public class DailyConfig {
 				w.flush();
 				w.close();
 			} catch (IOException e) {
-				dailyjoin.getDailyLogger().log(Level.WARNING, String.format("setFileDay: could not create or save file '%s'", getValue(FILE_DAYS_CONSECUTIVE)));
+				DailyJoin.getDailyLogger().log(Level.WARNING, String.format("setFileDay: could not create or save file '%s'", getValue(FILE_DAYS_CONSECUTIVE)));
 			}
 		}
 		}
@@ -198,7 +198,7 @@ public class DailyConfig {
 					w.flush();
 					w.close();
 				} catch (IOException e) {
-					dailyjoin.getDailyLogger().log(Level.WARNING, String.format("setFileTotalDays: could not create or save file '%s'", getValue(FILE_DAYS_TOTAL)));
+					DailyJoin.getDailyLogger().log(Level.WARNING, String.format("setFileTotalDays: could not create or save file '%s'", getValue(FILE_DAYS_TOTAL)));
 				}
 			}
 		}
@@ -230,7 +230,7 @@ public class DailyConfig {
 			// save file
 			cfg.save(file);
 		} catch (IOException e) {
-			dailyjoin.getDailyLogger().log(Level.SEVERE, "handleLanguage: could not save language file", e);
+			DailyJoin.getDailyLogger().log(Level.SEVERE, "handleLanguage: could not save language file", e);
 		}
 	}
 
@@ -246,7 +246,7 @@ public class DailyConfig {
 		if (values.containsKey(key)) {
 			return true;
 		}
-		if (dailyjoin.inst().getConfig().contains(key)) {
+		if (DailyJoin.inst().getConfig().contains(key)) {
 			return true;
 		}
 		return false;
@@ -260,7 +260,7 @@ public class DailyConfig {
 	 */
 	public String getValue(String key) {
 		if (!values.containsKey(key)) {
-			values.put(key, dailyjoin.inst().getConfig().getString(key));
+			values.put(key, DailyJoin.inst().getConfig().getString(key));
 		}
 		return values.get(key);
 	}
@@ -285,7 +285,7 @@ public class DailyConfig {
 		try {
 			return Integer.valueOf(getValue(key));
 		} catch (NumberFormatException e) {
-			dailyjoin.getDailyLogger().log(Level.SEVERE,
+			DailyJoin.getDailyLogger().log(Level.SEVERE,
 					String.format("getInteger(%s) got an exception please check your configuration.", key), e);
 		}
 		return null;

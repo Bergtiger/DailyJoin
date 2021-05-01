@@ -1,6 +1,6 @@
 package de.bergtiger.dailyjoin.cmd;
 
-import de.bergtiger.dailyjoin.dailyjoin;
+import de.bergtiger.dailyjoin.DailyJoin;
 import de.bergtiger.dailyjoin.bdo.DailyPlayer;
 import de.bergtiger.dailyjoin.dao.TigerConnection;
 import de.bergtiger.dailyjoin.dao.impl.PlayerDAOimpl;
@@ -19,7 +19,7 @@ public class DailyCmdAdd {
     private DailyCmdAdd(){}
 
     public static void run(CommandSender cs, String[] args) {
-        Bukkit.getScheduler().runTaskAsynchronously(dailyjoin.inst(), () -> new DailyCmdAdd().setPlayerData(cs, args));
+        Bukkit.getScheduler().runTaskAsynchronously(DailyJoin.inst(), () -> new DailyCmdAdd().setPlayerData(cs, args));
     }
 
     /**

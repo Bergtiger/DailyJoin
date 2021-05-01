@@ -13,54 +13,96 @@ import java.util.List;
 
 public class PlayerDAOimpl implements PlayerDAO {
 
-    private boolean sql;
-    private final PlayerDAOImplSQL daoSQL = new PlayerDAOImplSQL();
-    private final PlayerDAOImplFile daoFile = new PlayerDAOImplFile();
+	private boolean sql;
+	private final PlayerDAOImplSQL daoSQL = new PlayerDAOImplSQL();
+	private final PlayerDAOImplFile daoFile = new PlayerDAOImplFile();
 
-    private static PlayerDAOimpl instance;
+	private static PlayerDAOimpl instance;
 
-    public static PlayerDAOimpl inst() {
-        if(instance == null)
-            instance = new PlayerDAOimpl();
-        return instance;
-    }
+	public static PlayerDAOimpl inst() {
+		if (instance == null)
+			instance = new PlayerDAOimpl();
+		return instance;
+	}
 
-    private PlayerDAOimpl() {
-        setSQL();
-    }
+	private PlayerDAOimpl() {
+		setSQL();
+	}
 
-    private void setSQL() {
-        if(DailyConfig.inst().hasValue(DailyConfig.DATA_FORMAT_SQL))
-            sql = DailyConfig.inst().getBoolean(DailyConfig.DATA_FORMAT_SQL);
-        sql = false;
-    }
+	private void setSQL() {
+		if (DailyConfig.inst().hasValue(DailyConfig.DATA_FORMAT_SQL))
+			sql = DailyConfig.inst().getBoolean(DailyConfig.DATA_FORMAT_SQL);
+		else
+			sql = false;
+	}
 
-    public void reload() {
-        setSQL();
-    }
+	public void reload() {
+		setSQL();
+	}
 
-    @Override
-    public Integer updatePlayer(DailyPlayer p) throws NoSQLConnectionException, UpdatePlayerException {
-        return sql ? daoSQL.updatePlayer(p) : daoFile.updatePlayer(p);
-    }
+	@Override
+	public Integer updatePlayer(DailyPlayer p) throws NoSQLConnectionException, UpdatePlayerException {
+		return updatePlayer(p, sql);
+	}
 
-    @Override
-    public DailyPlayer getPlayer(String uuid) throws NoSQLConnectionException {
-        return sql ? daoSQL.getPlayer(uuid) : daoFile.getPlayer(uuid);
-    }
+	/**
+	 * updatePlayer with explicit choosing between data storage.
+	 * @param p DailyPlayer to be stored
+	 * @param useSQL choose if sql should be used
+	 * @return
+	 * @throws NoSQLConnectionException
+	 * @throws UpdatePlayerException
+	 */
+	public Integer updatePlayer(DailyPlayer p, boolean useSQL) throws NoSQLConnectionException, UpdatePlayerException {
+		return useSQL ? daoSQL.updatePlayer(p) : daoFile.updatePlayer(p);
+	}
+	
+	@Override
+	public DailyPlayer getPlayer(String uuid) throws NoSQLConnectionException {
+		return getPlayer(uuid, sql);
+	}
 
-    @Override
-    public TigerList<DailyPlayer> getOrderedPlayers(String column, String richtung) throws NoSQLConnectionException {
-        return sql ? daoSQL.getOrderedPlayers(column, richtung) : daoFile.getOrderedPlayers(column, richtung);
-    }
+	/**
+	 * getPlayer with explicit choosing between data storage.
+	 * @param uuid
+	 * @param useSQL choose if sql should be used
+	 * @return
+	 * @throws NoSQLConnectionException
+	 */
+	public DailyPlayer getPlayer(String uuid, boolean useSQL) throws NoSQLConnectionException {
+		System.out.println("uuid: " + uuid + ", useSQL: " + useSQL);
+		System.out.println("player: " + (useSQL ? daoSQL.getPlayer(uuid) : daoFile.getPlayer(uuid)));
+		return useSQL ? daoSQL.getPlayer(uuid) : daoFile.getPlayer(uuid);
+	}
 
-    @Override
-    public List<String> getNames(String args) throws NoSQLConnectionException {
-        return sql ? daoSQL.getNames(args) : daoFile.getNames(args);
-    }
+	@Override
+	public TigerList<DailyPlayer> getOrderedPlayers(String column, String richtung) throws NoSQLConnectionException {
+		return sql ? daoSQL.getOrderedPlayers(column, richtung) : daoFile.getOrderedPlayers(column, richtung);
+	}
 
-    @Override
-    public String getUUid(String name) throws NoSQLConnectionException {
-        return sql ? daoSQL.getUUid(name) : daoFile.getUUid(name);
-    }
+	@Override
+	public List<String> getNames(String args) throws NoSQLConnectionException {
+		return sql ? daoSQL.getNames(args) : daoFile.getNames(args);
+	}
+
+	@Override
+	public String getUUid(String name) throws NoSQLConnectionException {
+		return sql ? daoSQL.getUUid(name) : daoFile.getUUid(name);
+	}
+	
+	/**
+	 * get all players from file.
+	 * @return
+	 */
+	public List<DailyPlayer> getPlayers() {
+		return daoFile.getPlayers();
+	}
+	
+	/**
+	 * save all players to file.
+	 * @param players
+	 */
+	public void updatePlayers(List<DailyPlayer> players) {
+		daoFile.updatePlayers(players);
+	}
 }

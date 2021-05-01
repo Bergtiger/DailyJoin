@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 
-import de.bergtiger.dailyjoin.dailyjoin;
+import de.bergtiger.dailyjoin.DailyJoin;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -38,8 +38,8 @@ public class DailyReward {
 
 	private void setData() {
 		//TODO
-		this.daily = dailyjoin.inst().getConfig().getStringList("config.daily");
-		this.birthday = dailyjoin.inst().getConfig().getStringList("config.birthday");
+		this.daily = DailyJoin.inst().getConfig().getStringList("config.daily");
+		this.birthday = DailyJoin.inst().getConfig().getStringList("config.birthday");
 		this.loadDaysConsecutive();
 		this.loadDaysTotal();
 	}
@@ -59,19 +59,19 @@ public class DailyReward {
 						try {
 							rewardsConsecutive.put(Integer.parseInt(k), cfg.getStringList(k));
 						} catch (NumberFormatException e) {
-							dailyjoin.getDailyLogger().log(Level.WARNING, String
+							DailyJoin.getDailyLogger().log(Level.WARNING, String
 									.format("loadDaysConsecutive: %s is not a valid number and will be ignored", k), e);
 						}
 					});
 				} else {
-					dailyjoin.getDailyLogger().log(Level.INFO, "loadDaysConsecutive: No Keys");
+					DailyJoin.getDailyLogger().log(Level.INFO, "loadDaysConsecutive: No Keys");
 				}
 			} else {
-				dailyjoin.getDailyLogger().log(Level.INFO,
+				DailyJoin.getDailyLogger().log(Level.INFO,
 						String.format("loadDaysConsecutive: No file '%s'", file.getAbsolutePath()));
 			}
 		} else {
-			dailyjoin.getDailyLogger().log(Level.WARNING, "loadDaysConsecutive: missing file in configuration");
+			DailyJoin.getDailyLogger().log(Level.WARNING, "loadDaysConsecutive: missing file in configuration");
 		}
 	}
 
@@ -90,19 +90,19 @@ public class DailyReward {
 						try {
 							this.rewardsTotal.put(Integer.parseInt(k), cfg.getStringList(k));
 						} catch (NumberFormatException e) {
-							dailyjoin.getDailyLogger().log(Level.WARNING,
+							DailyJoin.getDailyLogger().log(Level.WARNING,
 									String.format("loadDaysTotal: %s is not a valid number and will be ignored", k), e);
 						}
 					});
 				} else {
-					dailyjoin.getDailyLogger().log(Level.INFO, "loadDaysTotal: No Keys");
+					DailyJoin.getDailyLogger().log(Level.INFO, "loadDaysTotal: No Keys");
 				}
 			} else {
-				dailyjoin.getDailyLogger().log(Level.INFO,
+				DailyJoin.getDailyLogger().log(Level.INFO,
 						String.format("loadDaysTotal: No file '%s'", file.getAbsolutePath()));
 			}
 		} else {
-			dailyjoin.getDailyLogger().log(Level.WARNING, "loadDaysTotal: missing file in configuratio");
+			DailyJoin.getDailyLogger().log(Level.WARNING, "loadDaysTotal: missing file in configuratio");
 		}
 	}
 

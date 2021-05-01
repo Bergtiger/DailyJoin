@@ -13,7 +13,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitTask;
 
 import de.bergtiger.dailyjoin.DailyFileToSQL;
-import de.bergtiger.dailyjoin.dailyjoin;
+import de.bergtiger.dailyjoin.DailyJoin;
 import de.bergtiger.dailyjoin.utils.config.DailyConfig;
 
 public class TigerConnection {
@@ -41,31 +41,31 @@ public class TigerConnection {
 			if(c.hasValue(HOST))
 				host = c.getValue(HOST);
 			else
-				dailyjoin.getDailyLogger().log(Level.SEVERE, "Missing value for " + HOST);
+				DailyJoin.getDailyLogger().log(Level.SEVERE, "Missing value for " + HOST);
 			// user
 			if(c.hasValue(USER))
 				user = c.getValue(USER);
 			else
-				dailyjoin.getDailyLogger().log(Level.SEVERE, "Missing value for " + USER);
+				DailyJoin.getDailyLogger().log(Level.SEVERE, "Missing value for " + USER);
 			// password
 			if(c.hasValue(PASSWORD))
 				password = c.getValue(PASSWORD);
 			else
-				dailyjoin.getDailyLogger().log(Level.SEVERE, "Missing value for " + PASSWORD);
+				DailyJoin.getDailyLogger().log(Level.SEVERE, "Missing value for " + PASSWORD);
 			// database
 			if(c.hasValue(DATABASE))
 				database = c.getValue(DATABASE);
 			else
-				dailyjoin.getDailyLogger().log(Level.SEVERE, "Missing value for " + DATABASE);
+				DailyJoin.getDailyLogger().log(Level.SEVERE, "Missing value for " + DATABASE);
 			// port
 			if(c.hasValue(PORT))
 				try {
 					port = Integer.valueOf(c.getValue(PORT));
 				} catch (NumberFormatException e) {
-					dailyjoin.getDailyLogger().log(Level.SEVERE, "Wrong value for database.Port, has to be a number");
+					DailyJoin.getDailyLogger().log(Level.SEVERE, "Wrong value for database.Port, has to be a number");
 				}
 			else
-				dailyjoin.getDailyLogger().log(Level.SEVERE, "Missing value for " + PORT);
+				DailyJoin.getDailyLogger().log(Level.SEVERE, "Missing value for " + PORT);
 		}
 	}
 	
@@ -85,7 +85,7 @@ public class TigerConnection {
 		} catch (Exception e) {
 			System.out.println("[DailyJoin] Error No Connection");
 			System.out.println("[DailyJoin] Try SQL-Reconnection in 30 seconds.");
-			thread = Bukkit.getScheduler().runTaskLaterAsynchronously(dailyjoin.inst(), () -> connect(), 30*20L);
+			thread = Bukkit.getScheduler().runTaskLaterAsynchronously(DailyJoin.inst(), () -> connect(), 30*20L);
 		}
 	}
 	
@@ -161,14 +161,14 @@ public class TigerConnection {
 			try {
 				rs.close();
 			} catch (SQLException ex) {
-				dailyjoin.getDailyLogger().log(Level.SEVERE, null, ex);
+				DailyJoin.getDailyLogger().log(Level.SEVERE, null, ex);
 			}
 		}
 		if(st != null) {
 			try {
 				st.close();
 			} catch (SQLException ex) {
-				dailyjoin.getDailyLogger().log(Level.SEVERE, null, ex);
+				DailyJoin.getDailyLogger().log(Level.SEVERE, null, ex);
 			}
 		}
 	}
@@ -182,10 +182,10 @@ public class TigerConnection {
 			closeThread();
 			if(hasConnection()) {
 				conn.close();
-				dailyjoin.getDailyLogger().log(Level.INFO, "Logout");
+				DailyJoin.getDailyLogger().log(Level.INFO, "Logout");
 			}
 		} catch (SQLException ex) {
-			dailyjoin.getDailyLogger().log(Level.SEVERE, null, ex);
+			DailyJoin.getDailyLogger().log(Level.SEVERE, null, ex);
 		} finally {
 			conn = null;
 		}

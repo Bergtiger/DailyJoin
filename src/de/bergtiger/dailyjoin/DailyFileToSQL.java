@@ -6,11 +6,12 @@ import java.util.logging.Level;
 
 import de.bergtiger.dailyjoin.bdo.DailyPlayer;
 import de.bergtiger.dailyjoin.dao.TigerConnection;
-import de.bergtiger.dailyjoin.dao.impl.file.DailyFile;
-import de.bergtiger.dailyjoin.dao.impl.sql.PlayerDAOImplSQL;
+import de.bergtiger.dailyjoin.dao.impl.PlayerDAOimpl;
 import de.bergtiger.dailyjoin.exception.NoSQLConnectionException;
 import de.bergtiger.dailyjoin.exception.UpdatePlayerException;
 import de.bergtiger.dailyjoin.utils.TimeUtils;
+
+import static de.bergtiger.dailyjoin.dao.impl.file.PlayerDAOImplFile.*;
 
 public class DailyFileToSQL {
 	
@@ -18,15 +19,15 @@ public class DailyFileToSQL {
 	 * 
 	 */
 	public void FileToSQL() {
-		File file = new File(DailyFile.FILE_DIRECTORY, DailyFile.FILE_NAME);
+		File file = new File(FILE_DIRECTORY, FILE_NAME);
 		if (file.exists()) {
-			List<DailyPlayer> players = DailyFile.loadAll();
+			List<DailyPlayer> players = PlayerDAOimpl.inst().getPlayers();
 			if (players != null && !players.isEmpty()) {
 				for (int i = 0; i < players.size(); i++) {
 					try {
 						DailyPlayer pFile = players.get(i);
 						// explicit SQL
-						DailyPlayer pSQL = new PlayerDAOImplSQL().getPlayer(pFile.getUuid());
+						DailyPlayer pSQL = PlayerDAOimpl.inst().getPlayer(pFile.getUuid(), true);
 						// check if existing Player
 						if (pSQL != null) {
 							// existing Player -> merge
@@ -54,23 +55,23 @@ public class DailyFileToSQL {
 						}
 						// update or insert Player
 						// explicit SQL
-						new PlayerDAOImplSQL().updatePlayer(pFile);
+						PlayerDAOimpl.inst().updatePlayer(pFile, true);
 						// remove from working list
 						players.remove(i);
 						i--;
 					} catch (NoSQLConnectionException e) {
 						// NoSQLException
 						// stop merge and save file
-						DailyFile.saveAll(players);
+						PlayerDAOimpl.inst().updatePlayers(players);
 						TigerConnection.noConnection();
 						return;
 					} catch (UpdatePlayerException e) {
-						dailyjoin.getDailyLogger().log(Level.SEVERE, "FileToSQL", e);
+						DailyJoin.getDailyLogger().log(Level.SEVERE, "FileToSQL", e);
 					}
 				}
 			} else {
 				// EmptyList
-				dailyjoin.getDailyLogger().log(Level.INFO, "Empty Offline List");
+				DailyJoin.getDailyLogger().log(Level.INFO, "Empty Offline List");
 			}
 			// finished merging file in sql
 			// delete file when players is empty
@@ -79,7 +80,7 @@ public class DailyFileToSQL {
 			}
 		} else {
 			// No File
-			dailyjoin.getDailyLogger().log(Level.INFO, "No Offline List");
+			DailyJoin.getDailyLogger().log(Level.INFO, "No Offline List");
 		}
 	}
 }

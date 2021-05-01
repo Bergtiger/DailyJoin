@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.logging.Level;
 
 import de.bergtiger.dailyjoin.bdo.TigerList;
-import de.bergtiger.dailyjoin.dailyjoin;
+import de.bergtiger.dailyjoin.DailyJoin;
 import de.bergtiger.dailyjoin.bdo.DailyPlayer;
 import de.bergtiger.dailyjoin.dao.TigerConnection;
 import de.bergtiger.dailyjoin.dao.PlayerDAO;
@@ -58,7 +58,7 @@ public class PlayerDAOImplSQL implements PlayerDAO {
 						return rs.getInt(1);
 					}
 				} catch (SQLException e) {
-					dailyjoin.getDailyLogger().log(Level.SEVERE, "updatePlayer: " + p, e);
+					DailyJoin.getDailyLogger().log(Level.SEVERE, "updatePlayer: " + p, e);
 					throw new UpdatePlayerException(true, p);
 				} finally {
 					TigerConnection.closeRessources(rs, st);
@@ -102,7 +102,7 @@ public class PlayerDAOImplSQL implements PlayerDAO {
 					return p;
 				}
 			} catch (SQLException e) {
-				dailyjoin.getDailyLogger().log(Level.SEVERE, "getPlayer: " + uuid, e);
+				DailyJoin.getDailyLogger().log(Level.SEVERE, "getPlayer: " + uuid, e);
 			} finally {
 				TigerConnection.closeRessources(rs, st);
 			}
@@ -142,7 +142,7 @@ public class PlayerDAOImplSQL implements PlayerDAO {
 						}
 						return players;
 					} catch (SQLException e) {
-						dailyjoin.getDailyLogger().log(Level.SEVERE, "getTopPlayers", e);
+						DailyJoin.getDailyLogger().log(Level.SEVERE, "getTopPlayers", e);
 					} finally {
 						TigerConnection.closeRessources(rs, st);
 					}
@@ -150,10 +150,10 @@ public class PlayerDAOImplSQL implements PlayerDAO {
 					throw new NoSQLConnectionException();
 				}
 			} else {
-				dailyjoin.getDailyLogger().log(Level.SEVERE, String.format("getTopPlayers: no richtung(%s)", order));
+				DailyJoin.getDailyLogger().log(Level.SEVERE, String.format("getTopPlayers: no richtung(%s)", order));
 			}
 		} else {
-			dailyjoin.getDailyLogger().log(Level.SEVERE, String.format("getTopPlayers: no column(%s)",column));
+			DailyJoin.getDailyLogger().log(Level.SEVERE, String.format("getTopPlayers: no column(%s)",column));
 		}
 		return null;
 	}
@@ -173,7 +173,7 @@ public class PlayerDAOImplSQL implements PlayerDAO {
 				}
 				return names;
 			} catch (SQLException e) {
-				dailyjoin.getDailyLogger().log(Level.SEVERE, "getNames", e);
+				DailyJoin.getDailyLogger().log(Level.SEVERE, "getNames", e);
 			} finally {
 				TigerConnection.closeRessources(rs, st);
 			}
@@ -197,7 +197,7 @@ public class PlayerDAOImplSQL implements PlayerDAO {
 						return rs.getString(1);
 					}
 				} catch (SQLException e) {
-					dailyjoin.getDailyLogger().log(Level.SEVERE, String.format("getUUid(%s)", name), e);
+					DailyJoin.getDailyLogger().log(Level.SEVERE, String.format("getUUid(%s)", name), e);
 				} finally {
 					TigerConnection.closeRessources(rs, st);
 				}
@@ -205,7 +205,7 @@ public class PlayerDAOImplSQL implements PlayerDAO {
 				throw new NoSQLConnectionException();
 			}
 		} else {
-			dailyjoin.getDailyLogger().log(Level.WARNING, "getUUid: You're trying to get a UUid from a player without a name.");
+			DailyJoin.getDailyLogger().log(Level.WARNING, "getUUid: You're trying to get a UUid from a player without a name.");
 		}
 		return null;
 	}

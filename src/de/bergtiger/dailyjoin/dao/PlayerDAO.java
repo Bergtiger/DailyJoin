@@ -25,7 +25,7 @@ public interface PlayerDAO {
 	 * @throws NoSQLConnectionException 
 	 */
 	public DailyPlayer getPlayer(String uuid) throws NoSQLConnectionException;
-
+	
 	/**
 	 * get top Players
 	 * @return

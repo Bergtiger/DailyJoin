@@ -1,7 +1,7 @@
 package de.bergtiger.dailyjoin.cmd;
 
 import de.bergtiger.dailyjoin.bdo.DailyPlayer;
-import de.bergtiger.dailyjoin.dailyjoin;
+import de.bergtiger.dailyjoin.DailyJoin;
 import de.bergtiger.dailyjoin.dao.TigerConnection;
 import de.bergtiger.dailyjoin.dao.impl.PlayerDAOimpl;
 import de.bergtiger.dailyjoin.exception.NoSQLConnectionException;
@@ -21,7 +21,7 @@ public class DailyCmdPlayer {
 	}
 
 	public static void run(CommandSender cs, String[] args) {
-		Bukkit.getScheduler().runTaskAsynchronously(dailyjoin.inst(), () -> new DailyCmdPlayer().showPlayer(cs, args));
+		Bukkit.getScheduler().runTaskAsynchronously(DailyJoin.inst(), () -> new DailyCmdPlayer().showPlayer(cs, args));
 	}
 
 	/**
@@ -50,8 +50,6 @@ public class DailyCmdPlayer {
 
 	private DailyPlayer getPlayer(String uuid) {
 		try {
-// TODO
-//			return TigerConnection.inst().getPlayerDAO().getPlayer(uuid);
 			return PlayerDAOimpl.inst().getPlayer(uuid);
 		} catch (NoSQLConnectionException e) {
 			TigerConnection.noConnection();

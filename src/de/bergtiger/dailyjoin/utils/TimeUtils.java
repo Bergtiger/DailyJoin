@@ -1,6 +1,6 @@
 package de.bergtiger.dailyjoin.utils;
 
-import de.bergtiger.dailyjoin.dailyjoin;
+import de.bergtiger.dailyjoin.DailyJoin;
 import de.bergtiger.dailyjoin.utils.lang.Lang;
 
 import java.sql.Timestamp;
@@ -135,10 +135,10 @@ public class TimeUtils {
 			try {
 				return DateTimeFormatter.ofPattern(format).format(t.toLocalDateTime());
 			} catch(Exception e) {
-				dailyjoin.getDailyLogger().log(Level.SEVERE, String.format("formated: could not format Timestamp(%s) with format(%s)", t, format),e);
+				DailyJoin.getDailyLogger().log(Level.SEVERE, String.format("formated: could not format Timestamp(%s) with format(%s)", t, format),e);
 			}
 		} else {
-			dailyjoin.getDailyLogger().log(Level.WARNING, "formated: Timestamp null");
+			DailyJoin.getDailyLogger().log(Level.WARNING, "formated: Timestamp null");
 		}
 		return "-";
 	}

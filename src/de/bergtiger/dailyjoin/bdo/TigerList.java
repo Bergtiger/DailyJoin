@@ -9,6 +9,8 @@ public class TigerList<T> extends ArrayList<T> {
 
     private int pageSize = 15;
     private int page = 0;
+    /** only DailyJoin searched column*/
+    private String column;
 
     public TigerList() {
         super();
@@ -58,5 +60,21 @@ public class TigerList<T> extends ArrayList<T> {
      */
     public int getPageMax() {
         return (size() / pageSize) + ((size() % pageSize != 0) ? 1 : 0);
+    }
+    
+    /**
+     * set searched column.
+     * @param column 
+     */
+    public void setColumn(String column) {
+    	this.column = column;
+    }
+    
+    /**
+     * get searched column.
+     * @return
+     */
+    public String getColumn() {
+    	return column;
     }
 }

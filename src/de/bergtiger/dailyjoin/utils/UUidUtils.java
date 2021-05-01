@@ -1,6 +1,6 @@
 package de.bergtiger.dailyjoin.utils;
 
-import de.bergtiger.dailyjoin.dailyjoin;
+import de.bergtiger.dailyjoin.DailyJoin;
 import de.bergtiger.dailyjoin.dao.impl.PlayerDAOimpl;
 import de.bergtiger.dailyjoin.dao.impl.file.PlayerDAOImplFile;
 import de.bergtiger.dailyjoin.exception.NoSQLConnectionException;
@@ -58,7 +58,7 @@ public class UUidUtils {
 			if (Bukkit.getPluginManager().isPluginEnabled("TigerList"))
 				uuid = getUUidFromTigerList(name);
 		} catch (Exception e) {
-			dailyjoin.getDailyLogger().log(Level.WARNING, String.format("findUUidFromName: TigerList (%s)", name) ,e);
+			DailyJoin.getDailyLogger().log(Level.WARNING, String.format("findUUidFromName: TigerList (%s)", name) ,e);
 		}
 		try {
 			uuid = PlayerDAOimpl.inst().getUUid(name);

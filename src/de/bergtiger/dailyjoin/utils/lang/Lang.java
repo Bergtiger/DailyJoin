@@ -93,13 +93,25 @@ public enum Lang implements Constants {
 	DAILY_RELOAD
 		("&7DailyJoin reloaded."),
 
-	TOP_PLAYER_DAYS_CONSECUTIVE
-		("&a----<[&6Top Day&a]>----"),
-	TOP_PLAYER_DAYS_TOTAL
-		("&a----<[&6Top Totaldays&a]>----"),
+	/** TODO */
+	TOP_HEADER (String.format("&a----<[&6Top Player&f(&e%s&f)&a]>----", VALUE)),
+	
+	/** TODO*/
+	TOP_FOOTER (String.format("&a---<(&e%s&f/&e%s&a)>----", PAGE, PAGE_MAX)),
+	/** TODO*/
+	TOP_NEXT ("&6next"),
+	/** TODO*/
+	TOP_PREV ("&6prev"),
+	/** TODO*/
+	TOP_PLAYER (String.format("&e%s: &7%s", PLAYER, VALUE)),
+		
+/**	TOP_PLAYER_DAYS_CONSECUTIVE
+		("&a----<[&6Top Day&a]>----"),*/
+/**	TOP_PLAYER_DAYS_TOTAL
+		("&a----<[&6Top Totaldays&a]>----"),*/
 	/** top list player as PLAYER, VALUE*/
-	TOP_PLAYER_LIST
-		(String.format("&e%s: &7%s", PLAYER, VALUE)),
+/**	TOP_PLAYER_LIST
+		(String.format("&e%s: &7%s", PLAYER, VALUE)),*/
 
 	/** plugin statistic menu header*/
 	PLUGIN_HEADER

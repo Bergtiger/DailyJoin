@@ -2,9 +2,8 @@ package de.bergtiger.dailyjoin.listener;
 
 import de.bergtiger.dailyjoin.utils.DailyReward;
 import de.bergtiger.dailyjoin.bdo.DailyPlayer;
-import de.bergtiger.dailyjoin.dailyjoin;
-import de.bergtiger.dailyjoin.dao.impl.file.PlayerDAOImplFile;
-import de.bergtiger.dailyjoin.dao.impl.sql.PlayerDAOImplSQL;
+import de.bergtiger.dailyjoin.DailyJoin;
+import de.bergtiger.dailyjoin.dao.impl.PlayerDAOimpl;
 import de.bergtiger.dailyjoin.exception.LoadPlayerException;
 import de.bergtiger.dailyjoin.exception.NoSQLConnectionException;
 import de.bergtiger.dailyjoin.exception.UpdatePlayerException;
@@ -59,17 +58,17 @@ public class DailyListener implements Listener {
 		if (dc.hasValue(DailyConfig.DELAY))
 			delay = dc.getInteger(DailyConfig.DELAY);
 		else
-			dailyjoin.getDailyLogger().log(Level.SEVERE, "Missing value for " + DailyConfig.DELAY);
+			DailyJoin.getDailyLogger().log(Level.SEVERE, "Missing value for " + DailyConfig.DELAY);
 		// data type
 		if (dc.hasValue(DailyConfig.DATA_FORMAT))
 			sql = dc.getBoolean(DailyConfig.DATA_FORMAT_SQL);
 		else
-			dailyjoin.getDailyLogger().log(Level.SEVERE, "Missing value for " + DailyConfig.DATA_FORMAT);
+			DailyJoin.getDailyLogger().log(Level.SEVERE, "Missing value for " + DailyConfig.DATA_FORMAT);
 		// rewardOnSQL
 		if (dc.hasValue(DailyConfig.REWARD_ON_SQL_CONNECTION_LOST))
 			rewardOnSQLConnectionLost = dc.getBoolean(DailyConfig.REWARD_ON_SQL_CONNECTION_LOST);
 		else
-			dailyjoin.getDailyLogger().log(Level.SEVERE,
+			DailyJoin.getDailyLogger().log(Level.SEVERE,
 					"Missing value for " + DailyConfig.REWARD_ON_SQL_CONNECTION_LOST);
 	}
 
@@ -81,7 +80,7 @@ public class DailyListener implements Listener {
 			if (time < 0) {
 				time = 10 * 20L;
 			}
-			Bukkit.getScheduler().scheduleSyncDelayedTask(dailyjoin.inst(), () -> playerJoined(p), time);
+			Bukkit.getScheduler().scheduleSyncDelayedTask(DailyJoin.inst(), () -> playerJoined(p), time);
 		}
 	}
 
@@ -123,7 +122,7 @@ public class DailyListener implements Listener {
 							}
 						}
 					} catch (LoadPlayerException loadPlayerException) {
-						dailyjoin.getDailyLogger().log(Level.SEVERE,
+						DailyJoin.getDailyLogger().log(Level.SEVERE,
 								String.format("could absolute not load %s", p.getName()), e);
 					} catch (UpdatePlayerException updatePlayerException) {
 						updatePlayerException.printStackTrace();
@@ -141,7 +140,7 @@ public class DailyListener implements Listener {
 									dp.getLastjoin());
 						}
 					} catch (UpdatePlayerException updatePlayerException) {
-						dailyjoin.getDailyLogger().log(Level.SEVERE,
+						DailyJoin.getDailyLogger().log(Level.SEVERE,
 								String.format("could absolute not save %s", dp.getName()), e);
 					}
 				}
@@ -220,15 +219,12 @@ public class DailyListener implements Listener {
 	 *                             IOException
 	 */
 	private DailyPlayer load(@Nonnull String uuid, boolean sql) throws LoadPlayerException {
-		if (sql) {
-			try {
-				return new PlayerDAOImplSQL().getPlayer(uuid);
-			} catch (NoSQLConnectionException e) {
-				dailyjoin.getDailyLogger().log(Level.WARNING, String.format("could not load(%s) from Database", uuid), e);
-				throw new LoadPlayerException(true, uuid);
-			}
+		try {
+			return PlayerDAOimpl.inst().getPlayer(uuid, sql);
+		} catch (NoSQLConnectionException e) {
+			DailyJoin.getDailyLogger().log(Level.WARNING, String.format("could not load(%s) from Database", uuid), e);
+			throw new LoadPlayerException(true, uuid);
 		}
-		return new PlayerDAOImplFile().getPlayer(uuid);
 	}
 
 	/**
@@ -240,16 +236,11 @@ public class DailyListener implements Listener {
 	 *                               IOException
 	 */
 	private void save(@Nonnull DailyPlayer dp, boolean sql) throws UpdatePlayerException {
-		if (sql) {
-			try {
-				new PlayerDAOImplSQL().updatePlayer(dp);
-			} catch (NoSQLConnectionException e) {
-				dailyjoin.getDailyLogger().log(Level.WARNING,
-						String.format("could not save(%s) in Database", dp.getName()), e);
-				throw new UpdatePlayerException(true, dp);
-			}
-		} else {
-			new PlayerDAOImplFile().updatePlayer(dp);
+		try {
+			PlayerDAOimpl.inst().updatePlayer(dp, sql);
+		} catch (NoSQLConnectionException e) {
+			DailyJoin.getDailyLogger().log(Level.WARNING, String.format("could not save(%s) in Database", dp.getName()), e);
+			throw new UpdatePlayerException(true, dp);
 		}
 	}
 }

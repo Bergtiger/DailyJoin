@@ -1,6 +1,6 @@
 package de.bergtiger.dailyjoin.dao;
 
-import de.bergtiger.dailyjoin.dailyjoin;
+import de.bergtiger.dailyjoin.DailyJoin;
 import de.bergtiger.dailyjoin.exception.NoSQLConnectionException;
 
 import java.sql.PreparedStatement;
@@ -82,7 +82,7 @@ public class DailyDataBase {
 						FIRSTJOIN));
 				st.executeUpdate();
 			} catch (SQLException e) {
-				dailyjoin.getDailyLogger().log(Level.SEVERE, "createDailyJoinTable: could not create Table.", e);
+				DailyJoin.getDailyLogger().log(Level.SEVERE, "createDailyJoinTable: could not create Table.", e);
 			} finally {
 				TigerConnection.closeRessources(null, st);
 			}
@@ -107,7 +107,7 @@ public class DailyDataBase {
 				}
 				return columns;
 			} catch (SQLException e) {
-				dailyjoin.getDailyLogger().log(Level.SEVERE, "hasOldColumns: could not load ColumnMeta", e);
+				DailyJoin.getDailyLogger().log(Level.SEVERE, "hasOldColumns: could not load ColumnMeta", e);
 			} finally {
 				TigerConnection.closeRessources(rs, null);
 			}
@@ -133,7 +133,7 @@ public class DailyDataBase {
 						return true;
 				}
 			} catch (SQLException e) {
-				dailyjoin.getDailyLogger().log(Level.SEVERE, "hasDailyJoinTable: could not load TableMeta", e);
+				DailyJoin.getDailyLogger().log(Level.SEVERE, "hasDailyJoinTable: could not load TableMeta", e);
 			} finally {
 				TigerConnection.closeRessources(rs, null);
 			}
@@ -159,9 +159,9 @@ public class DailyDataBase {
 						oldColumn,
 						newColumn));
 				st.executeUpdate();
-				dailyjoin.getDailyLogger().log(Level.INFO, String.format("updateOldColumnName: changed %s to %s", oldColumn, newColumn));
+				DailyJoin.getDailyLogger().log(Level.INFO, String.format("updateOldColumnName: changed %s to %s", oldColumn, newColumn));
 			} catch (SQLException e) {
-				dailyjoin.getDailyLogger().log(Level.SEVERE, "updateOldColumnName: could not alter Table", e);
+				DailyJoin.getDailyLogger().log(Level.SEVERE, "updateOldColumnName: could not alter Table", e);
 			} finally {
 				TigerConnection.closeRessources(null, st);
 			}

@@ -1,4 +1,4 @@
-package de.bergtiger.dailyjoin.utils;
+package de.bergtiger.dailyjoin.utils.permission;
 
 import org.bukkit.command.CommandSender;
 
@@ -12,7 +12,9 @@ public enum TigerPermission {
     CMD ("dailyjoin.cmd"),
     PLAYER ("dailyjoin.player"),
     RELOAD ("dailyjoin.reload"),
+    CONFIG ("dailyjoin.config"),
     PLUGIN ("dailyjoin.plugin"),
+    MIGRATION ("dailyjoin.migration"),
     JOIN("dailyjoin.join");
 
     private final String permission;

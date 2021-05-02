@@ -13,19 +13,34 @@ import org.bukkit.configuration.file.YamlConfiguration;
 
 public class DailyConfig {
 
-	public static final String DATA_SQL = "sql", DATA_FILE = "file",
+	private static final String
+			CONFIG = "config",
+			DB = "database";
+	public static final String
+			DATA_SQL = "sql",
+			DATA_FILE = "file",
 
 			PLUGIN_DIRECTORY = "plugins/DailyJoin",
 
-			DB = "database", HOST = DB + ".host", PORT = DB + ".port", USER = DB + ".user", PASSWORD = DB + ".password",
+			HOST = DB + ".host",
+			PORT = DB + ".port",
+			USER = DB + ".user",
+			PASSWORD = DB + ".password",
 			DATABASE = DB + ".database",
 
-			CONFIG = "config", DATA_FORMAT = CONFIG + ".data.format", DATA_FORMAT_SQL = CONFIG + ".data.format.sql",
-			DATA_FORMAT_OLD = CONFIG + ".SQL", DELAY = CONFIG + ".delay", PAGE_SIZE = CONFIG + ".page.size",
-			DAILY = CONFIG + ".daily", BIRTHDAY = CONFIG + ".birthday", FILE_DAYS_TOTAL = CONFIG + ".file.days.total",
-			FILE_DAYS_CONSECUTIVE = CONFIG + ".file.days.consecutive", FILE_DAYS_OLD_TOTAL = CONFIG + ".FileTotalDays",
+			DATA_FORMAT = CONFIG + ".data.format",
+			DATA_FORMAT_SQL = CONFIG + ".data.format.sql",
+			DATA_FORMAT_OLD = CONFIG + ".SQL",
+			DELAY = CONFIG + ".delay",
+			PAGE_SIZE = CONFIG + ".page.size",
+			DAILY = CONFIG + ".daily",
+			BIRTHDAY = CONFIG + ".birthday",
+			FILE_DAYS_TOTAL = CONFIG + ".file.days.total",
+			FILE_DAYS_CONSECUTIVE = CONFIG + ".file.days.consecutive",
+			FILE_DAYS_OLD_TOTAL = CONFIG + ".FileTotalDays",
 			FILE_DAYS_OLD_CONSECUTIVE = CONFIG + ".FileDay",
-			REWARD_ON_SQL_CONNECTION_LOST = CONFIG + "GetRewardOnSQLConnectionLost";
+			LOAD_FILE_ON_SQL_CONNECTION = CONFIG + ".LoadFileOnSQLConnection",
+			REWARD_ON_SQL_CONNECTION_LOST = CONFIG + ".GetRewardOnSQLConnectionLost";
 
 	private static DailyConfig instance;
 
@@ -67,7 +82,7 @@ public class DailyConfig {
 		// page_size
 		if (cfg.contains(PAGE_SIZE)) {
 			// check matching integer (\\d*)
-			if (!cfg.getString(PAGE_SIZE).matches("\\d*")) {
+			if (!cfg.getString(PAGE_SIZE).matches("[1-9]\\d*")) {
 				DailyJoin.getDailyLogger().log(Level.WARNING, "page_size no integer");
 				cfg.set(PAGE_SIZE, 15);
 			}
@@ -124,6 +139,16 @@ public class DailyConfig {
 						}
 					} else {
 						cfg.addDefault(REWARD_ON_SQL_CONNECTION_LOST, true);
+					}
+					// load file on sql connection
+					if (cfg.contains(LOAD_FILE_ON_SQL_CONNECTION)) {
+						if(!cfg.getString(LOAD_FILE_ON_SQL_CONNECTION).matches("(?i)(true|false)")) {
+							// not allowed value
+							DailyJoin.getDailyLogger().log(Level.WARNING, "load file on sql connection has to be true or false");
+							cfg.set(LOAD_FILE_ON_SQL_CONNECTION, true);
+						}
+					} else {
+						cfg.addDefault(LOAD_FILE_ON_SQL_CONNECTION, true);
 					}
 					// database
 					if (!cfg.contains(DATABASE)) {
@@ -234,29 +259,43 @@ public class DailyConfig {
 		}
 	}
 
-	private HashMap<String, String> values = new HashMap<>();
+	private final HashMap<String, String> values = new HashMap<>();
 
 	/**
 	 * check if configuration has a value.
-	 * 
-	 * @param key check
-	 * @return
+	 * @param key identifier
+	 * @return true if configuration contains this key
 	 */
 	public boolean hasValue(String key) {
 		if (values.containsKey(key)) {
 			return true;
 		}
-		if (DailyJoin.inst().getConfig().contains(key)) {
-			return true;
-		}
-		return false;
+		return DailyJoin.inst().getConfig().contains(key);
+	}
+
+	/**
+	 * set value and reloads plugin.
+	 * @param key identifier
+	 * @param value new value to store in configuration
+	 */
+	public void setValue(String key, String value) {
+		FileConfiguration cfg = DailyJoin.inst().getConfig();
+		if(cfg.contains(key))
+			cfg.set(key, value);
+		else
+			cfg.addDefault(key, value);
+		// save
+		cfg.options().header("DailyJoin");
+		cfg.options().copyHeader(true);
+		cfg.options().copyDefaults(true);
+		DailyJoin.inst().saveConfig();
+		DailyJoin.inst().reload();
 	}
 
 	/**
 	 * get string value from configuration.
-	 * 
-	 * @param key
-	 * @return
+	 * @param key identifier
+	 * @return value as string
 	 */
 	public String getValue(String key) {
 		if (!values.containsKey(key)) {
@@ -265,21 +304,24 @@ public class DailyConfig {
 		return values.get(key);
 	}
 
+	public String getValueSave(String key) {
+		String value = getValue(key);
+		return value != null ? value : "";
+	}
+
 	/**
 	 * get boolean value from configuration.
-	 * 
-	 * @param key
-	 * @return
+	 * @param key identifier
+	 * @return value as boolean
 	 */
 	public boolean getBoolean(String key) {
-		return Boolean.valueOf(getValue(key));
+		return Boolean.parseBoolean(getValue(key));
 	}
 
 	/**
 	 * get integer value from configuration.
-	 * 
-	 * @param key
-	 * @return
+	 * @param key identifier
+	 * @return value as integer
 	 */
 	public Integer getInteger(String key) {
 		try {

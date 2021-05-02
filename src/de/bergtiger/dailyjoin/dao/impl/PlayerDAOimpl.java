@@ -9,6 +9,7 @@ import de.bergtiger.dailyjoin.exception.NoSQLConnectionException;
 import de.bergtiger.dailyjoin.exception.UpdatePlayerException;
 import de.bergtiger.dailyjoin.utils.config.DailyConfig;
 
+import java.util.HashMap;
 import java.util.List;
 
 public class PlayerDAOimpl implements PlayerDAO {
@@ -87,13 +88,28 @@ public class PlayerDAOimpl implements PlayerDAO {
 	public String getUUid(String name) throws NoSQLConnectionException {
 		return sql ? daoSQL.getUUid(name) : daoFile.getUUid(name);
 	}
-	
+
+	@Override
+	public List<DailyPlayer> getPlayers() throws NoSQLConnectionException {
+		return getPlayers(sql);
+	}
+
 	/**
 	 * get all players from file.
 	 * @return
+	 * @throws NoSQLConnectionException 
 	 */
-	public List<DailyPlayer> getPlayers() {
-		return daoFile.getPlayers();
+	public List<DailyPlayer> getPlayers(boolean useSQL) throws NoSQLConnectionException {
+		return useSQL ? daoSQL.getPlayers() : daoFile.getPlayers();
+	}
+
+	@Override
+	public HashMap<String, DailyPlayer> getPlayersAsMap() throws NoSQLConnectionException {
+		return getPlayersAsMap(sql);
+	}
+
+	public HashMap<String, DailyPlayer> getPlayersAsMap(boolean useSQL) throws NoSQLConnectionException {
+		return useSQL ? daoSQL.getPlayersAsMap() : daoFile.getPlayersAsMap();
 	}
 	
 	/**

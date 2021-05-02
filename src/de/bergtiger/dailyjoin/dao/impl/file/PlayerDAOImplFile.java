@@ -12,11 +12,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import java.io.File;
 import java.io.IOException;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
@@ -211,6 +207,48 @@ public class PlayerDAOImplFile implements PlayerDAO {
 						p.setDaysConsecutive(cfg.getInt(path + DAYS_OLD_CONSECUTIVE));
 					// add players
 					players.add(p);
+				});
+				return players;
+			}
+		}
+		return null;
+	}
+
+	public HashMap<String, DailyPlayer> getPlayersAsMap() {
+		File file = new File(FILE_DIRECTORY, FILE_NAME);
+		if (file.exists()) {
+			FileConfiguration cfg = YamlConfiguration.loadConfiguration(file);
+			HashMap<String, DailyPlayer> players = new HashMap<>();
+			if (cfg.contains(PLAYER_PATH)) {
+				cfg.getConfigurationSection(PLAYER_PATH).getKeys(false).forEach(uuid -> {
+					DailyPlayer p = new DailyPlayer();
+					String path = String.format(PLAYER_PATH_FORMAT, uuid);
+					// set uuid
+					p.setUuid(uuid);
+					// set name
+					if (cfg.contains(path + NAME))
+						p.setName(cfg.getString(path + NAME));
+					// set days total
+					if (cfg.contains(path + DAYS_TOTAL))
+						p.setDaysTotal(cfg.getInt(path + DAYS_TOTAL));
+					// set days consecutive
+					if (cfg.contains(path + DAYS_CONSECUTIVE))
+						p.setDaysConsecutive(cfg.getInt(path + DAYS_CONSECUTIVE));
+					// set first join
+					if (cfg.contains(path + FIRSTJOIN))
+						p.setFirstjoin(new Timestamp(cfg.getLong(path + FIRSTJOIN)));
+					// set last join
+					if (cfg.contains(path + LASTJOIN))
+						p.setLastjoin(new Timestamp(cfg.getLong(path + LASTJOIN)));
+					// TODO remove old code
+					// set days total
+					if (cfg.contains(path + DAYS_OLD_TOTAL))
+						p.setDaysTotal(cfg.getInt(path + DAYS_OLD_TOTAL));
+					// set days consecutive
+					if (cfg.contains(path + DAYS_OLD_CONSECUTIVE))
+						p.setDaysConsecutive(cfg.getInt(path + DAYS_OLD_CONSECUTIVE));
+					// add players
+					players.put(uuid, p);
 				});
 				return players;
 			}

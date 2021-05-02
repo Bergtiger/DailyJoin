@@ -7,7 +7,7 @@ import de.bergtiger.dailyjoin.dao.impl.PlayerDAOimpl;
 import de.bergtiger.dailyjoin.exception.LoadPlayerException;
 import de.bergtiger.dailyjoin.exception.NoSQLConnectionException;
 import de.bergtiger.dailyjoin.exception.UpdatePlayerException;
-import de.bergtiger.dailyjoin.utils.TigerPermission;
+import de.bergtiger.dailyjoin.utils.permission.TigerPermission;
 import de.bergtiger.dailyjoin.utils.TimeUtils;
 import de.bergtiger.dailyjoin.utils.config.DailyConfig;
 

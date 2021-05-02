@@ -12,7 +12,7 @@ import java.util.logging.Level;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitTask;
 
-import de.bergtiger.dailyjoin.DailyFileToSQL;
+import de.bergtiger.dailyjoin.dao.migration.DailyFileToSQL;
 import de.bergtiger.dailyjoin.DailyJoin;
 import de.bergtiger.dailyjoin.utils.config.DailyConfig;
 
@@ -60,7 +60,7 @@ public class TigerConnection {
 			// port
 			if(c.hasValue(PORT))
 				try {
-					port = Integer.valueOf(c.getValue(PORT));
+					port = Integer.parseInt(c.getValue(PORT));
 				} catch (NumberFormatException e) {
 					DailyJoin.getDailyLogger().log(Level.SEVERE, "Wrong value for database.Port, has to be a number");
 				}
@@ -78,14 +78,16 @@ public class TigerConnection {
 		// try Connection
 		try {
 			openConnection();
-			System.out.println("[DailyJoin] SQL-Connection");
+			DailyJoin.getDailyLogger().log(Level.INFO, "SQL-Connection");
 			DailyDataBase.createTable();
-			System.out.println("[DailyJoin] Get offline Joins");
-			new DailyFileToSQL().FileToSQL();
+			if(DailyConfig.inst().hasValue(LOAD_FILE_ON_SQL_CONNECTION) && DailyConfig.inst().getBoolean(LOAD_FILE_ON_SQL_CONNECTION)) {
+				DailyJoin.getDailyLogger().log(Level.INFO, "Get offline Joins");
+				DailyFileToSQL.inst().FileToSQL();
+			}
 		} catch (Exception e) {
-			System.out.println("[DailyJoin] Error No Connection");
-			System.out.println("[DailyJoin] Try SQL-Reconnection in 30 seconds.");
-			thread = Bukkit.getScheduler().runTaskLaterAsynchronously(DailyJoin.inst(), () -> connect(), 30*20L);
+			DailyJoin.getDailyLogger().log(Level.WARNING, "No Connection");
+			DailyJoin.getDailyLogger().log(Level.WARNING, "Try SQL-Reconnection in 30 seconds.");
+			thread = Bukkit.getScheduler().runTaskLaterAsynchronously(DailyJoin.inst(), this::connect, 30*20L);
 		}
 	}
 	
@@ -111,17 +113,17 @@ public class TigerConnection {
 		}
 	}
 	
-	private Connection openConnection() throws Exception{
+	private void openConnection() throws Exception{
+		// TODO test if needed
 		Class.forName("com.mysql.jdbc.Driver");
-		
+		// TODO new sql driver
 		//Class.forName("com.mysql.cj.jdbc.Driver");
 		conn = DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/" + database, user, password);
-		return conn;
 	}
 	
 	/**
 	 * get SQL-Connection.
-	 * @return
+	 * @return connection
 	 */
 	public static Connection conn() {
 		return conn;

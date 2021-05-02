@@ -13,7 +13,7 @@ import org.bukkit.entity.Player;
 
 import javax.annotation.Nonnull;
 
-import static de.bergtiger.dailyjoin.utils.TigerPermission.*;
+import static de.bergtiger.dailyjoin.utils.permission.TigerPermission.*;
 
 public class DailyCmdPlayer {
 
@@ -57,19 +57,24 @@ public class DailyCmdPlayer {
 		return null;
 	}
 
-    /**
-     * shows DailyPlayer in CommandSender's chat.
-     * @param cs CommandSender who asked for information
-     * @param dp DailyPlayer information to be shown
-     */
+	/**
+	 * shows DailyPlayer in CommandSender's chat.
+	 * 
+	 * @param cs CommandSender who asked for information
+	 * @param dp DailyPlayer information to be shown
+	 */
 	private void showPlayer(@Nonnull CommandSender cs, @Nonnull DailyPlayer dp) {
 		// Header
 		cs.spigot().sendMessage(Lang.build(Lang.PLAYER_HEADER.get().replace(Lang.PLAYER, dp.getName())));
 		// Data
-		cs.spigot().sendMessage(Lang.build(Lang.PLAYER_JOIN_FIRST.get().replace(Lang.VALUE, TimeUtils.formated(dp.getFirstjoin()))));
-		cs.spigot().sendMessage(Lang.build(Lang.PLAYER_JOIN_LAST.get().replace(Lang.VALUE, TimeUtils.formated(dp.getLastjoin()))));
-		cs.spigot().sendMessage(Lang.build(Lang.PLAYER_DAYS_CONSECUTIVE.get().replace(Lang.VALUE, Integer.toString(dp.getDaysConsecutive()))));
-		cs.spigot().sendMessage(Lang.build(Lang.PLAYER_DAYS_TOTAL.get().replace(Lang.VALUE, Integer.toString(dp.getDaysTotal()))));
+		cs.spigot().sendMessage(
+				Lang.build(Lang.PLAYER_JOIN_FIRST.get().replace(Lang.VALUE, TimeUtils.formated(dp.getFirstjoin()))));
+		cs.spigot().sendMessage(
+				Lang.build(Lang.PLAYER_JOIN_LAST.get().replace(Lang.VALUE, TimeUtils.formated(dp.getLastjoin()))));
+		cs.spigot().sendMessage(Lang.build(
+				Lang.PLAYER_DAYS_CONSECUTIVE.get().replace(Lang.VALUE, Integer.toString(dp.getDaysConsecutive()))));
+		cs.spigot().sendMessage(
+				Lang.build(Lang.PLAYER_DAYS_TOTAL.get().replace(Lang.VALUE, Integer.toString(dp.getDaysTotal()))));
 		// Footer
 		cs.spigot().sendMessage(Lang.build(Lang.PLAYER_FOOTER.get()));
 	}

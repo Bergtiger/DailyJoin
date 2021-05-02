@@ -6,6 +6,7 @@ public interface Constants {
 		VALUE = "-value-", 
 		PLAYER = "-player-", 
 		DATA = "-data-",
+		TYPE = "-type-",
 		/** only lists*/
 		PAGE = "-page-",
 		PAGE_MAX = "-pagemax-",

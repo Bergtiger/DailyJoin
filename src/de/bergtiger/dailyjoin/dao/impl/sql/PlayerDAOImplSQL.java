@@ -5,6 +5,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -112,12 +113,76 @@ public class PlayerDAOImplSQL implements PlayerDAO {
 		return null;
 	}
 
+	@Override
+	public List<DailyPlayer> getPlayers() throws NoSQLConnectionException {
+		if (TigerConnection.hasConnection()) {
+			ResultSet rs = null;
+			PreparedStatement st = null;
+			try {
+				st = TigerConnection.conn().prepareStatement("SELECT * FROM dailyjoin", ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+				// get Query
+				rs = st.executeQuery();
+				List<DailyPlayer> players = new ArrayList<>();
+				while(rs.next()) {
+					DailyPlayer p = new DailyPlayer();
+					p.setName(rs.getString(NAME));
+					p.setUuid(rs.getString(UUID));
+					p.setDaysTotal(rs.getInt(DAYS_TOTAL));
+					p.setDaysConsecutive(rs.getInt(DAYS_CONSECUTIVE));
+					p.setFirstjoin(rs.getTimestamp(FIRSTJOIN));
+					p.setLastjoin(rs.getTimestamp(LASTJOIN));
+					players.add(p);
+				}
+				return players;
+			} catch (SQLException e) {
+				DailyJoin.getDailyLogger().log(Level.SEVERE, "getPlayers: ", e);
+			} finally {
+				TigerConnection.closeRessources(rs, st);
+			}
+		} else {
+			throw new NoSQLConnectionException();
+		}
+		return null;
+	}
+
+	@Override
+	public HashMap<String, DailyPlayer> getPlayersAsMap() throws NoSQLConnectionException {
+		if (TigerConnection.hasConnection()) {
+			ResultSet rs = null;
+			PreparedStatement st = null;
+			try {
+				st = TigerConnection.conn().prepareStatement("SELECT * FROM dailyjoin", ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+				// get Query
+				rs = st.executeQuery();
+				HashMap<String, DailyPlayer> players = new HashMap<>();
+				while(rs.next()) {
+					DailyPlayer p = new DailyPlayer();
+					p.setName(rs.getString(NAME));
+					p.setUuid(rs.getString(UUID));
+					p.setDaysTotal(rs.getInt(DAYS_TOTAL));
+					p.setDaysConsecutive(rs.getInt(DAYS_CONSECUTIVE));
+					p.setFirstjoin(rs.getTimestamp(FIRSTJOIN));
+					p.setLastjoin(rs.getTimestamp(LASTJOIN));
+					players.put(p.getUuid(), p);
+				}
+				return players;
+			} catch (SQLException e) {
+				DailyJoin.getDailyLogger().log(Level.SEVERE, "getPlayers: ", e);
+			} finally {
+				TigerConnection.closeRessources(rs, st);
+			}
+		} else {
+			throw new NoSQLConnectionException();
+		}
+		return null;
+	}
+	
 	/**
 	 * get players ordered by a given column in a given direction.
 	 * @param column column to order by
 	 * @param order only asc or desc allowed
 	 * @return List of DailyPlayers ordered by given column in given order
-	 * @throws NoSQLConnectionException
+	 * @throws NoSQLConnectionException could not connect with database.
 	 */
 	@Override
 	public TigerList<DailyPlayer> getOrderedPlayers(String column, String order) throws NoSQLConnectionException {

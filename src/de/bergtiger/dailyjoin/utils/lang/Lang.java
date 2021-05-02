@@ -54,7 +54,17 @@ public enum Lang implements Constants {
 	/** broadcast player as PLAYER, days as VALUE*/
 	REWARD_DAYS_TOTAL
 		(String.format("&e%s &7ist bereits insgesamt &e%s &7Tage auf dem Server.", PLAYER, VALUE)),
-	
+
+	/** config change wrong argument value as VALUE, configuration identifier as TYPE*/
+	CONFIG_WRONG_ARGUMENT
+		(String.format("&e%s &cis not a valid value for &6%s", VALUE, TYPE)),
+	/** config changed success configuration identifier as TYPE, DATA old value, VALUE new value*/
+	CONFIG_CHANGED_SUCCESS
+		(String.format("&achanged &6%s &afrom &e%s &ato &e%s", TYPE, DATA, VALUE)),
+	/** config change exception restore old value as DATA, VALUE as new value that did not work, TYPE identifier*/
+	CONFIG_CHANGED_ERROR
+		(String.format("&ccould not change &e%s to%s &crestore old value &e", TYPE, VALUE, DATA)),
+
 	DAILY_INFO_CMD
 		("&b/daily  -  &7zeigt alle gültigen Befehle"),
 	DAILY_INFO_TOP
@@ -67,6 +77,8 @@ public enum Lang implements Constants {
 		("&b/daily info  -  &7zeigt Plugin version"),
 	DAILY_INFO_RELOAD
 		("&b/daily reload  -  &7lädt config neu"),
+	DAILY_INFO_MIGRATION
+		("&b/daily migration [file_to_sql, sql_to_file] - &7migrates data source"),
 	DAILY_INFO_PLAYER
 		("&b/daily player [player, uuid]  -  &7zeigt die Daten des Spielers"),
 	DAILY_INFO_CONFIG
@@ -93,25 +105,53 @@ public enum Lang implements Constants {
 	DAILY_RELOAD
 		("&7DailyJoin reloaded."),
 
-	/** TODO */
-	TOP_HEADER (String.format("&a----<[&6Top Player&f(&e%s&f)&a]>----", VALUE)),
-	
-	/** TODO*/
-	TOP_FOOTER (String.format("&a---<(&e%s&f/&e%s&a)>----", PAGE, PAGE_MAX)),
-	/** TODO*/
-	TOP_NEXT ("&6next"),
-	/** TODO*/
-	TOP_PREV ("&6prev"),
-	/** TODO*/
-	TOP_PLAYER (String.format("&e%s: &7%s", PLAYER, VALUE)),
-		
-/**	TOP_PLAYER_DAYS_CONSECUTIVE
-		("&a----<[&6Top Day&a]>----"),*/
-/**	TOP_PLAYER_DAYS_TOTAL
-		("&a----<[&6Top Totaldays&a]>----"),*/
-	/** top list player as PLAYER, VALUE*/
-/**	TOP_PLAYER_LIST
-		(String.format("&e%s: &7%s", PLAYER, VALUE)),*/
+	/** header for list, VALUE for searched parameter */
+	TOP_HEADER
+			(String.format("&a----<[&6Top Player&f(&e%s&f)&a]>----", VALUE)),
+	/** footer for list, current page as PAGE, PAGE_MAX for max page in this list*/
+	TOP_FOOTER
+			(String.format("&a---<(&e%s&f/&e%s&a)>----", PAGE, PAGE_MAX)),
+	/** show next page button*/
+	TOP_NEXT
+			("&6next"),
+	/** show previous page button*/
+	TOP_PREV
+			("&6prev"),
+	/** shows player as PLAYER, searched value as VALUE*/
+	TOP_PLAYER
+			(String.format("&e%s: &7%s", PLAYER, VALUE)),
+	/** hover for next button*/
+	TOP_HOVER_NEXT
+			("&fShows previous page"),
+	/** hover for previous button*/
+	TOP_HOVER_PREV
+			("&fShows next page"),
+
+	/** player name for hover as VALUE*/
+	HOVER_PLAYER_NAME
+			(String.format("&ePlayer&6:&f %s", VALUE)),
+	/** player uuid for hover as VALUE */
+	@Deprecated
+	HOVER_PLAYER_UUID
+			(String.format("&eUUid&6:&f %s", VALUE)),
+	/** player firstjoin for hover as VALUE*/
+	HOVER_PLAYER_FIRSTJOIN
+			(String.format("&eFirstjoin&6:&f %s", VALUE)),
+	/** player lastjoin for hover as VALUE*/
+	HOVER_PLAYER_LASTJOIN
+			(String.format("&eLastjoin&6:&f %s", VALUE)),
+	/** player days total for hover as VALUE*/
+	HOVER_PLAYER_DAYS_TOTAL
+			(String.format("&eDays total&6:&f %s", VALUE)),
+	/** player days consecutive for hover as VALUE*/
+	HOVER_PLAYER_DAYS_CONSECUTIVE
+			(String.format("&eDays consecutive&6:&f %s", VALUE)),
+	/** migration begin to file*/
+	MIGRATION_START_SQLTOFILE ("&aStarted migration from &eSQL &ato &eFile."),
+	/** migration begin to sql*/
+	MIGRATION_START_FILETOSQL ("&aStarted migration from &eFile &ato &eSQL"),
+	/** migration successfully ended*/
+	MIGRATION_SUCCESS ("&aFinished migration."),
 
 	/** plugin statistic menu header*/
 	PLUGIN_HEADER
@@ -134,6 +174,9 @@ public enum Lang implements Constants {
 	/** plugin statistic reward as VALUE*/
 	PLUGIN_REWARD_RECONNECTION
 		(String.format("&eReward on Reconnection: &7%s", VALUE)),
+	/** plugin statistic merge as VALUE*/
+	PLUGIN_MERGE_ON_CONNECTION
+		(String.format("&eMerge on connection: &7%s", VALUE)),
 	/** plugin statistic reward delay as VALUE*/
 	PLUGIN_DELAY
 		(String.format("&eRewardDelay: &7%s", VALUE)),

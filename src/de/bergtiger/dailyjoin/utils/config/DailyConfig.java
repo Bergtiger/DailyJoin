@@ -3,6 +3,7 @@ package de.bergtiger.dailyjoin.utils.config;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.logging.Level;
 
@@ -73,7 +74,9 @@ public class DailyConfig {
 		if (cfg.contains(DELAY)) {
 			// check matching integer (\\d*)
 			if (!cfg.getString(DELAY).matches("\\d*")) {
-				DailyJoin.getDailyLogger().log(Level.WARNING, "delay no integer");
+				DailyJoin.getDailyLogger().log(
+						Level.WARNING,
+						String.format("%s has to be a positive integer or 0. Found '%s' and set to default '30'.", DELAY, cfg.getString(DELAY)));
 				cfg.set(DELAY, 30);
 			}
 		} else {
@@ -83,7 +86,9 @@ public class DailyConfig {
 		if (cfg.contains(PAGE_SIZE)) {
 			// check matching integer (\\d*)
 			if (!cfg.getString(PAGE_SIZE).matches("[1-9]\\d*")) {
-				DailyJoin.getDailyLogger().log(Level.WARNING, "page_size no integer");
+				DailyJoin.getDailyLogger().log(
+						Level.WARNING,
+						String.format("%s has to be a positive integer. Found '%s' and set to default '15'", PAGE_SIZE, cfg.getString(PAGE_SIZE)));
 				cfg.set(PAGE_SIZE, 15);
 			}
 		} else {
@@ -93,7 +98,9 @@ public class DailyConfig {
 		if (cfg.contains(FILE_DAYS_TOTAL)) {
 			// check matching yaml (^.+\\.yml$)
 			if (!cfg.getString(FILE_DAYS_TOTAL).matches(".+\\.yml")) {
-				DailyJoin.getDailyLogger().log(Level.WARNING, "File_Days_total no yaml file");
+				DailyJoin.getDailyLogger().log(
+						Level.WARNING,
+						String.format("%s has to be a yaml file. Found '%s' and set to default 'TotalDays.yml'", FILE_DAYS_TOTAL, cfg.getString(FILE_DAYS_TOTAL)));
 				cfg.set(FILE_DAYS_TOTAL, "TotalDays.yml");
 			}
 		} else {
@@ -103,7 +110,9 @@ public class DailyConfig {
 		if (cfg.contains(FILE_DAYS_CONSECUTIVE)) {
 			// check matching yaml (^.+\\.yml$)
 			if (!cfg.getString(FILE_DAYS_CONSECUTIVE).matches(".+\\.yml")) {
-				DailyJoin.getDailyLogger().log(Level.WARNING, "File_Days_consecutive no yaml file");
+				DailyJoin.getDailyLogger().log(
+						Level.WARNING,
+						String.format("%s has to be a yaml file. Found '%s' and set to default 'Day.yml'", FILE_DAYS_CONSECUTIVE, cfg.getString(FILE_DAYS_CONSECUTIVE)));
 				cfg.set(FILE_DAYS_CONSECUTIVE, "Day.yml");
 			}
 		} else {
@@ -111,7 +120,21 @@ public class DailyConfig {
 		}
 		// check if total and consecutive files are equal -> warning
 		if (cfg.getString(FILE_DAYS_TOTAL).equals(cfg.getString(FILE_DAYS_CONSECUTIVE))) {
-			DailyJoin.getDailyLogger().log(Level.WARNING, "days total and days consecutive share same file");
+			DailyJoin.getDailyLogger().log(
+					Level.WARNING,
+					String.format("%s and %s share same file.", FILE_DAYS_TOTAL, FILE_DAYS_CONSECUTIVE));
+		}
+		// daily reward
+		if (!cfg.contains(DAILY)) {
+			cfg.addDefault(DAILY, Arrays.asList(
+					"give @p minecraft:apple{display:{Name:\"{\\\"text\\\":\\\"Daily Apple\\\",\\\"color\\\":\\\"light_purple\\\",\\\"italic\\\":false}\",Lore:[\"{\\\"text\\\":\\\"An apple a day keeps the doctor away\\\",\\\"color\\\":\\\"yellow\\\",\\\"italic\\\":false}\"]}}",
+					"give @p minecraft:golden_apple 1"));
+		}
+		// birthday
+		if (!cfg.contains(BIRTHDAY)) {
+			cfg.addDefault(BIRTHDAY, Arrays.asList(
+					"give @p minecraft:cake 1",
+					"give @p minecraft:golden_apple 1"));
 		}
 
 		// data format (SQL/File)
@@ -119,7 +142,9 @@ public class DailyConfig {
 			// check matching sql|file
 			if (!cfg.getString(DATA_FORMAT).matches(String.format("(?i)(%s|%s)", DATA_SQL, DATA_FILE))) {
 				// no allowed data format
-				DailyJoin.getDailyLogger().log(Level.SEVERE, "data format has to be file or sql");
+				DailyJoin.getDailyLogger().log(
+						Level.SEVERE,
+						String.format("%s has to be file or sql. Found '%s' and set to default '%s'", DATA_FORMAT, cfg.getString(DATA_FORMAT)));
 				cfg.set(DATA_FORMAT, DATA_FILE);
 			} else {
 				// load
@@ -133,8 +158,9 @@ public class DailyConfig {
 						// check matching true|false
 						if (!cfg.getString(REWARD_ON_SQL_CONNECTION_LOST).matches("(?i)(true|false)")) {
 							// not allowed value
-							DailyJoin.getDailyLogger().log(Level.WARNING,
-									"reward on sql connection lost has to be true or false");
+							DailyJoin.getDailyLogger().log(
+									Level.WARNING,
+									String.format("%s has to be true or false. Found '%s' and set to default 'true'", REWARD_ON_SQL_CONNECTION_LOST, cfg.getString(REWARD_ON_SQL_CONNECTION_LOST)));
 							cfg.set(REWARD_ON_SQL_CONNECTION_LOST, true);
 						}
 					} else {
@@ -144,7 +170,9 @@ public class DailyConfig {
 					if (cfg.contains(LOAD_FILE_ON_SQL_CONNECTION)) {
 						if(!cfg.getString(LOAD_FILE_ON_SQL_CONNECTION).matches("(?i)(true|false)")) {
 							// not allowed value
-							DailyJoin.getDailyLogger().log(Level.WARNING, "load file on sql connection has to be true or false");
+							DailyJoin.getDailyLogger().log(
+									Level.WARNING,
+									String.format("%s has to be true or false. Found '%s' and set to default 'true'", LOAD_FILE_ON_SQL_CONNECTION, cfg.getString(LOAD_FILE_ON_SQL_CONNECTION)));
 							cfg.set(LOAD_FILE_ON_SQL_CONNECTION, true);
 						}
 					} else {
@@ -278,7 +306,7 @@ public class DailyConfig {
 	 * @param key identifier
 	 * @param value new value to store in configuration
 	 */
-	public void setValue(String key, String value) {
+	public void setValue(String key, Object value) {
 		FileConfiguration cfg = DailyJoin.inst().getConfig();
 		if(cfg.contains(key))
 			cfg.set(key, value);
@@ -290,6 +318,21 @@ public class DailyConfig {
 		cfg.options().copyDefaults(true);
 		DailyJoin.inst().saveConfig();
 		DailyJoin.inst().reload();
+	}
+	
+	/**
+	 * set value and reloads plugin.
+	 * @param key identifier
+	 * @param value new value to store in configuration
+	 * @param class value is casted before saving
+	 */
+	public void setValue(String key, String value, Class<?> clazz) {
+		if(clazz.equals(Integer.class))
+			setValue(key, Integer.parseInt(value));
+		else if(clazz.equals(Boolean.class))
+			setValue(key, Integer.parseInt(value));
+		else
+			setValue(key, value);
 	}
 
 	/**
@@ -304,6 +347,11 @@ public class DailyConfig {
 		return values.get(key);
 	}
 
+	/**
+	 * get string value from configuration
+	 * @param key identifier
+	 * @return value as string not null
+	 */
 	public String getValueSave(String key) {
 		String value = getValue(key);
 		return value != null ? value : "";

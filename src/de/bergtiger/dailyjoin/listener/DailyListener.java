@@ -18,6 +18,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
 import javax.annotation.Nonnull;
+
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.logging.Level;
 
 public class DailyListener implements Listener {
@@ -172,6 +175,7 @@ public class DailyListener implements Listener {
 				}
 				// add total days
 				dp.setDaysTotal(dp.getDaysTotal() + 1);
+				dp.setLastjoin(Timestamp.from(Instant.now()));
 			} else {
 				// Player was online today and has given reward
 				return null;

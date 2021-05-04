@@ -91,36 +91,39 @@ public class DailyCommand implements CommandExecutor {
 		if (hasPermission(cs, ADMIN, CMD)) {
 			String cmdShort = String.format("/%s %s", CMD_CMD, "%s");
 			String cmdLong = String.format("/%s %s ", CMD_CMD, "%s");
-			cs.spigot().sendMessage(Lang.build(Lang.DAILY_INFO_CMD.get()));
-			cs.spigot()
-					.sendMessage(Lang.build(Lang.DAILY_INFO_TOP.get(), null, null, String.format(cmdShort, CMD_TOP)));
+			// if CommandSender has not ADMIN or CMD, how did he get here ?
+			cs.spigot().sendMessage(Lang.build(Lang.INFO_CMD.get()));
+			// Top
+			if (hasPermission(cs, ADMIN, TOP)) {
+				cs.spigot().sendMessage(Lang.build(Lang.INFO_TOP.get(), null, Lang.INFO_HOVER_TOP.get(), String.format(cmdShort, CMD_TOP)));
+			}
 			// Set
 			if (hasPermission(cs, ADMIN, SET)) {
 				cs.spigot().sendMessage(
-						Lang.build(Lang.DAILY_INFO_SET.get(), null, null, String.format(cmdLong, CMD_SET)));
+						Lang.build(Lang.INFO_SET.get(), null, Lang.INFO_HOVER_SET.get(), String.format(cmdLong, CMD_SET)));
 				cs.spigot().sendMessage(
-						Lang.build(Lang.DAILY_INFO_ADD.get(), null, null, String.format(cmdLong, CMD_ADD)));
+						Lang.build(Lang.INFO_ADD.get(), null, Lang.INFO_HOVER_ADD.get(), String.format(cmdLong, CMD_ADD)));
 			}
 			// PluginInfo
 			if (hasPermission(cs, ADMIN, PLUGIN))
 				cs.spigot().sendMessage(
-						Lang.build(Lang.DAILY_INFO_INFO.get(), String.format(cmdShort, CMD_INFO), null, null));
+						Lang.build(Lang.INFO_INFO.get(), String.format(cmdShort, CMD_INFO), Lang.INFO_HOVER_INFO.get(), null));
 			// Reload
 			if (hasPermission(cs, ADMIN, RELOAD))
 				cs.spigot().sendMessage(
-						Lang.build(Lang.DAILY_INFO_RELOAD.get(), String.format(cmdShort, CMD_RELOAD), null, null));
+						Lang.build(Lang.INFO_RELOAD.get(), String.format(cmdShort, CMD_RELOAD), Lang.INFO_HOVER_RELOAD.get(), null));
 			// Migration
 			if (hasPermission(cs, ADMIN, MIGRATION))
 				cs.spigot().sendMessage(
-						Lang.build(Lang.DAILY_INFO_MIGRATION.get(), null, null, String.format(cmdLong, CMD_MIGRATION)));
+						Lang.build(Lang.INFO_MIGRATION.get(), null, Lang.INFO_HOVER_MIGRATION.get(), String.format(cmdLong, CMD_MIGRATION)));
 			// Config
 			if (hasPermission(cs, ADMIN, CONFIG))
 				cs.spigot().sendMessage(
-						Lang.build(Lang.DAILY_INFO_CONFIG.get(), null, null, String.format(cmdLong, CMD_CONFIG)));
+						Lang.build(Lang.INFO_CONFIG.get(), null, Lang.INFO_HOVER_CONFIG.get(), String.format(cmdLong, CMD_CONFIG)));
 			// Player
 			if (hasPermission(cs, ADMIN, PLAYER))
 				cs.spigot().sendMessage(
-						Lang.build(Lang.DAILY_INFO_PLAYER.get(), null, null, String.format(cmdLong, CMD_PLAYER)));
+						Lang.build(Lang.INFO_PLAYER.get(), null, Lang.INFO_HOVER_PLAYER.get(), String.format(cmdLong, CMD_PLAYER)));
 		} else {
 			cs.spigot().sendMessage(Lang.build(Lang.NOPERMISSION.get()));
 		}

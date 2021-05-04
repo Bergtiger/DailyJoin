@@ -1,6 +1,7 @@
 package de.bergtiger.dailyjoin.bdo;
 
 import java.sql.Timestamp;
+import java.time.Instant;
 
 public class DailyPlayer {
 
@@ -18,8 +19,8 @@ public class DailyPlayer {
 		this.uuid = uuid;
 		this.daysTotal = 1;
 		this.daysConsecutive = 1;
-		this.firstjoin = new Timestamp(System.currentTimeMillis());
-		this.lastjoin = new Timestamp(System.currentTimeMillis());
+		this.firstjoin = Timestamp.from(Instant.now());
+		this.lastjoin = Timestamp.from(Instant.now());
 	}
 
 	public DailyPlayer(String name, String uuid, int daysConsecutive, int daysTotal, Timestamp firstjoin, Timestamp lastjoin){

@@ -63,27 +63,46 @@ public enum Lang implements Constants {
 		(String.format("&achanged &6%s &afrom &e%s &ato &e%s", TYPE, DATA, VALUE)),
 	/** config change exception restore old value as DATA, VALUE as new value that did not work, TYPE identifier*/
 	CONFIG_CHANGED_ERROR
-		(String.format("&ccould not change &e%s to%s &crestore old value &e", TYPE, VALUE, DATA)),
+		(String.format("&ccould not change &e%s &cto &e%s &crestore old value &e%s", TYPE, VALUE, DATA)),
 
-	DAILY_INFO_CMD
+	INFO_CMD
 		("&b/daily  -  &7zeigt alle gültigen Befehle"),
-	DAILY_INFO_TOP
+	INFO_TOP
 		("&b/daily top [day, totaldays] [value] -  &7zeigt top Liste"),
-	DAILY_INFO_SET
+	INFO_SET
 		("&b/daily set [player, uuid] [day, totaldays] [value]  -  &7Setzt dem Spieler day/totaldays value"),
-	DAILY_INFO_ADD
+	INFO_ADD
 		("&b/daily add [player, uuid] [day, totaldays] [value]  -  &7Addiert dem Spieler day/totaldays value"),
-	DAILY_INFO_INFO
+	INFO_INFO
 		("&b/daily info  -  &7zeigt Plugin version"),
-	DAILY_INFO_RELOAD
-		("&b/daily reload  -  &7lädt config neu"),
-	DAILY_INFO_MIGRATION
-		("&b/daily migration [file_to_sql, sql_to_file] - &7migrates data source"),
-	DAILY_INFO_PLAYER
+	INFO_PLAYER
 		("&b/daily player [player, uuid]  -  &7zeigt die Daten des Spielers"),
-	DAILY_INFO_CONFIG
+	INFO_RELOAD
+		("&b/daily reload  -  &7lädt config neu"),
+	INFO_CONFIG
 		("&b/daily config [ma/system/reward/oldfiles/delay] [true/false/in case of delay number]  -  &7ändert die config"),
-	
+	INFO_MIGRATION
+		("&b/daily migration [file_to_sql, sql_to_file] - &7migrates data source"),
+
+	INFO_HOVER_CMD
+		("&eshow all commands"),
+	INFO_HOVER_TOP
+		("&eshow top player\n&etypes:"),
+	INFO_HOVER_SET
+		("&eset a value from a player"),
+	INFO_HOVER_ADD
+		("&eadd a value to a player\nremoving from a player with negative value"),
+	INFO_HOVER_INFO
+		("&eshow plugin info and configuration"),
+	INFO_HOVER_PLAYER
+		("&eshow player statistic"),
+	INFO_HOVER_RELOAD
+		("&ereloads plugin configuration and cache"),
+	INFO_HOVER_CONFIG
+		("&emodify plugin configuration"),
+	INFO_HOVER_MIGRATION
+		("&emigrate from file/sql to sql/file"),
+
 //	DailyAdd
 //		("&7/daily add [player/uuid] [day, totaldays] [value]"),
 	/** player as PLAYER, column/type as DATA, value/days as VALUE*/

@@ -12,6 +12,9 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import java.io.File;
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
@@ -34,6 +37,11 @@ public class PlayerDAOImplFile implements PlayerDAO {
 			FIRSTJOIN = "firstjoin", 
 			LASTJOIN = "lastjoin";
 
+	/**
+	 * used DateTimeFormat in file (ISO_DATE_TIME)
+	 */
+	private static final DateTimeFormatter DTF = DateTimeFormatter.ISO_DATE_TIME;
+	
 	@Override
 	public Integer updatePlayer(DailyPlayer dp) throws UpdatePlayerException {
 		if (dp != null) {
@@ -41,7 +49,6 @@ public class PlayerDAOImplFile implements PlayerDAO {
 			File file = new File(FILE_DIRECTORY, FILE_NAME);
 			FileConfiguration cfg = YamlConfiguration.loadConfiguration(file);
 			// save player
-			Timestamp t = new Timestamp(Calendar.getInstance().getTime().getTime());
 			String path = String.format(PLAYER_PATH_FORMAT, dp.getUuid());
 			// name
 			if (cfg.contains(path + NAME))
@@ -60,12 +67,12 @@ public class PlayerDAOImplFile implements PlayerDAO {
 				cfg.addDefault(path + DAYS_TOTAL, dp.getDaysTotal());
 			// firstjoin
 			if (!cfg.contains(path + FIRSTJOIN))
-				cfg.set(path + FIRSTJOIN, t.getTime());
+				cfg.set(path + FIRSTJOIN, DTF.format(Instant.now()));
 			// lastjoin
 			if (cfg.contains(path + LASTJOIN))
-				cfg.set(path + LASTJOIN, t.getTime());
+				cfg.set(path + LASTJOIN, DTF.format(Instant.now()));
 			else
-				cfg.addDefault(path + LASTJOIN, t.getTime());
+				cfg.addDefault(path + LASTJOIN, DTF.format(Instant.now()));
 			//
 			cfg.options().copyDefaults(true);
 			try {
@@ -101,8 +108,8 @@ public class PlayerDAOImplFile implements PlayerDAO {
 					cfg.addDefault(path + NAME, dp.getName());
 					cfg.addDefault(path + DAYS_TOTAL, dp.getDaysTotal());
 					cfg.addDefault(path + DAYS_CONSECUTIVE, dp.getDaysConsecutive());
-					cfg.addDefault(path + FIRSTJOIN, dp.getFirstjoin());
-					cfg.addDefault(path + LASTJOIN, dp.getLastjoin());
+					cfg.addDefault(path + FIRSTJOIN, DTF.format(dp.getFirstjoin().toLocalDateTime()));
+					cfg.addDefault(path + LASTJOIN, DTF.format(dp.getLastjoin().toLocalDateTime()));
 				}
 				// save file
 				try {
@@ -144,10 +151,10 @@ public class PlayerDAOImplFile implements PlayerDAO {
 						dp.setDaysConsecutive(cfg.getInt(path + DAYS_CONSECUTIVE));
 					// set first join
 					if (cfg.contains(path + FIRSTJOIN))
-						dp.setFirstjoin(new Timestamp(cfg.getLong(path + FIRSTJOIN)));
+						dp.setFirstjoin(Timestamp.valueOf(LocalDateTime.parse(cfg.getString(path + FIRSTJOIN), DTF)));
 					// set last join
 					if (cfg.contains(path + LASTJOIN))
-						dp.setLastjoin(new Timestamp(cfg.getLong(path + LASTJOIN)));
+						dp.setLastjoin(Timestamp.valueOf(LocalDateTime.parse(cfg.getString(path + LASTJOIN), DTF)));
 					// TODO remove old code
 					// set days total
 					if (cfg.contains(path + DAYS_OLD_TOTAL))
@@ -194,10 +201,10 @@ public class PlayerDAOImplFile implements PlayerDAO {
 						p.setDaysConsecutive(cfg.getInt(path + DAYS_CONSECUTIVE));
 					// set first join
 					if (cfg.contains(path + FIRSTJOIN))
-						p.setFirstjoin(new Timestamp(cfg.getLong(path + FIRSTJOIN)));
+						p.setFirstjoin(Timestamp.valueOf(LocalDateTime.parse(cfg.getString(path + FIRSTJOIN), DTF)));
 					// set last join
 					if (cfg.contains(path + LASTJOIN))
-						p.setLastjoin(new Timestamp(cfg.getLong(path + LASTJOIN)));
+						p.setLastjoin(Timestamp.valueOf(LocalDateTime.parse(cfg.getString(path + LASTJOIN), DTF)));
 					// TODO remove old code
 					// set days total
 					if (cfg.contains(path + DAYS_OLD_TOTAL))
@@ -236,10 +243,10 @@ public class PlayerDAOImplFile implements PlayerDAO {
 						p.setDaysConsecutive(cfg.getInt(path + DAYS_CONSECUTIVE));
 					// set first join
 					if (cfg.contains(path + FIRSTJOIN))
-						p.setFirstjoin(new Timestamp(cfg.getLong(path + FIRSTJOIN)));
+						p.setFirstjoin(Timestamp.valueOf(LocalDateTime.parse(cfg.getString(path + FIRSTJOIN), DTF)));
 					// set last join
 					if (cfg.contains(path + LASTJOIN))
-						p.setLastjoin(new Timestamp(cfg.getLong(path + LASTJOIN)));
+						p.setLastjoin(Timestamp.valueOf(LocalDateTime.parse(cfg.getString(path + LASTJOIN), DTF)));
 					// TODO remove old code
 					// set days total
 					if (cfg.contains(path + DAYS_OLD_TOTAL))
@@ -278,10 +285,10 @@ public class PlayerDAOImplFile implements PlayerDAO {
 						dp.setDaysConsecutive(cfg.getInt(path + DAYS_CONSECUTIVE));
 					// set first join
 					if (cfg.contains(path + FIRSTJOIN))
-						dp.setFirstjoin(new Timestamp(cfg.getLong(path + FIRSTJOIN)));
+						dp.setFirstjoin(Timestamp.valueOf(LocalDateTime.parse(cfg.getString(path + FIRSTJOIN), DTF)));
 					// set last join
 					if (cfg.contains(path + LASTJOIN))
-						dp.setLastjoin(new Timestamp(cfg.getLong(path + LASTJOIN)));
+						dp.setLastjoin(Timestamp.valueOf(LocalDateTime.parse(cfg.getString(path + LASTJOIN), DTF)));
 					// TODO remove old code
 					// set days total
 					if (cfg.contains(path + DAYS_OLD_TOTAL))

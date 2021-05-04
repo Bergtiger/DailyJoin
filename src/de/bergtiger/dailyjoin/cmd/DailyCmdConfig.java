@@ -29,37 +29,37 @@ public class DailyCmdConfig {
 				switch (args[1].toLowerCase()) {
 				case DATA_FORMAT: {
 					// allowed value (sql|file)
-					setValue(cs, DATA_FORMAT, args[2], String.format("(?i)(%s|%s)", DATA_SQL, DATA_FILE));
+					setValue(cs, DATA_FORMAT, args[2], String.format("(?i)(%s|%s)", DATA_SQL, DATA_FILE), String.class);
 				}
 					break;
 				case DELAY: {
 					// allowed value (number >= 0)
-					setValue(cs, DELAY, args[2], "\\d*");
+					setValue(cs, DELAY, args[2], "\\d*", Integer.class);
 				}
 					break;
 				case PAGE_SIZE: {
 					// allowed value (number >= 1)
-					setValue(cs, PAGE_SIZE, args[2], "[1-9]\\d*");
+					setValue(cs, PAGE_SIZE, args[2], "[1-9]\\d*", Integer.class);
 				}
 					break;
 				case FILE_DAYS_TOTAL: {
 					// allowed value
-					setValue(cs, FILE_DAYS_TOTAL, args[2], ".+\\.yml");
+					setValue(cs, FILE_DAYS_TOTAL, args[2], ".+\\.yml", String.class);
 				}
 					break;
 				case FILE_DAYS_CONSECUTIVE: {
 					// allowed value
-					setValue(cs, FILE_DAYS_CONSECUTIVE, args[2], ".+\\.yml");
+					setValue(cs, FILE_DAYS_CONSECUTIVE, args[2], ".+\\.yml", String.class);
 				}
 					break;
 				case LOAD_FILE_ON_SQL_CONNECTION: {
 					// allowed value (boolean)
-					setValue(cs, LOAD_FILE_ON_SQL_CONNECTION, args[2], "(?i)(true|file)");
+					setValue(cs, LOAD_FILE_ON_SQL_CONNECTION, args[2], "(?i)(true|file)", Boolean.class);
 				}
 					break;
 				case REWARD_ON_SQL_CONNECTION_LOST: {
 					// allowed value (boolean)
-					setValue(cs, REWARD_ON_SQL_CONNECTION_LOST, args[2], "(?i)(true|file)");
+					setValue(cs, REWARD_ON_SQL_CONNECTION_LOST, args[2], "(?i)(true|file)", Boolean.class);
 				}
 					break;
 				default:
@@ -81,12 +81,12 @@ public class DailyCmdConfig {
 	 * @param value new value to save in configuration
 	 * @param regex check value regex
 	 */
-	private void setValue(CommandSender cs, String key, String value, String regex) {
+	private void setValue(CommandSender cs, String key, String value, String regex, Class<?> clazz) {
 		// allowed value (regex)
 		if (value.matches(regex)) {
 			String old = DailyConfig.inst().getValueSave(key);
 			try {
-				DailyConfig.inst().setValue(key, value);
+				DailyConfig.inst().setValue(key, value, clazz);
 				cs.spigot().sendMessage(Lang.build(Lang.CONFIG_CHANGED_SUCCESS.get().replace(Lang.TYPE, key)
 						.replace(Lang.DATA, old).replace(Lang.VALUE, value)));
 			} catch (Exception e) {

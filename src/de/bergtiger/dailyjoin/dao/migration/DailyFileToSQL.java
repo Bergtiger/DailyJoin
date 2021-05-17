@@ -93,7 +93,11 @@ public class DailyFileToSQL {
 						} catch (NoSQLConnectionException e) {
 							// NoSQLException
 							// stop merge and save file
-							PlayerDAOimpl.inst().updatePlayers(players);
+							try {
+								PlayerDAOimpl.inst().updatePlayers(players, false);
+							} catch (UpdatePlayerException e1) {
+								DailyJoin.getDailyLogger().log(Level.SEVERE, "FileToSQL, no Connection and could not save back to file", e);
+							}
 							TigerConnection.noConnection();
 							return;
 						} catch (UpdatePlayerException e) {

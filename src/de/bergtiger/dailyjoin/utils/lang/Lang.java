@@ -83,6 +83,8 @@ public enum Lang implements Constants {
 		("&b/daily config [ma/system/reward/oldfiles/delay] [true/false/in case of delay number]  -  &7ändert die config"),
 	INFO_MIGRATION
 		("&b/daily migration [file_to_sql, sql_to_file] - &7migrates data source"),
+	INFO_UPDATE_NAMES
+		("&b/daily update_names - &7updates all player names in database"),
 
 	INFO_HOVER_CMD
 		("&eshow all commands"),
@@ -102,7 +104,29 @@ public enum Lang implements Constants {
 		("&emodify plugin configuration"),
 	INFO_HOVER_MIGRATION
 		("&emigrate from file/sql to sql/file"),
-
+	INFO_HOVER_UPDATE_NAMES
+		("&eupdate all player names in database"),
+//	Update Name
+	/** start updating names*/
+	UPDATE_NAME_START("&aStarting updating player names."),
+	/** finished updating names, VALUE amount of updated names*/
+	UPDATE_NAME_FINISHED
+		(String.format("&aFinished updating player names. Updated &e%s players", VALUE)),
+	/** no players for updating names*/
+	UPDATE_NAME_NOPLAYERS("&cNo players found to check or update."),
+	/** updating names in progress, wait till new process can be started*/
+	UPDATE_NAME_RUNNING
+		(String.format("&cUpdate is running&e, &cplease wait until it is finished &6(&e%s&f%%&6)", VALUE)),
+	/** successfully stopped updating names process*/
+	UPDATE_NAME_STOPPED
+		("&cStopped updating names"),
+	/** updating names not running, can't stop it*/
+	UPDATE_NAME_NOTRUNNING
+		("&cupdating names not running"),
+	/** updating names stopped VALUE as reason why it stopped*/
+	UPDATE_NAME_EXCEPTION
+		(String.format("&cStopped updating names&6: &e%s", VALUE)),
+		
 //	DailyAdd
 //		("&7/daily add [player/uuid] [day, totaldays] [value]"),
 	/** player as PLAYER, column/type as DATA, value/days as VALUE*/
@@ -180,28 +204,34 @@ public enum Lang implements Constants {
 		("&a---------------------"),
 	/** plugin statistic version as VALUE*/
 	PLUGIN_VERSION
-		(String.format("&eVersion: &7%s", VALUE)),
+		(String.format("&eVersion&6: &7%s", VALUE)),
 	/** plugin statistic time format as VALUE*/
 	PLUGIN_TIMEFORMAT
-		(String.format("&eTimeFormat: &7%s", VALUE)),
+		(String.format("&eTimeFormat&6: &7%s", VALUE)),
 	/** plugin statistic file or sql as VALUE*/
 	PLUGIN_SYSTEM
-		(String.format("&eSystem: &7%s", VALUE)),
+		(String.format("&eSystem&6: &7%s", VALUE)),
 	/** plugin statistic sql connected as VALUE*/
 	PLUGIN_CONNECTED
-		(String.format("&eConnected: &7%s", VALUE)),
+		(String.format("&eConnected&6: &7%s", VALUE)),
 	/** plugin statistic reward as VALUE*/
 	PLUGIN_REWARD_RECONNECTION
-		(String.format("&eReward on Reconnection: &7%s", VALUE)),
+		(String.format("&eReward on Reconnection&6: &7%s", VALUE)),
 	/** plugin statistic merge as VALUE*/
 	PLUGIN_MERGE_ON_CONNECTION
-		(String.format("&eMerge on connection: &7%s", VALUE)),
+		(String.format("&eMerge on connection&6: &7%s", VALUE)),
 	/** plugin statistic reward delay as VALUE*/
 	PLUGIN_DELAY
-		(String.format("&eRewardDelay: &7%s", VALUE)),
+		(String.format("&eRewardDelay&6: &7%s", VALUE)),
 	/** plugin statistic rewards */
 	PLUGIN_PAGE_SIZE
-		(String.format("&ePageSize: &7%s", VALUE)),
+		(String.format("&ePageSize&6: &7%s", VALUE)),
+	/** plugin statistic update names running as VALUE*/
+	PLUGIN_UPDATE_NAMES
+		(String.format("&eUpdateNames&6: &7%s", VALUE)),
+	/** plugin statistic update names running as VALUE with process value as DATA*/
+	PLUGIN_UPDATE_NAMESVALUE
+		(String.format("&eUpdateNames&6: &7%s &6(&e%s&f%%&6)", VALUE, DATA)),
 
 	/** player statistic header player name as PLAYER*/
 	PLAYER_HEADER

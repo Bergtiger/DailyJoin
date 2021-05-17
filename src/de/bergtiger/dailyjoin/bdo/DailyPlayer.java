@@ -12,8 +12,16 @@ public class DailyPlayer {
 	private Timestamp firstjoin;
 	private Timestamp lastjoin;
 
+	/**
+	 * new empty daily player without any set values.
+	 */
 	public DailyPlayer() {}
 
+	/**
+	 * new daily player with default values.
+	 * @param name of player
+	 * @param uuid of player
+	 */
 	public DailyPlayer(String name, String uuid) {
 		this.name = name;
 		this.uuid = uuid;
@@ -23,6 +31,15 @@ public class DailyPlayer {
 		this.lastjoin = Timestamp.from(Instant.now());
 	}
 
+	/**
+	 * new daily player with given values.
+	 * @param name of player
+	 * @param uuid of player
+	 * @param daysConsecutive sum of all consecutive days this player was online without a break.
+	 * @param daysTotal sum of all days this player was online.
+	 * @param firstjoin of player
+	 * @param lastjoin of player
+	 */
 	public DailyPlayer(String name, String uuid, int daysConsecutive, int daysTotal, Timestamp firstjoin, Timestamp lastjoin){
 		this.name = name;
 		this.uuid = uuid;

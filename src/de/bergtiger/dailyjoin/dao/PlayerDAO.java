@@ -20,6 +20,13 @@ public interface PlayerDAO {
 	public Integer updatePlayer(DailyPlayer p) throws NoSQLConnectionException, UpdatePlayerException;
 	
 	/**
+	 * update Players in Database
+	 * @param players List of players
+	 * @throws NoSQLConnectionException 
+	 */
+	public void updatePlayers(List<DailyPlayer> players) throws NoSQLConnectionException, UpdatePlayerException;
+	
+	/**
 	 * get Player
 	 * @param uuid
 	 * @return
@@ -33,6 +40,9 @@ public interface PlayerDAO {
 	 * @throws NoSQLConnectionException
 	 */
 	public List<DailyPlayer> getPlayers() throws NoSQLConnectionException;
+	
+	
+	public List<DailyPlayer> getPlayers(String name) throws NoSQLConnectionException;
 
 	/**
 	 * get all players as map

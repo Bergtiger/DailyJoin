@@ -6,6 +6,7 @@ import de.bergtiger.dailyjoin.dao.TigerConnection;
 import de.bergtiger.dailyjoin.dao.impl.PlayerDAOimpl;
 import de.bergtiger.dailyjoin.exception.NoSQLConnectionException;
 import de.bergtiger.dailyjoin.exception.UpdatePlayerException;
+import de.bergtiger.dailyjoin.utils.PlayerUtils;
 import de.bergtiger.dailyjoin.utils.lang.Lang;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -19,15 +20,21 @@ public class DailyCmdAdd {
 	private DailyCmdAdd() {
 	}
 
+	/**
+	 * runs daily add value to player command in its own thread.
+	 * 
+	 * @param cs   {@link CommandSender}
+	 * @param args command arguments
+	 */
 	public static void run(CommandSender cs, String[] args) {
 		Bukkit.getScheduler().runTaskAsynchronously(DailyJoin.inst(), () -> new DailyCmdAdd().setPlayerData(cs, args));
 	}
 
 	/**
-	 * cmd: /daily add(0) [uuid](1) [type](2) [value](3)
+	 * /daily add(0) [uuid](1) [type](2) [value](3)
 	 * 
-	 * @param cs
-	 * @param args
+	 * @param cs   {@link CommandSender}
+	 * @param args command arguments
 	 */
 	private void setPlayerData(CommandSender cs, String[] args) {
 		if (hasPermission(cs, ADMIN, SET)) {
@@ -38,8 +45,6 @@ public class DailyCmdAdd {
 					int value = Integer.valueOf(args[3]);
 					// get Player
 					try {
-						// TODO
-//						DailyPlayer dp = TigerConnection.inst().getPlayerDAO().getPlayer(uuid);
 						DailyPlayer dp = PlayerDAOimpl.inst().getPlayer(uuid);
 						if (dp != null) {
 							// set player value
@@ -52,14 +57,12 @@ public class DailyCmdAdd {
 								return;
 							}
 							// save player value
-							// TODO
-//							TigerConnection.inst().getPlayerDAO().updatePlayer(dp);
 							PlayerDAOimpl.inst().updatePlayer(dp);
 							cs.spigot().sendMessage(Lang.build(
 									Lang.DAILY_ADD_SUCCESS.get().replace(Lang.PLAYER, uuid).replace(Lang.DATA, type)
 											.replace(Lang.VALUE, Integer.toString(value)),
 									String.format("/%s %s %s", DailyCommand.CMD_CMD, DailyCommand.CMD_PLAYER, uuid),
-									null, null));
+									PlayerUtils.buildHover(dp), null));
 						} else {
 							cs.spigot().sendMessage(Lang.build(Lang.NOPLAYER.get().replace(Lang.PLAYER, uuid)));
 						}

@@ -18,15 +18,21 @@ public class DailyCmdSet {
 	private DailyCmdSet() {
 	}
 
+	/**
+	 * runs daily set value from player command in its own thread.
+	 * 
+	 * @param cs   {@link CommandSender}
+	 * @param args command arguments
+	 */
 	public static void run(CommandSender cs, String[] args) {
 		Bukkit.getScheduler().runTaskAsynchronously(DailyJoin.inst(), () -> new DailyCmdSet().setPlayerData(cs, args));
 	}
 
 	/**
-	 * cmd: /daily set(0) [uuid](1) [type](2) [value](3)
+	 * /daily set(0) [uuid](1) [type](2) [value](3)
 	 * 
-	 * @param cs
-	 * @param args
+	 * @param cs   {@link CommandSender}
+	 * @param args command arguments
 	 */
 	private void setPlayerData(CommandSender cs, String[] args) {
 		if (hasPermission(cs, ADMIN, SET)) {
@@ -37,8 +43,6 @@ public class DailyCmdSet {
 					int value = Integer.valueOf(args[3]);
 					// get Player
 					try {
-						// TODO
-//						DailyPlayer dp = TigerConnection.inst().getPlayerDAO().getPlayer(uuid);
 						DailyPlayer dp = PlayerDAOimpl.inst().getPlayer(uuid);
 						if (dp != null) {
 							// set player value
@@ -51,8 +55,6 @@ public class DailyCmdSet {
 								return;
 							}
 							// save player value
-							// TODO
-//							TigerConnection.inst().getPlayerDAO().updatePlayer(dp);
 							PlayerDAOimpl.inst().updatePlayer(dp);
 							cs.spigot().sendMessage(Lang.build(
 									Lang.DAILY_SET_SUCCESS.get().replace(Lang.PLAYER, uuid).replace(Lang.DATA, type)

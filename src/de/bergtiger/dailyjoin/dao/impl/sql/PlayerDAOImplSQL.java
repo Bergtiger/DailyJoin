@@ -22,31 +22,27 @@ import static de.bergtiger.dailyjoin.dao.DailyDataBase.*;
 public class PlayerDAOImplSQL implements PlayerDAO {
 
 	/**
-	 * insert Player in Database.
-	 * if Player exists update.
+	 * insert Player in Database. if Player exists update.
+	 * 
 	 * @param p Player to update or insert.
 	 * @return generated key
 	 * @throws NoSQLConnectionException could not connect with database.
-	 * @throws UpdatePlayerException could not execute update.
+	 * @throws UpdatePlayerException    could not execute update.
 	 */
 	@Override
 	public Integer updatePlayer(DailyPlayer p) throws NoSQLConnectionException, UpdatePlayerException {
-		if(p != null) {
-			if(TigerConnection.hasConnection()) {
+		if (p != null) {
+			if (TigerConnection.hasConnection()) {
 				ResultSet rs = null;
 				PreparedStatement st = null;
 				try {
-					st = TigerConnection.conn().prepareStatement(String.format("INSERT INTO %s (%s, %s, %s, %s, %s, %s) VALUES (?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE "
-							+ "%s = VALUES(%s), "
-							+ "%s = VALUES(%s), "
-							+ "%s = VALUES(%s), "
-							+ "%s = VALUES(%s)",
-							DAILY_JOIN_TABLE,
-							UUID, NAME, DAYS_TOTAL, DAYS_CONSECUTIVE, FIRSTJOIN, LASTJOIN,
-							NAME, NAME,
-							DAYS_TOTAL, DAYS_TOTAL,
-							DAYS_CONSECUTIVE, DAYS_CONSECUTIVE,
-							LASTJOIN, LASTJOIN), Statement.RETURN_GENERATED_KEYS);
+					st = TigerConnection.conn().prepareStatement(String.format(
+							"INSERT INTO %s (%s, %s, %s, %s, %s, %s) VALUES (?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE "
+									+ "%s = VALUES(%s), " + "%s = VALUES(%s), " + "%s = VALUES(%s), "
+									+ "%s = VALUES(%s)",
+							DAILY_JOIN_TABLE, UUID, NAME, DAYS_TOTAL, DAYS_CONSECUTIVE, FIRSTJOIN, LASTJOIN, NAME, NAME,
+							DAYS_TOTAL, DAYS_TOTAL, DAYS_CONSECUTIVE, DAYS_CONSECUTIVE, LASTJOIN, LASTJOIN),
+							Statement.RETURN_GENERATED_KEYS);
 					st.setString(1, p.getUuid());
 					st.setString(2, p.getName());
 					st.setInt(3, p.getDaysTotal());
@@ -55,7 +51,7 @@ public class PlayerDAOImplSQL implements PlayerDAO {
 					st.setTimestamp(6, p.getLastjoin());
 					st.executeUpdate();
 					rs = st.getGeneratedKeys();
-					if(rs.next()) {
+					if (rs.next()) {
 						return rs.getInt(1);
 					}
 				} catch (SQLException e) {
@@ -71,8 +67,48 @@ public class PlayerDAOImplSQL implements PlayerDAO {
 		return null;
 	}
 
+	@Override
+	public void updatePlayers(List<DailyPlayer> players) throws NoSQLConnectionException, UpdatePlayerException {
+		if (players != null && !players.isEmpty()) {
+			if (TigerConnection.hasConnection()) {
+				ResultSet rs = null;
+				PreparedStatement st = null;
+				try {
+					st = TigerConnection.conn().prepareStatement(String.format(
+							"INSERT INTO %s (%s, %s, %s, %s, %s, %s) VALUES (?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE "
+									+ "%s = VALUES(%s), " + "%s = VALUES(%s), " + "%s = VALUES(%s), "
+									+ "%s = VALUES(%s)",
+							DAILY_JOIN_TABLE, UUID, NAME, DAYS_TOTAL, DAYS_CONSECUTIVE, FIRSTJOIN, LASTJOIN, NAME, NAME,
+							DAYS_TOTAL, DAYS_TOTAL, DAYS_CONSECUTIVE, DAYS_CONSECUTIVE, LASTJOIN, LASTJOIN));
+					for(DailyPlayer dp : players) {
+						// save clear all existing parameter
+						st.clearParameters();
+						// set parameter
+						st.setString(1, dp.getUuid());
+						st.setString(2, dp.getName());
+						st.setInt(3, dp.getDaysTotal());
+						st.setInt(4, dp.getDaysConsecutive());
+						st.setTimestamp(5, dp.getFirstjoin());
+						st.setTimestamp(6, dp.getLastjoin());
+						// add Batch to Query
+						st.addBatch();
+					}
+					st.executeBatch();
+				} catch (SQLException e) {
+					DailyJoin.getDailyLogger().log(Level.SEVERE, "updatePlayers: " + players, e);
+					throw new UpdatePlayerException(true, null);
+				} finally {
+					TigerConnection.closeRessources(rs, st);
+				}
+			} else {
+				throw new NoSQLConnectionException();
+			}
+		}
+	}
+
 	/**
 	 * get Player
+	 * 
 	 * @param uuid Player uuid or name.
 	 * @return player statistic.
 	 * @throws NoSQLConnectionException could not connect with database.
@@ -83,16 +119,18 @@ public class PlayerDAOImplSQL implements PlayerDAO {
 			ResultSet rs = null;
 			PreparedStatement st = null;
 			try {
-				if(uuid.length() > 16)
-					st = TigerConnection.conn().prepareStatement("SELECT * FROM dailyjoin WHERE uuid LIKE ?", ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+				if (uuid.length() > 16)
+					st = TigerConnection.conn().prepareStatement("SELECT * FROM dailyjoin WHERE uuid LIKE ?",
+							ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
 				else
-					st = TigerConnection.conn().prepareStatement("SELECT * FROM dailyjoin WHERE name LIKE ?", ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+					st = TigerConnection.conn().prepareStatement("SELECT * FROM dailyjoin WHERE name LIKE ?",
+							ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
 				// set uuid
 				st.setString(1, uuid);
 				// get Query
 				rs = st.executeQuery();
 				// only one player allowed
-				if(rs.next()) {
+				if (rs.next()) {
 					DailyPlayer p = new DailyPlayer();
 					p.setName(rs.getString(NAME));
 					p.setUuid(rs.getString(UUID));
@@ -119,11 +157,12 @@ public class PlayerDAOImplSQL implements PlayerDAO {
 			ResultSet rs = null;
 			PreparedStatement st = null;
 			try {
-				st = TigerConnection.conn().prepareStatement("SELECT * FROM dailyjoin", ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+				st = TigerConnection.conn().prepareStatement("SELECT * FROM dailyjoin", ResultSet.TYPE_FORWARD_ONLY,
+						ResultSet.CONCUR_READ_ONLY);
 				// get Query
 				rs = st.executeQuery();
 				List<DailyPlayer> players = new ArrayList<>();
-				while(rs.next()) {
+				while (rs.next()) {
 					DailyPlayer p = new DailyPlayer();
 					p.setName(rs.getString(NAME));
 					p.setUuid(rs.getString(UUID));
@@ -146,16 +185,51 @@ public class PlayerDAOImplSQL implements PlayerDAO {
 	}
 
 	@Override
+	public List<DailyPlayer> getPlayers(String name) throws NoSQLConnectionException {
+		if (TigerConnection.hasConnection()) {
+			ResultSet rs = null;
+			PreparedStatement st = null;
+			try {
+				st = TigerConnection.conn().prepareStatement("SELECT * FROM dailyjoin WHERE name LIKE ?", ResultSet.TYPE_FORWARD_ONLY,
+						ResultSet.CONCUR_READ_ONLY);
+				st.setString(1, name);
+				// get Query
+				rs = st.executeQuery();
+				List<DailyPlayer> players = new ArrayList<>();
+				while (rs.next()) {
+					DailyPlayer p = new DailyPlayer();
+					p.setName(rs.getString(NAME));
+					p.setUuid(rs.getString(UUID));
+					p.setDaysTotal(rs.getInt(DAYS_TOTAL));
+					p.setDaysConsecutive(rs.getInt(DAYS_CONSECUTIVE));
+					p.setFirstjoin(rs.getTimestamp(FIRSTJOIN));
+					p.setLastjoin(rs.getTimestamp(LASTJOIN));
+					players.add(p);
+				}
+				return players;
+			} catch (SQLException e) {
+				DailyJoin.getDailyLogger().log(Level.SEVERE, "getPlayers: ", e);
+			} finally {
+				TigerConnection.closeRessources(rs, st);
+			}
+		} else {
+			throw new NoSQLConnectionException();
+		}
+		return null;
+	}
+	
+	@Override
 	public HashMap<String, DailyPlayer> getPlayersAsMap() throws NoSQLConnectionException {
 		if (TigerConnection.hasConnection()) {
 			ResultSet rs = null;
 			PreparedStatement st = null;
 			try {
-				st = TigerConnection.conn().prepareStatement("SELECT * FROM dailyjoin", ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+				st = TigerConnection.conn().prepareStatement("SELECT * FROM dailyjoin", ResultSet.TYPE_FORWARD_ONLY,
+						ResultSet.CONCUR_READ_ONLY);
 				// get Query
 				rs = st.executeQuery();
 				HashMap<String, DailyPlayer> players = new HashMap<>();
-				while(rs.next()) {
+				while (rs.next()) {
 					DailyPlayer p = new DailyPlayer();
 					p.setName(rs.getString(NAME));
 					p.setUuid(rs.getString(UUID));
@@ -176,23 +250,26 @@ public class PlayerDAOImplSQL implements PlayerDAO {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * get players ordered by a given column in a given direction.
+	 * 
 	 * @param column column to order by
-	 * @param order only asc or desc allowed
+	 * @param order  only asc or desc allowed
 	 * @return List of DailyPlayers ordered by given column in given order
 	 * @throws NoSQLConnectionException could not connect with database.
 	 */
 	@Override
 	public TigerList<DailyPlayer> getOrderedPlayers(String column, String order) throws NoSQLConnectionException {
-		if(column != null && !column.isEmpty()) {
-			if(order != null && order.toUpperCase().matches("(?i)(ASC|DESC)")) {
+		if (column != null && !column.isEmpty()) {
+			if (order != null && order.toUpperCase().matches("(?i)(ASC|DESC)")) {
 				if (TigerConnection.hasConnection()) {
 					ResultSet rs = null;
 					PreparedStatement st = null;
 					try {
-						st = TigerConnection.conn().prepareStatement(String.format("SELECT * FROM %s ORDER BY %s %s", DAILY_JOIN_TABLE, column, order), ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+						st = TigerConnection.conn().prepareStatement(
+								String.format("SELECT * FROM %s ORDER BY %s %s", DAILY_JOIN_TABLE, column, order),
+								ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
 						rs = st.executeQuery();
 						TigerList<DailyPlayer> players = new TigerList<>();
 						while (rs.next()) {
@@ -218,22 +295,24 @@ public class PlayerDAOImplSQL implements PlayerDAO {
 				DailyJoin.getDailyLogger().log(Level.SEVERE, String.format("getTopPlayers: no richtung(%s)", order));
 			}
 		} else {
-			DailyJoin.getDailyLogger().log(Level.SEVERE, String.format("getTopPlayers: no column(%s)",column));
+			DailyJoin.getDailyLogger().log(Level.SEVERE, String.format("getTopPlayers: no column(%s)", column));
 		}
 		return null;
 	}
 
 	@Override
 	public List<String> getNames(String args) throws NoSQLConnectionException {
-		if(TigerConnection.hasConnection()) {
+		if (TigerConnection.hasConnection()) {
 			ResultSet rs = null;
 			PreparedStatement st = null;
 			try {
-				st = TigerConnection.conn().prepareStatement(String.format("SELECT %s FROM %s WHERE %s LIKE ?", NAME, DAILY_JOIN_TABLE, NAME), ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+				st = TigerConnection.conn().prepareStatement(
+						String.format("SELECT %s FROM %s WHERE %s LIKE ?", NAME, DAILY_JOIN_TABLE, NAME),
+						ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
 				st.setString(1, (args + '%'));
 				rs = st.executeQuery();
 				List<String> names = new ArrayList<>();
-				while(rs.next()) {
+				while (rs.next()) {
 					names.add(rs.getString(1));
 				}
 				return names;
@@ -250,15 +329,16 @@ public class PlayerDAOImplSQL implements PlayerDAO {
 
 	@Override
 	public String getUUid(String name) throws NoSQLConnectionException {
-		if(name != null) {
-			if(TigerConnection.hasConnection()) {
+		if (name != null) {
+			if (TigerConnection.hasConnection()) {
 				ResultSet rs = null;
 				PreparedStatement st = null;
 				try {
-					st = TigerConnection.conn().prepareStatement("SELECT uuid FROM dailyjoin WHERE name LIKE ?", ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+					st = TigerConnection.conn().prepareStatement("SELECT uuid FROM dailyjoin WHERE name LIKE ?",
+							ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
 					st.setString(1, name);
 					rs = st.executeQuery();
-					if(rs.next()) {
+					if (rs.next()) {
 						return rs.getString(1);
 					}
 				} catch (SQLException e) {
@@ -270,7 +350,8 @@ public class PlayerDAOImplSQL implements PlayerDAO {
 				throw new NoSQLConnectionException();
 			}
 		} else {
-			DailyJoin.getDailyLogger().log(Level.WARNING, "getUUid: You're trying to get a UUid from a player without a name.");
+			DailyJoin.getDailyLogger().log(Level.WARNING,
+					"getUUid: You're trying to get a UUid from a player without a name.");
 		}
 		return null;
 	}

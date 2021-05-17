@@ -6,6 +6,7 @@ import java.util.logging.Logger;
 import de.bergtiger.dailyjoin.cmd.DailyCmdTop;
 import de.bergtiger.dailyjoin.cmd.DailyCommand;
 import de.bergtiger.dailyjoin.dao.impl.PlayerDAOimpl;
+import de.bergtiger.dailyjoin.dao.migration.DailyNameUpdate;
 import de.bergtiger.dailyjoin.listener.DailyListener;
 import de.bergtiger.dailyjoin.tab.DailyTabComplete;
 import de.bergtiger.dailyjoin.utils.DailyReward;
@@ -52,15 +53,20 @@ public class DailyJoin extends JavaPlugin{
 
 	/**
 	 * Plugin Logger.
-	 * @return
+	 * @return Logger from this plugin
 	 */
 	public static Logger getDailyLogger() {
 		return inst().getLogger();
 	}
 	
+	/**
+	 * reload plugin.
+	 */
 	public void reload() {
 		reloadConfig();
 		DailyConfig.load();
+		// end possible name update
+		DailyNameUpdate.inst().endThread();
 		// reload connection
 		TigerConnection.inst().reload();
 		// reload dao
@@ -75,7 +81,8 @@ public class DailyJoin extends JavaPlugin{
 	
 	@Override
 	public void onDisable() {
-		getDailyLogger().log(Level.INFO, "DailyJoin beendet.");
+		DailyNameUpdate.inst().endThread();
 		TigerConnection.inst().closeConnection();
+		getDailyLogger().log(Level.INFO, "DailyJoin beendet.");
 	}
 }

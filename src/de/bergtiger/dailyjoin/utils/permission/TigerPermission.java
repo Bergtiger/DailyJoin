@@ -15,6 +15,7 @@ public enum TigerPermission {
     CONFIG ("dailyjoin.config"),
     PLUGIN ("dailyjoin.plugin"),
     MIGRATION ("dailyjoin.migration"),
+    UPDATE_NAMES ("dailyjoin.update.names"),
     JOIN("dailyjoin.join");
 
     private final String permission;

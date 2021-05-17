@@ -1,6 +1,7 @@
 package de.bergtiger.dailyjoin.cmd;
 
 import de.bergtiger.dailyjoin.dao.migration.DailyFileToSQL;
+import de.bergtiger.dailyjoin.dao.migration.DailyNameUpdate;
 import de.bergtiger.dailyjoin.DailyJoin;
 import de.bergtiger.dailyjoin.dao.migration.DailySQLToFile;
 
@@ -29,10 +30,15 @@ public class DailyCommand implements CommandExecutor {
 			CMD_PLAYER = "player",
 			/** migration to SQL or File */
 			CMD_MIGRATION = "migration",
-			/** change config */
+			/** update player names in database*/
+			CMD_UPDATE_NAMES = "update_names",
+			/** change configuration */
 			CMD_CONFIG = "config",
-
-			SQL_TO_FILE = "sql_to_file", FILE_TO_SQL = "file_to_sql";
+			
+			/** argument for migration command from SQL database to file*/
+			SQL_TO_FILE = "sql_to_file",
+			/** argument for migration command from file to SQL database*/
+			FILE_TO_SQL = "file_to_sql";
 
 	@Override
 	public boolean onCommand(CommandSender cs, Command cmd, String label, String[] args) {
@@ -67,6 +73,10 @@ public class DailyCommand implements CommandExecutor {
 				migration(cs, args);
 				break;
 
+			case CMD_UPDATE_NAMES:
+				DailyNameUpdate.run(cs, args);
+				break;
+				
 			case CMD_CONFIG:
 				DailyCmdConfig.run(cs, args);
 				break;
@@ -83,9 +93,9 @@ public class DailyCommand implements CommandExecutor {
 	}
 
 	/**
-	 * show daily commands.
+	 * show allowed daily commands for the CommandSender.
 	 * 
-	 * @param cs CommandSender to show all available commands
+	 * @param cs {@link CommandSender} to show all available commands
 	 */
 	private void daily_command(CommandSender cs) {
 		if (hasPermission(cs, ADMIN, CMD)) {
@@ -116,6 +126,10 @@ public class DailyCommand implements CommandExecutor {
 			if (hasPermission(cs, ADMIN, MIGRATION))
 				cs.spigot().sendMessage(
 						Lang.build(Lang.INFO_MIGRATION.get(), null, Lang.INFO_HOVER_MIGRATION.get(), String.format(cmdLong, CMD_MIGRATION)));
+			// Update names
+			if (hasPermission(cs, ADMIN, UPDATE_NAMES))
+				cs.spigot().sendMessage(
+						Lang.build(Lang.INFO_UPDATE_NAMES.get(), String.format(cmdShort, CMD_UPDATE_NAMES), Lang.INFO_HOVER_UPDATE_NAMES.get(), null));
 			// Config
 			if (hasPermission(cs, ADMIN, CONFIG))
 				cs.spigot().sendMessage(
@@ -130,9 +144,9 @@ public class DailyCommand implements CommandExecutor {
 	}
 
 	/**
-	 * reloads dailyjoin configuration.
+	 * reloads DailyJoin configuration.
 	 * 
-	 * @param cs CommandSender to show success
+	 * @param cs {@link CommandSender} to show success
 	 */
 	private void daily_reload(CommandSender cs) {
 		if (hasPermission(cs, ADMIN, RELOAD)) {
@@ -146,7 +160,7 @@ public class DailyCommand implements CommandExecutor {
 	/**
 	 * migrates player values from source to destination.
 	 * 
-	 * @param cs   CommandSender to show success
+	 * @param cs   {@link CommandSender} to show success
 	 * @param args migration(0) type(1)
 	 */
 	private void migration(CommandSender cs, String[] args) {

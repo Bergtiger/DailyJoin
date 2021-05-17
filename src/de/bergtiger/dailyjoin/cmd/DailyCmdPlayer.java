@@ -20,15 +20,21 @@ public class DailyCmdPlayer {
 	private DailyCmdPlayer() {
 	}
 
+	/**
+	 * runs daily add command in its own thread.
+	 * 
+	 * @param cs   {@link CommandSender}}
+	 * @param args command arguments
+	 */
 	public static void run(CommandSender cs, String[] args) {
 		Bukkit.getScheduler().runTaskAsynchronously(DailyJoin.inst(), () -> new DailyCmdPlayer().showPlayer(cs, args));
 	}
 
 	/**
-	 * cmd: /daily player(0) [uuid](1)
+	 * /daily player(0) [uuid](1)
 	 *
-	 * @param cs
-	 * @param args
+	 * @param cs   {@link CommandSender}
+	 * @param args command arguments
 	 */
 	private void showPlayer(CommandSender cs, String[] args) {
 		if (hasPermission(cs, ADMIN, USER, PLAYER)) {
@@ -37,31 +43,27 @@ public class DailyCmdPlayer {
 			if (args.length >= 2 && (args[1].equalsIgnoreCase(uuid) || hasPermission(cs, ADMIN, PLAYER)))
 				uuid = args[1];
 			// get player
-			DailyPlayer dp;
-			if ((dp = getPlayer(uuid)) != null) {
-				showPlayer(cs, dp);
-			} else {
-				cs.spigot().sendMessage(Lang.build(Lang.NOPLAYER.get().replace(Lang.PLAYER, uuid)));
+			try {
+				DailyPlayer dp;
+				if ((dp = PlayerDAOimpl.inst().getPlayer(uuid)) != null) {
+					showPlayer(cs, dp);
+				} else {
+					cs.spigot().sendMessage(Lang.build(Lang.NOPLAYER.get().replace(Lang.PLAYER, uuid)));
+				}
+			} catch (NoSQLConnectionException e) {
+				cs.spigot().sendMessage(Lang.build(Lang.NOCONNECTION.get()));
+				TigerConnection.noConnection();
 			}
 		} else {
 			cs.spigot().sendMessage(Lang.build(Lang.NOPERMISSION.get()));
 		}
 	}
 
-	private DailyPlayer getPlayer(String uuid) {
-		try {
-			return PlayerDAOimpl.inst().getPlayer(uuid);
-		} catch (NoSQLConnectionException e) {
-			TigerConnection.noConnection();
-		}
-		return null;
-	}
-
 	/**
 	 * shows DailyPlayer in CommandSender's chat.
 	 * 
-	 * @param cs CommandSender who asked for information
-	 * @param dp DailyPlayer information to be shown
+	 * @param cs {@link CommandSender} who asked for information
+	 * @param dp {@link DailyPlayer} information to be shown
 	 */
 	private void showPlayer(@Nonnull CommandSender cs, @Nonnull DailyPlayer dp) {
 		// Header

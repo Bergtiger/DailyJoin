@@ -1,6 +1,7 @@
 package de.bergtiger.dailyjoin.listener;
 
 import de.bergtiger.dailyjoin.utils.DailyReward;
+import de.bergtiger.dailyjoin.utils.PlayerUtils;
 import de.bergtiger.dailyjoin.bdo.DailyPlayer;
 import de.bergtiger.dailyjoin.DailyJoin;
 import de.bergtiger.dailyjoin.dao.impl.PlayerDAOimpl;
@@ -21,6 +22,7 @@ import javax.annotation.Nonnull;
 
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.List;
 import java.util.logging.Level;
 
 public class DailyListener implements Listener {
@@ -33,7 +35,7 @@ public class DailyListener implements Listener {
 	/**
 	 * get DailyListener instance.
 	 * 
-	 * @return instance of DailyListener
+	 * @return instance of {@link DailyListener}
 	 */
 	public static DailyListener inst() {
 		if (instance == null)
@@ -88,10 +90,12 @@ public class DailyListener implements Listener {
 	}
 
 	/**
-	 * @param p Player
+	 * @param p {@link Player}
 	 */
 	private void playerJoined(Player p) {
 		if (p != null && p.isOnline()) {
+			// check needed name updates
+			updatePlayerName(p);
 			// load Player
 			DailyPlayer dp = null;
 			try {
@@ -152,16 +156,52 @@ public class DailyListener implements Listener {
 	}
 
 	/**
+	 * updates names when a player joins.
+	 * @param p {@link Player} joined
+	 */
+	private void updatePlayerName(Player p) {
+		if(p != null) {
+			try {
+				List<DailyPlayer> players = PlayerDAOimpl.inst().getPlayers(p.getName());
+				if(players != null && !players.isEmpty()) {
+					// update name, should be only one
+					for(int i = 0; i < players.size(); i++) {
+						DailyPlayer dp = players.get(i);
+						String currentName;
+						if((currentName = PlayerUtils.getLatestName(dp.getUuid())) != null && !currentName.equalsIgnoreCase(dp.getName())) {
+							// new Name
+							dp.setName(currentName);
+							DailyJoin.getDailyLogger().log(Level.INFO, String.format("Name changed from %s to %s", p.getName(), currentName));
+						} else {
+							// remove player, needs no update
+							players.remove(i);
+							i--;
+						}
+					}
+					// save updates
+					PlayerDAOimpl.inst().updatePlayers(players);
+				}
+			} catch (NoSQLConnectionException e) {
+				DailyJoin.getDailyLogger().log(Level.SEVERE, "updatePlayerName: ", e);
+			} catch (UpdatePlayerException e) {
+				DailyJoin.getDailyLogger().log(Level.SEVERE, "could not save updated names", e);
+			}
+		}
+	}
+	
+	/**
 	 * process Player. check if player was already online and set consecutive and
 	 * total days.
 	 * 
-	 * @param p  Player for new DailyPlayer
-	 * @param dp DailyPlayer to process
+	 * @param p  {@link Player} for new DailyPlayer
+	 * @param dp {@link DailyPlayer} to process
 	 * @return DailyPlayer with modified days or null if Player was already online
 	 */
 	private DailyPlayer processPlayer(Player p, DailyPlayer dp) {
 		if (dp != null) {
 			// existing Player
+			// check name update
+			dp.setName(p.getName());
 			// check if Player was online today
 			if (!checkPlayerOnlineToday(dp)) {
 				// Player was not online today and has not given a reward yet
@@ -190,7 +230,7 @@ public class DailyListener implements Listener {
 	/**
 	 * check if Player was already online today
 	 * 
-	 * @param dp DailyPlayer to check
+	 * @param dp {@link DailyPlayer} to check
 	 * @return true if lastjoin equals today
 	 */
 	private boolean checkPlayerOnlineToday(DailyPlayer dp) {
@@ -203,7 +243,7 @@ public class DailyListener implements Listener {
 	/**
 	 * check if Player was online yesterday.
 	 * 
-	 * @param dp DailyPlayer to check
+	 * @param dp {@link DailyPlayer} to check
 	 * @return true if lastjoin equals yesterday
 	 */
 	private boolean checkPlayerOnlineYesterday(DailyPlayer dp) {
@@ -218,8 +258,8 @@ public class DailyListener implements Listener {
 	 * 
 	 * @param uuid Player to load
 	 * @param sql  true when load from Database, else File
-	 * @return DailyPlayer or null if Player is new
-	 * @throws LoadPlayerException could not load DailyPlayer because of an
+	 * @return {@link DailyPlayer} or null if Player is new
+	 * @throws {@link LoadPlayerException} could not load DailyPlayer because of an
 	 *                             IOException
 	 */
 	private DailyPlayer load(@Nonnull String uuid, boolean sql) throws LoadPlayerException {
@@ -234,9 +274,9 @@ public class DailyListener implements Listener {
 	/**
 	 * save DailyPlayer.
 	 * 
-	 * @param dp  DailyPlayer to save
+	 * @param dp  {@link DailyPlayer} to save
 	 * @param sql true when save in Database, else File
-	 * @throws UpdatePlayerException could not save DailyPlayer because of an
+	 * @throws {@link UpdatePlayerException} could not save DailyPlayer because of an
 	 *                               IOException
 	 */
 	private void save(@Nonnull DailyPlayer dp, boolean sql) throws UpdatePlayerException {

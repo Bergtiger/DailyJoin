@@ -12,7 +12,6 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import java.io.File;
 import java.io.IOException;
 import java.sql.Timestamp;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -21,27 +20,18 @@ import java.util.stream.Collectors;
 
 public class PlayerDAOImplFile implements PlayerDAO {
 
-	public static final String 
-			FILE_DIRECTORY = "plugins/DailyJoin/players", 
-			FILE_NAME = "player.yml",
+	public static final String FILE_DIRECTORY = "plugins/DailyJoin/players", FILE_NAME = "player.yml",
 			// key path
-			PLAYER_PATH = "player", 
-			PLAYER_PATH_SHORT = "player.%s", 
-			PLAYER_PATH_FORMAT = "player.%s.",
+			PLAYER_PATH = "player", PLAYER_PATH_SHORT = "player.%s", PLAYER_PATH_FORMAT = "player.%s.",
 			// data
-			NAME = "name", 
-			DAYS_TOTAL = "days.total",
-			DAYS_CONSECUTIVE = "days.consecutive",
-			DAYS_OLD_TOTAL = "totaldays", 
-			DAYS_OLD_CONSECUTIVE = "day", 
-			FIRSTJOIN = "firstjoin", 
-			LASTJOIN = "lastjoin";
+			NAME = "name", DAYS_TOTAL = "days.total", DAYS_CONSECUTIVE = "days.consecutive",
+			DAYS_OLD_TOTAL = "totaldays", DAYS_OLD_CONSECUTIVE = "day", FIRSTJOIN = "firstjoin", LASTJOIN = "lastjoin";
 
 	/**
 	 * used DateTimeFormat in file (ISO_DATE_TIME)
 	 */
 	private static final DateTimeFormatter DTF = DateTimeFormatter.ISO_DATE_TIME;
-	
+
 	@Override
 	public Integer updatePlayer(DailyPlayer dp) throws UpdatePlayerException {
 		if (dp != null) {
@@ -67,12 +57,12 @@ public class PlayerDAOImplFile implements PlayerDAO {
 				cfg.addDefault(path + DAYS_TOTAL, dp.getDaysTotal());
 			// firstjoin
 			if (!cfg.contains(path + FIRSTJOIN))
-				cfg.set(path + FIRSTJOIN, DTF.format(Instant.now()));
+				cfg.set(path + FIRSTJOIN, DTF.format(LocalDateTime.now()));
 			// lastjoin
 			if (cfg.contains(path + LASTJOIN))
-				cfg.set(path + LASTJOIN, DTF.format(Instant.now()));
+				cfg.set(path + LASTJOIN, DTF.format(LocalDateTime.now()));
 			else
-				cfg.addDefault(path + LASTJOIN, DTF.format(Instant.now()));
+				cfg.addDefault(path + LASTJOIN, DTF.format(LocalDateTime.now()));
 			//
 			cfg.options().copyDefaults(true);
 			try {
@@ -87,39 +77,85 @@ public class PlayerDAOImplFile implements PlayerDAO {
 		return null;
 	}
 
-	public void updatePlayers(List<DailyPlayer> players) {
+//	@Override
+//	public void updatePlayers(List<DailyPlayer> players) {
+//		if (players != null && !players.isEmpty()) {
+//			File file = new File(FILE_DIRECTORY, FILE_NAME);
+//			// delete existing file
+//			if (file.exists()) {
+//				if (file.delete()) {
+//					DailyJoin.getDailyLogger().log(Level.INFO, "deleted old player file.");
+//				} else {
+//					DailyJoin.getDailyLogger().log(Level.WARNING, "Could not delete old player file.");
+//				}
+//			}
+//			// build new players
+//			if (players != null && !players.isEmpty()) {
+//				FileConfiguration cfg = YamlConfiguration.loadConfiguration(file);
+//				String path;
+//				// add player
+//				for (DailyPlayer dp : players) {
+//					path = String.format(PLAYER_PATH_FORMAT, dp.getUuid());
+//					cfg.addDefault(path + NAME, dp.getName());
+//					cfg.addDefault(path + DAYS_TOTAL, dp.getDaysTotal());
+//					cfg.addDefault(path + DAYS_CONSECUTIVE, dp.getDaysConsecutive());
+//					cfg.addDefault(path + FIRSTJOIN, DTF.format(dp.getFirstjoin().toLocalDateTime()));
+//					cfg.addDefault(path + LASTJOIN, DTF.format(dp.getLastjoin().toLocalDateTime()));
+//				}
+//				// save file
+//				try {
+//					cfg.options().header("DailyJoin offline player list");
+//					cfg.options().copyHeader(true);
+//					cfg.options().copyDefaults(true);
+//					cfg.save(file);
+//				} catch (IOException e) {
+//					DailyJoin.getDailyLogger().log(Level.SEVERE, "savelist: ", e);
+//				}
+//			}
+//		}
+//	}
+
+	@Override
+	public void updatePlayers(List<DailyPlayer> players) throws UpdatePlayerException {
 		if (players != null && !players.isEmpty()) {
+			// load file
 			File file = new File(FILE_DIRECTORY, FILE_NAME);
-			// delete existing file
-			if (file.exists()) {
-				if (file.delete()) {
-					DailyJoin.getDailyLogger().log(Level.INFO, "deleted old player file.");
-				} else {
-					DailyJoin.getDailyLogger().log(Level.WARNING, "Could not delete old player file.");
-				}
-			}
-			// build new players
-			if (players != null && !players.isEmpty()) {
-				FileConfiguration cfg = YamlConfiguration.loadConfiguration(file);
-				String path;
-				// add player
-				for (DailyPlayer dp : players) {
-					path = String.format(PLAYER_PATH_FORMAT, dp.getUuid());
+			FileConfiguration cfg = YamlConfiguration.loadConfiguration(file);
+			// save player
+			for (DailyPlayer dp : players) {
+				String path = String.format(PLAYER_PATH_FORMAT, dp.getUuid());
+				// name
+				if (cfg.contains(path + NAME))
+					cfg.set(path + NAME, dp.getName());
+				else
 					cfg.addDefault(path + NAME, dp.getName());
-					cfg.addDefault(path + DAYS_TOTAL, dp.getDaysTotal());
+				// day
+				if (cfg.contains(path + DAYS_CONSECUTIVE))
+					cfg.set(path + DAYS_CONSECUTIVE, dp.getDaysConsecutive());
+				else
 					cfg.addDefault(path + DAYS_CONSECUTIVE, dp.getDaysConsecutive());
-					cfg.addDefault(path + FIRSTJOIN, DTF.format(dp.getFirstjoin().toLocalDateTime()));
-					cfg.addDefault(path + LASTJOIN, DTF.format(dp.getLastjoin().toLocalDateTime()));
-				}
+				// totaldays
+				if (cfg.contains(path + DAYS_TOTAL))
+					cfg.set(path + DAYS_TOTAL, dp.getDaysTotal());
+				else
+					cfg.addDefault(path + DAYS_TOTAL, dp.getDaysTotal());
+				// firstjoin
+				if (!cfg.contains(path + FIRSTJOIN))
+					cfg.set(path + FIRSTJOIN, DTF.format(LocalDateTime.now()));
+				// lastjoin
+				if (cfg.contains(path + LASTJOIN))
+					cfg.set(path + LASTJOIN, DTF.format(LocalDateTime.now()));
+				else
+					cfg.addDefault(path + LASTJOIN, DTF.format(LocalDateTime.now()));
+			}
+			cfg.options().copyDefaults(true);
+			try {
 				// save file
-				try {
-					cfg.options().header("DailyJoin offline player list");
-					cfg.options().copyHeader(true);
-					cfg.options().copyDefaults(true);
-					cfg.save(file);
-				} catch (IOException e) {
-					DailyJoin.getDailyLogger().log(Level.SEVERE, "savelist: ", e);
-				}
+				cfg.save(file);
+				DailyJoin.getDailyLogger().log(Level.INFO, "Save File");
+			} catch (IOException e) {
+				DailyJoin.getDailyLogger().log(Level.INFO, "Error on save file");
+				throw new UpdatePlayerException(false, null);
 			}
 		}
 	}
@@ -169,6 +205,7 @@ public class PlayerDAOImplFile implements PlayerDAO {
 		return null;
 	}
 
+	@Override
 	public List<DailyPlayer> getPlayers() {
 		File file = new File(FILE_DIRECTORY, FILE_NAME);
 		if (file.exists()) {
@@ -221,6 +258,55 @@ public class PlayerDAOImplFile implements PlayerDAO {
 		return null;
 	}
 
+	@Override
+	public List<DailyPlayer> getPlayers(String name) {
+		File file = new File(FILE_DIRECTORY, FILE_NAME);
+		if (file.exists()) {
+			FileConfiguration cfg = YamlConfiguration.loadConfiguration(file);
+			List<DailyPlayer> players = new ArrayList<>();
+			// load players with uuid
+			if (cfg.contains(PLAYER_PATH)) {
+				cfg.getConfigurationSection(PLAYER_PATH).getKeys(false).forEach(uuid -> {
+					DailyPlayer p = new DailyPlayer();
+					String path = String.format(PLAYER_PATH_FORMAT, uuid);
+					// set uuid
+					p.setUuid(uuid);
+					// set name
+					if (cfg.contains(path + NAME))
+						p.setName(cfg.getString(path + NAME));
+					// check if name equals
+					if (p.getName().equalsIgnoreCase(name)) {
+						// set days total
+						if (cfg.contains(path + DAYS_TOTAL))
+							p.setDaysTotal(cfg.getInt(path + DAYS_TOTAL));
+						// set days consecutive
+						if (cfg.contains(path + DAYS_CONSECUTIVE))
+							p.setDaysConsecutive(cfg.getInt(path + DAYS_CONSECUTIVE));
+						// set first join
+						if (cfg.contains(path + FIRSTJOIN))
+							p.setFirstjoin(
+									Timestamp.valueOf(LocalDateTime.parse(cfg.getString(path + FIRSTJOIN), DTF)));
+						// set last join
+						if (cfg.contains(path + LASTJOIN))
+							p.setLastjoin(Timestamp.valueOf(LocalDateTime.parse(cfg.getString(path + LASTJOIN), DTF)));
+						// TODO remove old code
+						// set days total
+						if (cfg.contains(path + DAYS_OLD_TOTAL))
+							p.setDaysTotal(cfg.getInt(path + DAYS_OLD_TOTAL));
+						// set days consecutive
+						if (cfg.contains(path + DAYS_OLD_CONSECUTIVE))
+							p.setDaysConsecutive(cfg.getInt(path + DAYS_OLD_CONSECUTIVE));
+						// add players
+						players.add(p);
+					}
+				});
+				return players;
+			}
+		}
+		return null;
+	}
+
+	@Override
 	public HashMap<String, DailyPlayer> getPlayersAsMap() {
 		File file = new File(FILE_DIRECTORY, FILE_NAME);
 		if (file.exists()) {
@@ -303,20 +389,31 @@ public class PlayerDAOImplFile implements PlayerDAO {
 		return null;
 	}
 
+	/**
+	 * 
+	 * @param column
+	 * @return
+	 */
 	private Comparator<DailyPlayer> getComparator(String column) {
-		if(column != null && !column.isEmpty()) {
+		if (column != null && !column.isEmpty()) {
 			switch (column.toLowerCase()) {
-				case DailyDataBase.UUID : return Comparator.comparing(DailyPlayer::getUuid);
-				case DailyDataBase.NAME : return Comparator.comparing(DailyPlayer::getName);
-				case DailyDataBase.LASTJOIN : return Comparator.comparing(DailyPlayer::getLastjoin);
-				case DailyDataBase.FIRSTJOIN : return Comparator.comparing(DailyPlayer::getFirstjoin);
-				case DailyDataBase.DAYS_TOTAL : return Comparator.comparing(DailyPlayer::getDaysTotal);
-				case DailyDataBase.DAYS_CONSECUTIVE : return Comparator.comparing(DailyPlayer::getDaysConsecutive);
+			case DailyDataBase.UUID:
+				return Comparator.comparing(DailyPlayer::getUuid);
+			case DailyDataBase.NAME:
+				return Comparator.comparing(DailyPlayer::getName);
+			case DailyDataBase.LASTJOIN:
+				return Comparator.comparing(DailyPlayer::getLastjoin);
+			case DailyDataBase.FIRSTJOIN:
+				return Comparator.comparing(DailyPlayer::getFirstjoin);
+			case DailyDataBase.DAYS_TOTAL:
+				return Comparator.comparing(DailyPlayer::getDaysTotal);
+			case DailyDataBase.DAYS_CONSECUTIVE:
+				return Comparator.comparing(DailyPlayer::getDaysConsecutive);
 			}
 		}
 		return Comparator.comparing(DailyPlayer::getName);
 	}
-	
+
 	@Override
 	public List<String> getNames(String args) {
 		File file = new File(FILE_DIRECTORY, FILE_NAME);
@@ -338,12 +435,16 @@ public class PlayerDAOImplFile implements PlayerDAO {
 		if (file.exists()) {
 			FileConfiguration cfg = YamlConfiguration.loadConfiguration(file);
 			if (cfg.contains(PLAYER_PATH)) {
+				try {
 				// '^player\.\S+\.name$'
-				return cfg.getKeys(true).stream()
+					return cfg.getKeys(true).stream()
 						.filter(k -> k.matches(String.format("^%s\\.\\S+\\.%s$", PLAYER_PATH, NAME)))
 						.filter(k -> Objects.requireNonNull(cfg.getString(k)).equalsIgnoreCase(name))
 						.map(n -> n.substring(PLAYER_PATH.length() + 1, n.length() - (NAME.length() + 1))).findFirst()
 						.get();
+				} catch (Exception e) {
+					DailyJoin.getDailyLogger().log(Level.INFO, String.format("No such name in player file (%s)", name));
+				}
 			}
 		}
 		return null;

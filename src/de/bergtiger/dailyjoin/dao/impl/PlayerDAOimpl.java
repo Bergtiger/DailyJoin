@@ -50,9 +50,9 @@ public class PlayerDAOimpl implements PlayerDAO {
 	 * updatePlayer with explicit choosing between data storage.
 	 * @param p DailyPlayer to be stored
 	 * @param useSQL choose if sql should be used
-	 * @return
-	 * @throws NoSQLConnectionException
-	 * @throws UpdatePlayerException
+	 * @return if player was updated
+	 * @throws NoSQLConnectionException {@link NoSQLConnectionException} when no sql connection is available
+	 * @throws UpdatePlayerException {@link UpdatePlayerException} when player could not be updated
 	 */
 	public Integer updatePlayer(DailyPlayer p, boolean useSQL) throws NoSQLConnectionException, UpdatePlayerException {
 		return useSQL ? daoSQL.updatePlayer(p) : daoFile.updatePlayer(p);
@@ -65,10 +65,10 @@ public class PlayerDAOimpl implements PlayerDAO {
 
 	/**
 	 * getPlayer with explicit choosing between data storage.
-	 * @param uuid
+	 * @param uuid player identifier
 	 * @param useSQL choose if sql should be used
-	 * @return
-	 * @throws NoSQLConnectionException
+	 * @return {@link DailyPlayer}
+	 * @throws NoSQLConnectionException {@link NoSQLConnectionException} when no sql connection is available
 	 */
 	public DailyPlayer getPlayer(String uuid, boolean useSQL) throws NoSQLConnectionException {
 		return useSQL ? daoSQL.getPlayer(uuid) : daoFile.getPlayer(uuid);
@@ -95,14 +95,22 @@ public class PlayerDAOimpl implements PlayerDAO {
 	}
 
 	/**
-	 * get all players from file.
-	 * @return
-	 * @throws NoSQLConnectionException 
+	 * get all players.
+	 * @return {@link List} of {@link DailyPlayer}
+	 * @throws NoSQLConnectionException {@link NoSQLConnectionException} when no sql connection is available
 	 */
 	public List<DailyPlayer> getPlayers(boolean useSQL) throws NoSQLConnectionException {
 		return useSQL ? daoSQL.getPlayers() : daoFile.getPlayers();
 	}
 
+	public List<DailyPlayer> getPlayers(String name) throws NoSQLConnectionException {
+		return getPlayers(name, sql);
+	}
+	
+	public List<DailyPlayer> getPlayers(String name, boolean useSQL) throws NoSQLConnectionException {
+		return useSQL ? daoSQL.getPlayers(name) : daoFile.getPlayers(name);
+	}
+	
 	@Override
 	public HashMap<String, DailyPlayer> getPlayersAsMap() throws NoSQLConnectionException {
 		return getPlayersAsMap(sql);
@@ -112,11 +120,20 @@ public class PlayerDAOimpl implements PlayerDAO {
 		return useSQL ? daoSQL.getPlayersAsMap() : daoFile.getPlayersAsMap();
 	}
 	
+	@Override
+	public void updatePlayers(List<DailyPlayer> players) throws NoSQLConnectionException, UpdatePlayerException {
+		updatePlayers(players, sql);
+	}
+	
 	/**
 	 * save all players to file.
-	 * @param players
+	 * @param players list of {@link DailyPlayer} to save
+	 * @throws UpdatePlayerException 
 	 */
-	public void updatePlayers(List<DailyPlayer> players) {
-		daoFile.updatePlayers(players);
+	public void updatePlayers(List<DailyPlayer> players, boolean useSQL) throws NoSQLConnectionException, UpdatePlayerException {
+		if(useSQL)
+			daoSQL.updatePlayers(players);
+		else
+			daoFile.updatePlayers(players);
 	}
 }

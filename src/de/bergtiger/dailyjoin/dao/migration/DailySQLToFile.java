@@ -13,6 +13,7 @@ import org.bukkit.command.CommandSender;
 
 import de.bergtiger.dailyjoin.dao.impl.PlayerDAOimpl;
 import de.bergtiger.dailyjoin.exception.NoSQLConnectionException;
+import de.bergtiger.dailyjoin.exception.UpdatePlayerException;
 import de.bergtiger.dailyjoin.utils.lang.Lang;
 
 import static de.bergtiger.dailyjoin.utils.permission.TigerPermission.*;
@@ -61,7 +62,13 @@ public class DailySQLToFile {
 			if(playersFile != null && !playersFile.isEmpty())
 				players.addAll(playersFile.values());
 			// save players
-			PlayerDAOimpl.inst().updatePlayers(players);
+			try {
+				PlayerDAOimpl.inst().updatePlayers(players, false);
+			} catch (NoSQLConnectionException e) {
+				DailyJoin.getDailyLogger().log(Level.SEVERE, "SQLToFile: that should be imposible.", e);
+			} catch (UpdatePlayerException e) {
+				DailyJoin.getDailyLogger().log(Level.SEVERE, "SQLToFile: could not save file", e);
+			}
 		}
 	}
 

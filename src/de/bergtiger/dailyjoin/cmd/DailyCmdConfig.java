@@ -11,6 +11,12 @@ import static de.bergtiger.dailyjoin.utils.config.DailyConfig.*;
 
 public class DailyCmdConfig {
 
+	/**
+	 * runs daily set configuration command in its own thread.
+	 * 
+	 * @param cs   {@link CommandSender}
+	 * @param args command arguments
+	 */
 	public static void run(CommandSender cs, String[] args) {
 		Bukkit.getScheduler().runTaskAsynchronously(DailyJoin.inst(),
 				() -> new DailyCmdConfig().modifyConfig(cs, args));
@@ -19,7 +25,7 @@ public class DailyCmdConfig {
 	/**
 	 * /daily [config](0) [type](1) [value](2)
 	 * 
-	 * @param cs   CommandSender
+	 * @param cs   {@link CommandSender}
 	 * @param args command arguments
 	 */
 	private void modifyConfig(CommandSender cs, String[] args) {
@@ -74,12 +80,12 @@ public class DailyCmdConfig {
 	}
 
 	/**
-	 * handle set value. check if value matches regex
+	 * handle set value. check if value matches RegEx.
 	 * 
-	 * @param cs    CommandSender to show prozess
+	 * @param cs    {@link CommandSender} to show prozess
 	 * @param key   configuration identifier
 	 * @param value new value to save in configuration
-	 * @param regex check value regex
+	 * @param regex check value RegEx
 	 */
 	private void setValue(CommandSender cs, String key, String value, String regex, Class<?> clazz) {
 		// allowed value (regex)

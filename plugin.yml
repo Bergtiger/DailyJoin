@@ -1,7 +1,9 @@
 name: DailyJoin
-version: Beta 1.6
+version: 2.0
 author: Bergtiger
 main: de.bergtiger.dailyjoin.DailyJoin
+api-version: 1.16
+
 
 commands:
   dailyjoin:

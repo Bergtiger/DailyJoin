@@ -12,8 +12,8 @@ public class TimeUtils {
 
 	/**
 	 * checks if two calendars represent the same day ignoring time.
-	 * @param cal1 the first calendar
-	 * @param cal2 the second calendar
+	 * @param cal1 the first {@link Calendar}
+	 * @param cal2 the second {@link Calendar}
 	 * @return true if they represent the same day
 	 */
 	public static boolean isSameDay(Calendar cal1, Calendar cal2) {
@@ -26,8 +26,8 @@ public class TimeUtils {
 
 	/**
 	 * checks if two Timestamps represent the same day ignoring time.
-	 * @param t1 the first Timestamp
-	 * @param t2 the second Timestamp
+	 * @param t1 the first {@link Timestamp}
+	 * @param t2 the second {@link Timestamp}
 	 * @return true if they represent the same day
 	 */
 	public static boolean isSameDay(Timestamp t1, Timestamp t2) {
@@ -43,7 +43,7 @@ public class TimeUtils {
 	
 	/**
 	 * checks if a calendar date is today.
-	 * @param cal the calendar
+	 * @param cal the {@link Calendar}
 	 * @return true if cal date is today
 	 */
 	public static boolean isToday(Calendar cal) {
@@ -52,8 +52,8 @@ public class TimeUtils {
 
 	/**
 	 * checks if a Timestamp is today.
-	 * @param t the Timestamp to check
-	 * @return true if Timestamp date is today
+	 * @param t the {@link Timestamp} to check
+	 * @return true if {@link Timestamp} date is today
 	 */
 	public static boolean isToday(Timestamp t) {
 		Calendar cal = Calendar.getInstance();
@@ -63,8 +63,8 @@ public class TimeUtils {
 
 	/**
 	 * checks if a Timestamp is yesterday.
-	 * @param t the Timestamp to check
-	 * @return true if Timestamp date is yesterday
+	 * @param t the {@link Timestamp} to check
+	 * @return true if {@link Timestamp} date is yesterday
 	 */
 	public static boolean isYesterday(Timestamp t) {
 		return isDaysBetween(t, new Timestamp(System.currentTimeMillis()), 1);
@@ -72,8 +72,8 @@ public class TimeUtils {
 
 	/**
 	 * checks if x days are between the calendar dates.
-	 * @param cal1 first calendar date (days will be added)
-	 * @param cal2 second calendar date
+	 * @param cal1 first {@link Calendar} date (days will be added)
+	 * @param cal2 second {@link Calendar} date
 	 * @param days days between the dates
 	 * @return true if exact x days are between the dates
 	 */
@@ -84,8 +84,8 @@ public class TimeUtils {
 
 	/**
 	 * checks if x days are between the timestamps.
-	 * @param t1 first timestamp
-	 * @param t2 second timestamp
+	 * @param t1 first {@link Timestamp}
+	 * @param t2 second {@link Timestamp}
 	 * @param days days between the timestamps.
 	 * @return true if exact x days are between the timestamps
 	 */
@@ -102,7 +102,7 @@ public class TimeUtils {
 
 	/**
 	 * returns the given calendar date with time values cleared.
-	 * @param cal calendar date
+	 * @param cal {@link Calendar} date
 	 * @return date without time
 	 */
 	public static Calendar clearTime(Calendar cal) {
@@ -116,21 +116,21 @@ public class TimeUtils {
 	}
 
 	/**
-	 * Timestamp as String formated with default time format.
-	 * @param t Timestamp
+	 * Timestamp as String formatted with default time format.
+	 * @param t {@link Timestamp} to format
 	 * @return String
 	 */
-	public static String formated(Timestamp t) {
-		return formated(t, Lang.FORMAT_TIME.get());
+	public static String formatted(Timestamp t) {
+		return formatted(t, Lang.FORMAT_TIME.get());
 	}
 
 	/**
-	 * Timestamp as String formated with given time format.
-	 * @param t Timestamp
+	 * Timestamp as String formatted with given time format.
+	 * @param t {@link Timestamp} to format
 	 * @param format time format as String
 	 * @return String
 	 */
-	public static String formated(Timestamp t, String format) {
+	public static String formatted(Timestamp t, String format) {
 		if(t != null) {
 			try {
 				return DateTimeFormatter.ofPattern(format).format(t.toLocalDateTime());

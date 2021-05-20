@@ -12,15 +12,24 @@ import java.util.logging.Level;
 
 public class DailyDataBase {
 
+	/**dailyjoin table name*/
 	public static final String
 			DAILY_JOIN_TABLE = "dailyjoin",
+			/** player value name*/
 			NAME = "name",
+			/** player value uuid*/
 			UUID = "uuid",
+			/** player value days total*/
 			DAYS_TOTAL = "days_total",
+			/** player value days consecutive*/
 			DAYS_CONSECUTIVE = "days_consecutive",
+			/** old player value days total*/
 			DAYS_OLD_TOTAL = "totaldays",
+			/** old player value days consecutive*/
 			DAYS_OLD_CONSECUTIVE = "day",
+			/** player value first join date*/
 			LASTJOIN = "lastjoin",
+			/** player value last join date*/
 			FIRSTJOIN = "firstjoin";
 
 	private DailyDataBase() {
@@ -84,7 +93,7 @@ public class DailyDataBase {
 			} catch (SQLException e) {
 				DailyJoin.getDailyLogger().log(Level.SEVERE, "createDailyJoinTable: could not create Table.", e);
 			} finally {
-				TigerConnection.closeRessources(null, st);
+				TigerConnection.closeResources(null, st);
 			}
 		} else {
 			throw new NoSQLConnectionException();
@@ -109,7 +118,7 @@ public class DailyDataBase {
 			} catch (SQLException e) {
 				DailyJoin.getDailyLogger().log(Level.SEVERE, "hasOldColumns: could not load ColumnMeta", e);
 			} finally {
-				TigerConnection.closeRessources(rs, null);
+				TigerConnection.closeResources(rs, null);
 			}
 		} else {
 			throw new NoSQLConnectionException();
@@ -135,7 +144,7 @@ public class DailyDataBase {
 			} catch (SQLException e) {
 				DailyJoin.getDailyLogger().log(Level.SEVERE, "hasDailyJoinTable: could not load TableMeta", e);
 			} finally {
-				TigerConnection.closeRessources(rs, null);
+				TigerConnection.closeResources(rs, null);
 			}
 		} else {
 			throw new NoSQLConnectionException();
@@ -163,7 +172,7 @@ public class DailyDataBase {
 			} catch (SQLException e) {
 				DailyJoin.getDailyLogger().log(Level.SEVERE, "updateOldColumnName: could not alter Table", e);
 			} finally {
-				TigerConnection.closeRessources(null, st);
+				TigerConnection.closeResources(null, st);
 			}
 		} else {
 			throw  new NoSQLConnectionException();

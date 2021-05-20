@@ -324,7 +324,7 @@ public class DailyConfig {
 	 * set value and reloads plugin.
 	 * @param key identifier
 	 * @param value new value to store in configuration
-	 * @param class value is casted before saving
+	 * @param clazz value is casted before saving
 	 */
 	public void setValue(String key, String value, Class<?> clazz) {
 		if(clazz.equals(Integer.class))

@@ -24,7 +24,7 @@ public class PlayerDAOImplSQL implements PlayerDAO {
 	/**
 	 * insert Player in Database. if Player exists update.
 	 * 
-	 * @param p Player to update or insert.
+	 * @param p {@link DailyPlayer} to update or insert.
 	 * @return generated key
 	 * @throws NoSQLConnectionException could not connect with database.
 	 * @throws UpdatePlayerException    could not execute update.
@@ -58,7 +58,7 @@ public class PlayerDAOImplSQL implements PlayerDAO {
 					DailyJoin.getDailyLogger().log(Level.SEVERE, "updatePlayer: " + p, e);
 					throw new UpdatePlayerException(true, p);
 				} finally {
-					TigerConnection.closeRessources(rs, st);
+					TigerConnection.closeResources(rs, st);
 				}
 			} else {
 				throw new NoSQLConnectionException();
@@ -98,7 +98,7 @@ public class PlayerDAOImplSQL implements PlayerDAO {
 					DailyJoin.getDailyLogger().log(Level.SEVERE, "updatePlayers: " + players, e);
 					throw new UpdatePlayerException(true, null);
 				} finally {
-					TigerConnection.closeRessources(rs, st);
+					TigerConnection.closeResources(rs, st);
 				}
 			} else {
 				throw new NoSQLConnectionException();
@@ -107,7 +107,7 @@ public class PlayerDAOImplSQL implements PlayerDAO {
 	}
 
 	/**
-	 * get Player
+	 * get player
 	 * 
 	 * @param uuid Player uuid or name.
 	 * @return player statistic.
@@ -143,7 +143,7 @@ public class PlayerDAOImplSQL implements PlayerDAO {
 			} catch (SQLException e) {
 				DailyJoin.getDailyLogger().log(Level.SEVERE, "getPlayer: " + uuid, e);
 			} finally {
-				TigerConnection.closeRessources(rs, st);
+				TigerConnection.closeResources(rs, st);
 			}
 		} else {
 			throw new NoSQLConnectionException();
@@ -176,7 +176,7 @@ public class PlayerDAOImplSQL implements PlayerDAO {
 			} catch (SQLException e) {
 				DailyJoin.getDailyLogger().log(Level.SEVERE, "getPlayers: ", e);
 			} finally {
-				TigerConnection.closeRessources(rs, st);
+				TigerConnection.closeResources(rs, st);
 			}
 		} else {
 			throw new NoSQLConnectionException();
@@ -210,7 +210,7 @@ public class PlayerDAOImplSQL implements PlayerDAO {
 			} catch (SQLException e) {
 				DailyJoin.getDailyLogger().log(Level.SEVERE, "getPlayers: ", e);
 			} finally {
-				TigerConnection.closeRessources(rs, st);
+				TigerConnection.closeResources(rs, st);
 			}
 		} else {
 			throw new NoSQLConnectionException();
@@ -243,7 +243,7 @@ public class PlayerDAOImplSQL implements PlayerDAO {
 			} catch (SQLException e) {
 				DailyJoin.getDailyLogger().log(Level.SEVERE, "getPlayers: ", e);
 			} finally {
-				TigerConnection.closeRessources(rs, st);
+				TigerConnection.closeResources(rs, st);
 			}
 		} else {
 			throw new NoSQLConnectionException();
@@ -286,7 +286,7 @@ public class PlayerDAOImplSQL implements PlayerDAO {
 					} catch (SQLException e) {
 						DailyJoin.getDailyLogger().log(Level.SEVERE, "getTopPlayers", e);
 					} finally {
-						TigerConnection.closeRessources(rs, st);
+						TigerConnection.closeResources(rs, st);
 					}
 				} else {
 					throw new NoSQLConnectionException();
@@ -319,7 +319,7 @@ public class PlayerDAOImplSQL implements PlayerDAO {
 			} catch (SQLException e) {
 				DailyJoin.getDailyLogger().log(Level.SEVERE, "getNames", e);
 			} finally {
-				TigerConnection.closeRessources(rs, st);
+				TigerConnection.closeResources(rs, st);
 			}
 		} else {
 			throw new NoSQLConnectionException();
@@ -344,7 +344,7 @@ public class PlayerDAOImplSQL implements PlayerDAO {
 				} catch (SQLException e) {
 					DailyJoin.getDailyLogger().log(Level.SEVERE, String.format("getUUid(%s)", name), e);
 				} finally {
-					TigerConnection.closeRessources(rs, st);
+					TigerConnection.closeResources(rs, st);
 				}
 			} else {
 				throw new NoSQLConnectionException();

@@ -29,9 +29,9 @@ public class PlayerUtils {
 					.append(Lang.HOVER_PLAYER_DAYS_CONSECUTIVE.get().replace(Lang.VALUE,
 							Integer.toString(dp.getDaysConsecutive())))
 					.append("\n")
-					.append(Lang.HOVER_PLAYER_LASTJOIN.get().replace(Lang.VALUE, TimeUtils.formated(dp.getLastjoin())))
+					.append(Lang.HOVER_PLAYER_LASTJOIN.get().replace(Lang.VALUE, TimeUtils.formatted(dp.getLastjoin())))
 					.append("\n").append(Lang.HOVER_PLAYER_FIRSTJOIN.get().replace(Lang.VALUE,
-							TimeUtils.formated(dp.getFirstjoin())))
+							TimeUtils.formatted(dp.getFirstjoin())))
 					.toString();
 		}
 		return null;

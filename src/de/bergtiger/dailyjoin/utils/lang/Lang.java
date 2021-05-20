@@ -332,7 +332,7 @@ public enum Lang implements Constants {
 				// find first hexColor
 				int i = text.indexOf("&#");
 				// substring first part(old color)
-				((TextComponent)bc).setText(text.substring(0, i));
+				((TextComponent)bc).setText(ChatColor.translateAlternateColorCodes('&', text.substring(0, i)));
 				// substring last part(new color)
 				bc.addExtra(
 						rgbColor(

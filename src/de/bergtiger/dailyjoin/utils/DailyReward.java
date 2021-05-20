@@ -36,6 +36,9 @@ public class DailyReward {
 		setData();
 	}
 
+	/**
+	 * load configuration
+	 */
 	private void setData() {
 		//TODO
 		this.daily = DailyJoin.inst().getConfig().getStringList("config.daily");
@@ -107,12 +110,12 @@ public class DailyReward {
 	}
 
 	/**
-	 * give Player his Rewards.
+	 * give player his rewards.
 	 * 
-	 * @param p               Player
-	 * @param daysConsecutive
-	 * @param daysTotal
-	 * @param t
+	 * @param p               {@link Player} who gets the reward
+	 * @param daysConsecutive days consecutive from this player
+	 * @param daysTotal	      days total from this player
+	 * @param t	              now
 	 */
 	public void giveReward(Player p, int daysConsecutive, int daysTotal, Timestamp t) {
 		giveDaily(p, daysConsecutive);
@@ -124,8 +127,8 @@ public class DailyReward {
 	/**
 	 * give daily rewards
 	 * 
-	 * @param p
-	 * @param day
+	 * @param p		{@link Player} who gets the reward
+	 * @param day 	//TODO
 	 */
 	private void giveDaily(Player p, int day) {
 		if ((daily != null) && (!daily.isEmpty())) {
@@ -137,8 +140,8 @@ public class DailyReward {
 	/**
 	 * give rewards for consecutive days
 	 * 
-	 * @param p
-	 * @param day
+	 * @param p {@link Player} who gets the reward
+	 * @param day player was online
 	 */
 	private void giveDaysConsecutive(Player p, int day) {
 		if ((rewardsConsecutive != null) && rewardsConsecutive.containsKey(day)) {
@@ -151,8 +154,8 @@ public class DailyReward {
 	/**
 	 * give rewards for total days
 	 * 
-	 * @param p
-	 * @param totaldays
+	 * @param p {@link Player} who gets the reward
+	 * @param totaldays player was online
 	 */
 	private void giveDaysTotal(Player p, int totaldays) {
 		if ((rewardsTotal != null) && rewardsTotal.containsKey(totaldays)) {
@@ -165,9 +168,9 @@ public class DailyReward {
 	/**
 	 * give birthday rewards
 	 * 
-	 * @param p
-	 * @param totaldays
-	 * @param t
+	 * @param p {@link Player} who gets the reward
+	 * @param totaldays //TODO
+	 * @param t now
 	 */
 	private void giveBirthday(Player p, int totaldays, Timestamp t) {
 		if ((birthday != null) && (!birthday.isEmpty())) {
@@ -184,6 +187,11 @@ public class DailyReward {
 		}
 	}
 
+	/**
+	 * perform a list of commands replaces '@p' and 'Lang.PLAYER'.
+	 * @param p {@link Player} who gets the reward
+	 * @param list of commands
+	 */
 	private void performCmds(Player p, List<String> list) {
 		for (int i = 0; i < list.size(); i++) {
 			Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(),

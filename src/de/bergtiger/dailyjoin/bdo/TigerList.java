@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * @author Bergtiger 
  * Extends {@link ArrayList} with a paging ability
- * @param <T>
+ * @param <T> the type of elements in this list
  */
 public class TigerList<T> extends ArrayList<T> {
 
@@ -44,7 +44,7 @@ public class TigerList<T> extends ArrayList<T> {
 
 	/**
 	 * Set Page.
-	 * 
+	 * minimal value 0, maximal value max page - 1
 	 * @param page set current page, first page = 0;
 	 */
 	public void setPage(int page) {

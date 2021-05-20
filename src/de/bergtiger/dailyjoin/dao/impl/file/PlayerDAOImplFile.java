@@ -19,13 +19,33 @@ import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 public class PlayerDAOImplFile implements PlayerDAO {
-
-	public static final String FILE_DIRECTORY = "plugins/DailyJoin/players", FILE_NAME = "player.yml",
+	/** file directory path*/
+	public static final String
+			FILE_DIRECTORY = "plugins/DailyJoin/players",
+			/** player file name*/
+			FILE_NAME = "player.yml",
 			// key path
-			PLAYER_PATH = "player", PLAYER_PATH_SHORT = "player.%s", PLAYER_PATH_FORMAT = "player.%s.",
+			/** player key path*/
+			PLAYER_PATH = "player",
+			/** player key path short for checking player with uuid*/
+			PLAYER_PATH_SHORT = "player.%s",
+			/** player key path long to get or check player value*/
+			PLAYER_PATH_FORMAT = "player.%s.",
 			// data
-			NAME = "name", DAYS_TOTAL = "days.total", DAYS_CONSECUTIVE = "days.consecutive",
-			DAYS_OLD_TOTAL = "totaldays", DAYS_OLD_CONSECUTIVE = "day", FIRSTJOIN = "firstjoin", LASTJOIN = "lastjoin";
+			/** player value name*/
+			NAME = "name",
+			/** player value days total*/
+			DAYS_TOTAL = "days.total",
+			/** player value days consecutive*/
+			DAYS_CONSECUTIVE = "days.consecutive",
+			/** old player value days total*/
+			DAYS_OLD_TOTAL = "totaldays",
+			/** old player value days consecutive*/
+			DAYS_OLD_CONSECUTIVE = "day",
+			/** player value first join date*/
+			FIRSTJOIN = "firstjoin",
+			/** player value last join date*/
+			LASTJOIN = "lastjoin";
 
 	/**
 	 * used DateTimeFormat in file (ISO_DATE_TIME)
@@ -57,12 +77,12 @@ public class PlayerDAOImplFile implements PlayerDAO {
 				cfg.addDefault(path + DAYS_TOTAL, dp.getDaysTotal());
 			// firstjoin
 			if (!cfg.contains(path + FIRSTJOIN))
-				cfg.set(path + FIRSTJOIN, DTF.format(LocalDateTime.now()));
+				cfg.set(path + FIRSTJOIN, DTF.format(dp.getFirstjoin() != null ? dp.getFirstjoin().toLocalDateTime() : LocalDateTime.now()));
 			// lastjoin
 			if (cfg.contains(path + LASTJOIN))
-				cfg.set(path + LASTJOIN, DTF.format(LocalDateTime.now()));
+				cfg.set(path + LASTJOIN, DTF.format(dp.getLastjoin() != null ? dp.getLastjoin().toLocalDateTime() : LocalDateTime.now()));
 			else
-				cfg.addDefault(path + LASTJOIN, DTF.format(LocalDateTime.now()));
+				cfg.addDefault(path + LASTJOIN, DTF.format(dp.getLastjoin() != null ? dp.getLastjoin().toLocalDateTime() : LocalDateTime.now()));
 			//
 			cfg.options().copyDefaults(true);
 			try {
@@ -76,44 +96,6 @@ public class PlayerDAOImplFile implements PlayerDAO {
 		}
 		return null;
 	}
-
-//	@Override
-//	public void updatePlayers(List<DailyPlayer> players) {
-//		if (players != null && !players.isEmpty()) {
-//			File file = new File(FILE_DIRECTORY, FILE_NAME);
-//			// delete existing file
-//			if (file.exists()) {
-//				if (file.delete()) {
-//					DailyJoin.getDailyLogger().log(Level.INFO, "deleted old player file.");
-//				} else {
-//					DailyJoin.getDailyLogger().log(Level.WARNING, "Could not delete old player file.");
-//				}
-//			}
-//			// build new players
-//			if (players != null && !players.isEmpty()) {
-//				FileConfiguration cfg = YamlConfiguration.loadConfiguration(file);
-//				String path;
-//				// add player
-//				for (DailyPlayer dp : players) {
-//					path = String.format(PLAYER_PATH_FORMAT, dp.getUuid());
-//					cfg.addDefault(path + NAME, dp.getName());
-//					cfg.addDefault(path + DAYS_TOTAL, dp.getDaysTotal());
-//					cfg.addDefault(path + DAYS_CONSECUTIVE, dp.getDaysConsecutive());
-//					cfg.addDefault(path + FIRSTJOIN, DTF.format(dp.getFirstjoin().toLocalDateTime()));
-//					cfg.addDefault(path + LASTJOIN, DTF.format(dp.getLastjoin().toLocalDateTime()));
-//				}
-//				// save file
-//				try {
-//					cfg.options().header("DailyJoin offline player list");
-//					cfg.options().copyHeader(true);
-//					cfg.options().copyDefaults(true);
-//					cfg.save(file);
-//				} catch (IOException e) {
-//					DailyJoin.getDailyLogger().log(Level.SEVERE, "savelist: ", e);
-//				}
-//			}
-//		}
-//	}
 
 	@Override
 	public void updatePlayers(List<DailyPlayer> players) throws UpdatePlayerException {
@@ -141,12 +123,12 @@ public class PlayerDAOImplFile implements PlayerDAO {
 					cfg.addDefault(path + DAYS_TOTAL, dp.getDaysTotal());
 				// firstjoin
 				if (!cfg.contains(path + FIRSTJOIN))
-					cfg.set(path + FIRSTJOIN, DTF.format(LocalDateTime.now()));
+					cfg.set(path + FIRSTJOIN, DTF.format(dp.getFirstjoin() != null ? dp.getFirstjoin().toLocalDateTime() : LocalDateTime.now()));
 				// lastjoin
 				if (cfg.contains(path + LASTJOIN))
-					cfg.set(path + LASTJOIN, DTF.format(LocalDateTime.now()));
+					cfg.set(path + LASTJOIN, DTF.format(dp.getLastjoin() != null ? dp.getLastjoin().toLocalDateTime() : LocalDateTime.now()));
 				else
-					cfg.addDefault(path + LASTJOIN, DTF.format(LocalDateTime.now()));
+					cfg.addDefault(path + LASTJOIN, DTF.format(dp.getLastjoin() != null ? dp.getLastjoin().toLocalDateTime() : LocalDateTime.now()));
 			}
 			cfg.options().copyDefaults(true);
 			try {

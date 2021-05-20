@@ -9,13 +9,14 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import de.bergtiger.dailyjoin.utils.lang.Lang;
+
 import static de.bergtiger.dailyjoin.utils.permission.TigerPermission.*;
 
 public class DailyCommand implements CommandExecutor {
 
-	public static final String
 	/** general command */
-	CMD_CMD = "dailyjoin",
+	public static final String
+			CMD_CMD = "dailyjoin",
 			/** list players */
 			CMD_TOP = "top",
 			/** set a specific value */
@@ -40,6 +41,15 @@ public class DailyCommand implements CommandExecutor {
 			/** argument for migration command from file to SQL database*/
 			FILE_TO_SQL = "file_to_sql";
 
+	/**
+	 * handle main command and distributes in sub commands
+	 *
+	 * @param cs {@link CommandSender}
+	 * @param cmd command
+	 * @param label alias
+	 * @param args command parameter
+	 * @return always true, errors are handled intern
+	 */
 	@Override
 	public boolean onCommand(CommandSender cs, Command cmd, String label, String[] args) {
 		// info - set - reload - config - player

@@ -4,7 +4,7 @@ import de.bergtiger.dailyjoin.cmd.DailyCmdSet;
 import de.bergtiger.dailyjoin.cmd.DailyCmdTop;
 import de.bergtiger.dailyjoin.dao.DailyDataBase;
 import de.bergtiger.dailyjoin.dao.TigerConnection;
-import de.bergtiger.dailyjoin.dao.impl.PlayerDAOimpl;
+import de.bergtiger.dailyjoin.dao.impl.PlayerDAOImpl;
 import de.bergtiger.dailyjoin.exception.NoSQLConnectionException;
 import de.bergtiger.dailyjoin.utils.config.DailyConfig;
 import org.bukkit.command.Command;
@@ -21,12 +21,12 @@ import java.util.stream.Collectors;
 public class DailyTabComplete implements TabCompleter {
 
 	/**
-	 *
-	 * @param cs    CommandSender
+	 * create a list of suggestions shown in chat to chose from.
+	 * @param cs    {@link CommandSender}
 	 * @param cmd   command
 	 * @param label alias
-	 * @param args  arguments
-	 * @return List<String> suggestions shown in chat
+	 * @param args  command parameter
+	 * @return list of suggestions shown in chat
 	 */
 	@Override
 	public List<String> onTabComplete(CommandSender cs, Command cmd, String label, String[] args) {
@@ -137,10 +137,15 @@ public class DailyTabComplete implements TabCompleter {
 		return suggestions;
 	}
 
+	/**
+	 * get player names to autofill.
+	 * @param args start of name
+	 * @return list of all matching names
+	 */
 	private List<String> getNames(String args) {
 		// player
 		try {
-			return PlayerDAOimpl.inst().getNames(args);
+			return PlayerDAOImpl.inst().getNames(args);
 		} catch (NoSQLConnectionException e) {
 			TigerConnection.noConnection();
 		}

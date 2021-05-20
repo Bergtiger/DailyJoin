@@ -5,7 +5,7 @@ import java.util.logging.Logger;
 
 import de.bergtiger.dailyjoin.cmd.DailyCmdTop;
 import de.bergtiger.dailyjoin.cmd.DailyCommand;
-import de.bergtiger.dailyjoin.dao.impl.PlayerDAOimpl;
+import de.bergtiger.dailyjoin.dao.impl.PlayerDAOImpl;
 import de.bergtiger.dailyjoin.dao.migration.DailyNameUpdate;
 import de.bergtiger.dailyjoin.listener.DailyListener;
 import de.bergtiger.dailyjoin.tab.DailyTabComplete;
@@ -70,7 +70,7 @@ public class DailyJoin extends JavaPlugin{
 		// reload connection
 		TigerConnection.inst().reload();
 		// reload dao
-		PlayerDAOimpl.inst().reload();
+		PlayerDAOImpl.inst().reload();
 		// reload listener
 		DailyListener.inst().reload();
 		// reload reward

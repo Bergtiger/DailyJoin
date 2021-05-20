@@ -7,7 +7,7 @@ import java.util.logging.Level;
 import de.bergtiger.dailyjoin.DailyJoin;
 import de.bergtiger.dailyjoin.bdo.DailyPlayer;
 import de.bergtiger.dailyjoin.dao.TigerConnection;
-import de.bergtiger.dailyjoin.dao.impl.PlayerDAOimpl;
+import de.bergtiger.dailyjoin.dao.impl.PlayerDAOImpl;
 import de.bergtiger.dailyjoin.exception.NoSQLConnectionException;
 import de.bergtiger.dailyjoin.exception.UpdatePlayerException;
 import de.bergtiger.dailyjoin.utils.TimeUtils;
@@ -30,10 +30,18 @@ public class DailyFileToSQL {
 
 	private DailyFileToSQL() {}
 
+	/**
+	 * runs daily migrate file_to_sql command in its own thread.
+	 * @param cs {@link CommandSender}
+	 */
 	public static void run(CommandSender cs) {
 		Bukkit.getScheduler().runTaskAsynchronously(DailyJoin.inst(), () -> DailyFileToSQL.inst().FileToSQL(cs));
 	}
 
+	/**
+	 * encloses FileToSQL
+	 * @param cs {@link CommandSender}
+	 */
 	private void FileToSQL(CommandSender cs) {
 		if (hasPermission(cs, ADMIN, MIGRATION)) {
 				cs.spigot().sendMessage(Lang.build(Lang.MIGRATION_START_FILETOSQL.get()));
@@ -45,19 +53,19 @@ public class DailyFileToSQL {
 	}
 
 	/**
-	 * 
+	 * loads from file and migrates into sql database.
 	 */
 	public void FileToSQL() {
 		File file = new File(FILE_DIRECTORY, FILE_NAME);
 		if (file.exists()) {
 			try {
-				List<DailyPlayer> players = PlayerDAOimpl.inst().getPlayers(false);
+				List<DailyPlayer> players = PlayerDAOImpl.inst().getPlayers(false);
 				if (players != null && !players.isEmpty()) {
 					for (int i = 0; i < players.size(); i++) {
 						try {
 							DailyPlayer pFile = players.get(i);
 							// explicit SQL
-							DailyPlayer pSQL = PlayerDAOimpl.inst().getPlayer(pFile.getUuid(), true);
+							DailyPlayer pSQL = PlayerDAOImpl.inst().getPlayer(pFile.getUuid(), true);
 							// check if existing Player
 							if (pSQL != null) {
 								// existing Player -> merge
@@ -86,7 +94,7 @@ public class DailyFileToSQL {
 							}
 							// update or insert Player
 							// explicit SQL
-							PlayerDAOimpl.inst().updatePlayer(pFile, true);
+							PlayerDAOImpl.inst().updatePlayer(pFile, true);
 							// remove from working list
 							players.remove(i);
 							i--;
@@ -94,7 +102,7 @@ public class DailyFileToSQL {
 							// NoSQLException
 							// stop merge and save file
 							try {
-								PlayerDAOimpl.inst().updatePlayers(players, false);
+								PlayerDAOImpl.inst().updatePlayers(players, false);
 							} catch (UpdatePlayerException e1) {
 								DailyJoin.getDailyLogger().log(Level.SEVERE, "FileToSQL, no Connection and could not save back to file", e);
 							}
@@ -111,7 +119,13 @@ public class DailyFileToSQL {
 				// finished merging file in sql
 				// delete file when players is empty
 				if (players == null || players.isEmpty()) {
-					file.delete();
+					if(file.delete()) {
+						// file deleted
+						DailyJoin.getDailyLogger().log(Level.INFO, "file deleted");
+					} else {
+						// could not delete file
+						DailyJoin.getDailyLogger().log(Level.INFO, "could not delete file");
+					}
 				}
 			} catch (NoSQLConnectionException e1) {
 				// should never be

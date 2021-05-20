@@ -4,7 +4,7 @@ import de.bergtiger.dailyjoin.utils.DailyReward;
 import de.bergtiger.dailyjoin.utils.PlayerUtils;
 import de.bergtiger.dailyjoin.bdo.DailyPlayer;
 import de.bergtiger.dailyjoin.DailyJoin;
-import de.bergtiger.dailyjoin.dao.impl.PlayerDAOimpl;
+import de.bergtiger.dailyjoin.dao.impl.PlayerDAOImpl;
 import de.bergtiger.dailyjoin.exception.LoadPlayerException;
 import de.bergtiger.dailyjoin.exception.NoSQLConnectionException;
 import de.bergtiger.dailyjoin.exception.UpdatePlayerException;
@@ -162,7 +162,7 @@ public class DailyListener implements Listener {
 	private void updatePlayerName(Player p) {
 		if(p != null) {
 			try {
-				List<DailyPlayer> players = PlayerDAOimpl.inst().getPlayers(p.getName());
+				List<DailyPlayer> players = PlayerDAOImpl.inst().getPlayers(p.getName());
 				if(players != null && !players.isEmpty()) {
 					// update name, should be only one
 					for(int i = 0; i < players.size(); i++) {
@@ -179,7 +179,7 @@ public class DailyListener implements Listener {
 						}
 					}
 					// save updates
-					PlayerDAOimpl.inst().updatePlayers(players);
+					PlayerDAOImpl.inst().updatePlayers(players);
 				}
 			} catch (NoSQLConnectionException e) {
 				DailyJoin.getDailyLogger().log(Level.SEVERE, "updatePlayerName: ", e);
@@ -190,7 +190,7 @@ public class DailyListener implements Listener {
 	}
 	
 	/**
-	 * process Player. check if player was already online and set consecutive and
+	 * process player. check if player was already online and set consecutive and
 	 * total days.
 	 * 
 	 * @param p  {@link Player} for new DailyPlayer
@@ -228,10 +228,10 @@ public class DailyListener implements Listener {
 	}
 
 	/**
-	 * check if Player was already online today
+	 * check if player was already online today
 	 * 
 	 * @param dp {@link DailyPlayer} to check
-	 * @return true if lastjoin equals today
+	 * @return true if last join equals today
 	 */
 	private boolean checkPlayerOnlineToday(DailyPlayer dp) {
 		if (dp != null) {
@@ -241,10 +241,10 @@ public class DailyListener implements Listener {
 	}
 
 	/**
-	 * check if Player was online yesterday.
+	 * check if player was online yesterday.
 	 * 
 	 * @param dp {@link DailyPlayer} to check
-	 * @return true if lastjoin equals yesterday
+	 * @return true if last join equals yesterday
 	 */
 	private boolean checkPlayerOnlineYesterday(DailyPlayer dp) {
 		if (dp != null) {
@@ -256,15 +256,14 @@ public class DailyListener implements Listener {
 	/**
 	 * load DailyPlayer from uuid.
 	 * 
-	 * @param uuid Player to load
-	 * @param sql  true when load from Database, else File
-	 * @return {@link DailyPlayer} or null if Player is new
-	 * @throws {@link LoadPlayerException} could not load DailyPlayer because of an
-	 *                             IOException
+	 * @param uuid player to load
+	 * @param sql  true when load from database, else file
+	 * @return {@link DailyPlayer} or null if player is new
+	 * @throws LoadPlayerException could not load DailyPlayer because of an IOException
 	 */
 	private DailyPlayer load(@Nonnull String uuid, boolean sql) throws LoadPlayerException {
 		try {
-			return PlayerDAOimpl.inst().getPlayer(uuid, sql);
+			return PlayerDAOImpl.inst().getPlayer(uuid, sql);
 		} catch (NoSQLConnectionException e) {
 			DailyJoin.getDailyLogger().log(Level.WARNING, String.format("could not load(%s) from Database", uuid), e);
 			throw new LoadPlayerException(true, uuid);
@@ -275,13 +274,12 @@ public class DailyListener implements Listener {
 	 * save DailyPlayer.
 	 * 
 	 * @param dp  {@link DailyPlayer} to save
-	 * @param sql true when save in Database, else File
-	 * @throws {@link UpdatePlayerException} could not save DailyPlayer because of an
-	 *                               IOException
+	 * @param sql true when save in database, else file
+	 * @throws UpdatePlayerException could not save DailyPlayer because of an IOException
 	 */
 	private void save(@Nonnull DailyPlayer dp, boolean sql) throws UpdatePlayerException {
 		try {
-			PlayerDAOimpl.inst().updatePlayer(dp, sql);
+			PlayerDAOImpl.inst().updatePlayer(dp, sql);
 		} catch (NoSQLConnectionException e) {
 			DailyJoin.getDailyLogger().log(Level.WARNING, String.format("could not save(%s) in Database", dp.getName()), e);
 			throw new UpdatePlayerException(true, dp);

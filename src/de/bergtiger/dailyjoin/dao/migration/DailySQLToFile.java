@@ -11,7 +11,7 @@ import de.bergtiger.dailyjoin.utils.TimeUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 
-import de.bergtiger.dailyjoin.dao.impl.PlayerDAOimpl;
+import de.bergtiger.dailyjoin.dao.impl.PlayerDAOImpl;
 import de.bergtiger.dailyjoin.exception.NoSQLConnectionException;
 import de.bergtiger.dailyjoin.exception.UpdatePlayerException;
 import de.bergtiger.dailyjoin.utils.lang.Lang;
@@ -23,10 +23,18 @@ public class DailySQLToFile {
 	private DailySQLToFile() {
 	}
 
+	/**
+	 * runs daily migrate sql_to_file command in its own thread.
+	 * @param cs {@link CommandSender}
+	 */
 	public static void run(CommandSender cs) {
 		Bukkit.getScheduler().runTaskAsynchronously(DailyJoin.inst(), () -> new DailySQLToFile().SQLToFile(cs));
 	}
 
+	/**
+	 * encloses SQLToFile
+	 * @param cs {@link CommandSender}
+	 */
 	private void SQLToFile(CommandSender cs) {
 		if (hasPermission(cs, ADMIN, MIGRATION)) {
 			try {
@@ -42,12 +50,16 @@ public class DailySQLToFile {
 		}
 	}
 
+	/**
+	 * loads from sql and migrates into file
+	 * @throws NoSQLConnectionException when no sql connection available
+	 */
 	private void SQLToFile() throws NoSQLConnectionException {
 		// load both as HashMap with uuid as key
  		// for each SQL migrate(p1, p2)
 		HashMap<String, DailyPlayer>
-				playersSQL = PlayerDAOimpl.inst().getPlayersAsMap(true),
-				playersFile = PlayerDAOimpl.inst().getPlayersAsMap(false);
+				playersSQL = PlayerDAOImpl.inst().getPlayersAsMap(true),
+				playersFile = PlayerDAOImpl.inst().getPlayersAsMap(false);
 		// check if there are players in sql
 		if (playersSQL != null && !playersSQL.isEmpty()) {
 			// check if there are players in file
@@ -63,7 +75,7 @@ public class DailySQLToFile {
 				players.addAll(playersFile.values());
 			// save players
 			try {
-				PlayerDAOimpl.inst().updatePlayers(players, false);
+				PlayerDAOImpl.inst().updatePlayers(players, false);
 			} catch (NoSQLConnectionException e) {
 				DailyJoin.getDailyLogger().log(Level.SEVERE, "SQLToFile: that should be imposible.", e);
 			} catch (UpdatePlayerException e) {
@@ -75,8 +87,8 @@ public class DailySQLToFile {
 	/**
 	 * merge SQL and file player together.
 	 * using same algorithm from FileToSQL
-	 * @param pSQL DailyPlayer from SQL
-	 * @param pFile DailyPlayer from file
+	 * @param pSQL {@link DailyPlayer} from SQL
+	 * @param pFile {@link DailyPlayer} from file
 	 */
 	private void mergeFromSQL(DailyPlayer pSQL, DailyPlayer pFile) {
 		if(pSQL != null && pFile != null) {

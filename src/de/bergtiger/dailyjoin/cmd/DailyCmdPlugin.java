@@ -18,7 +18,7 @@ public class DailyCmdPlugin {
 	/**
 	 * runs daily plugin information command in its own thread.
 	 * 
-	 * @param cs   {@link CommandSender}
+	 * @param cs {@link CommandSender}
 	 */
 	public static void run(CommandSender cs) {
 		Bukkit.getScheduler().runTaskAsynchronously(DailyJoin.inst(), () -> new DailyCmdPlugin().showPlugin(cs));
@@ -68,7 +68,7 @@ public class DailyCmdPlugin {
 					DailyNameUpdate.inst().hasThread() ?
 							Lang.PLUGIN_UPDATE_NAMESVALUE.get() : Lang.PLUGIN_UPDATE_NAMES.get())
 								.replace(Lang.VALUE, Boolean.toString(DailyNameUpdate.inst().hasThread()))
-								.replace(Lang.DATA, DailyNameUpdate.inst().getProcessFormated())));
+								.replace(Lang.DATA, DailyNameUpdate.inst().getProcessFormatted())));
 			
 			cs.spigot().sendMessage(Lang.build(Lang.PLUGIN_FOOTER.get()));
 		} else {

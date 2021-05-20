@@ -1,7 +1,7 @@
 package de.bergtiger.dailyjoin.utils;
 
 import de.bergtiger.dailyjoin.DailyJoin;
-import de.bergtiger.dailyjoin.dao.impl.PlayerDAOimpl;
+import de.bergtiger.dailyjoin.dao.impl.PlayerDAOImpl;
 import de.bergtiger.dailyjoin.dao.impl.file.PlayerDAOImplFile;
 import de.bergtiger.dailyjoin.exception.NoSQLConnectionException;
 
@@ -46,7 +46,7 @@ public class UUidUtils {
 	/**
 	 * get UUid from a player name.
 	 * @param name of the searched player
-	 * @return 
+	 * @return uuid
 	 */
 	private String findUUidFromName(String name) {
 		// uuid was searched before
@@ -61,7 +61,7 @@ public class UUidUtils {
 			DailyJoin.getDailyLogger().log(Level.WARNING, String.format("findUUidFromName: TigerList (%s)", name) ,e);
 		}
 		try {
-			uuid = PlayerDAOimpl.inst().getUUid(name);
+			uuid = PlayerDAOImpl.inst().getUUid(name);
 		} catch (NoSQLConnectionException e) {
 			// explicit File
 			uuid = new PlayerDAOImplFile().getUUid(name);
@@ -72,10 +72,10 @@ public class UUidUtils {
 	}
 
 	/**
-	 * get a uuid from a name from tigerlist plugin.
+	 * get a uuid from a name from Tigerlist plugin.
 	 * 
 	 * @param name name of searched player
-	 * @return uuid if player exists in tigerlist database
+	 * @return uuid if player exists in Tigerlist database
 	 */
 	private String getUUidFromTigerList(String name) {
 		throw new NotImplementedException();

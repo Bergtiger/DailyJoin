@@ -3,7 +3,7 @@ package de.bergtiger.dailyjoin.cmd;
 import de.bergtiger.dailyjoin.bdo.DailyPlayer;
 import de.bergtiger.dailyjoin.DailyJoin;
 import de.bergtiger.dailyjoin.dao.TigerConnection;
-import de.bergtiger.dailyjoin.dao.impl.PlayerDAOimpl;
+import de.bergtiger.dailyjoin.dao.impl.PlayerDAOImpl;
 import de.bergtiger.dailyjoin.exception.NoSQLConnectionException;
 import de.bergtiger.dailyjoin.utils.TimeUtils;
 import de.bergtiger.dailyjoin.utils.lang.Lang;
@@ -45,7 +45,7 @@ public class DailyCmdPlayer {
 			// get player
 			try {
 				DailyPlayer dp;
-				if ((dp = PlayerDAOimpl.inst().getPlayer(uuid)) != null) {
+				if ((dp = PlayerDAOImpl.inst().getPlayer(uuid)) != null) {
 					showPlayer(cs, dp);
 				} else {
 					cs.spigot().sendMessage(Lang.build(Lang.NOPLAYER.get().replace(Lang.PLAYER, uuid)));
@@ -70,9 +70,9 @@ public class DailyCmdPlayer {
 		cs.spigot().sendMessage(Lang.build(Lang.PLAYER_HEADER.get().replace(Lang.PLAYER, dp.getName())));
 		// Data
 		cs.spigot().sendMessage(
-				Lang.build(Lang.PLAYER_JOIN_FIRST.get().replace(Lang.VALUE, TimeUtils.formated(dp.getFirstjoin()))));
+				Lang.build(Lang.PLAYER_JOIN_FIRST.get().replace(Lang.VALUE, TimeUtils.formatted(dp.getFirstjoin()))));
 		cs.spigot().sendMessage(
-				Lang.build(Lang.PLAYER_JOIN_LAST.get().replace(Lang.VALUE, TimeUtils.formated(dp.getLastjoin()))));
+				Lang.build(Lang.PLAYER_JOIN_LAST.get().replace(Lang.VALUE, TimeUtils.formatted(dp.getLastjoin()))));
 		cs.spigot().sendMessage(Lang.build(
 				Lang.PLAYER_DAYS_CONSECUTIVE.get().replace(Lang.VALUE, Integer.toString(dp.getDaysConsecutive()))));
 		cs.spigot().sendMessage(

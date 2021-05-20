@@ -4,7 +4,7 @@ import de.bergtiger.dailyjoin.DailyJoin;
 import de.bergtiger.dailyjoin.bdo.DailyPlayer;
 import de.bergtiger.dailyjoin.bdo.TigerList;
 import de.bergtiger.dailyjoin.dao.TigerConnection;
-import de.bergtiger.dailyjoin.dao.impl.PlayerDAOimpl;
+import de.bergtiger.dailyjoin.dao.impl.PlayerDAOImpl;
 import de.bergtiger.dailyjoin.exception.NoSQLConnectionException;
 import de.bergtiger.dailyjoin.exception.UpdatePlayerException;
 import de.bergtiger.dailyjoin.utils.PlayerUtils;
@@ -33,6 +33,12 @@ public class DailyNameUpdate {
 	private DailyNameUpdate() {
 	}
 
+	/**
+	 * runs name update in its own thread.
+	 *
+	 * @param cs {@link CommandSender}
+	 * @param args command arguments
+	 */
 	public static void run(CommandSender cs, String[] args) {
 		Bukkit.getScheduler().runTaskAsynchronously(DailyJoin.inst(), () -> DailyNameUpdate.inst().updateNames(cs, args));
 	}
@@ -62,8 +68,8 @@ public class DailyNameUpdate {
 			// start command
 			if (thread == null) {
 				try {
-					TigerList<DailyPlayer> players = new TigerList<>(PlayerDAOimpl.inst().getPlayers());
-					if (players != null && !players.isEmpty()) {
+					TigerList<DailyPlayer> players = new TigerList<>(PlayerDAOImpl.inst().getPlayers());
+					if (!players.isEmpty()) {
 						// set page size to 250
 						players.setPageSize(250);
 						this.players = players;
@@ -79,14 +85,19 @@ public class DailyNameUpdate {
 			} else {
 				// thread is running, please wait until it is finished
 				cs.spigot().sendMessage(
-						Lang.build(Lang.UPDATE_NAME_RUNNING.get().replace(Lang.VALUE, getProcessFormated())));
+						Lang.build(Lang.UPDATE_NAME_RUNNING.get().replace(Lang.VALUE, getProcessFormatted())));
 			}
 		} else {
 			cs.spigot().sendMessage(Lang.build(Lang.NOPERMISSION.get()));
 		}
 
 	}
-	
+
+	/**
+	 * checks for each player if cached name is equal to Mojangs name.
+	 * if needed cached players are updated.
+	 * @param cs {@link CommandSender}
+	 */
 	private void updatePlayers(CommandSender cs) {	
 		// initialize
 		currentPlayer = 0;
@@ -115,14 +126,14 @@ public class DailyNameUpdate {
 						currentPlayer++;
 					}
 					// show process
-					DailyJoin.getDailyLogger().log(Level.INFO, String.format("update Names (%s%%)", getProcessFormated()));
+					DailyJoin.getDailyLogger().log(Level.INFO, String.format("update Names (%s%%)", getProcessFormatted()));
 					// check if hasNext
 					if(i < players.getPageMax() - 1)
 						// sleep interval
 						Thread.sleep(15 * 60 * 1000);
 				}
 				// update players
-				PlayerDAOimpl.inst().updatePlayers(updates);
+				PlayerDAOImpl.inst().updatePlayers(updates);
 				updatedPlayers += updates.size();
 				// finished update
 				DailyJoin.getDailyLogger().log(Level.INFO, "finished update Names.");
@@ -152,9 +163,9 @@ public class DailyNameUpdate {
 
 	private TigerList<DailyPlayer> players;
 
-	private static DecimalFormat df2 = new DecimalFormat("#.##");
+	private static final DecimalFormat df2 = new DecimalFormat("#.##");
 	
-	public String getProcessFormated() {
+	public String getProcessFormatted() {
 		return df2.format(getProcess());
 	}
 	

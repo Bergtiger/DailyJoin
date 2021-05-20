@@ -34,6 +34,9 @@ public class TigerConnection {
 	
 	private TigerConnection() {}
 
+	/**
+	 * load connection data from configuration
+	 */
 	public void loadData() {
 		DailyConfig c = DailyConfig.inst();
 		if(c.hasValue(DATA_FORMAT_SQL) && c.getBoolean(DATA_FORMAT_SQL)) {
@@ -68,7 +71,10 @@ public class TigerConnection {
 				DailyJoin.getDailyLogger().log(Level.SEVERE, "Missing value for " + PORT);
 		}
 	}
-	
+
+	/**
+	 * open a sql connection
+	 */
 	private void connect() {
 		// if Thread exists stop
 		closeThread();
@@ -90,7 +96,11 @@ public class TigerConnection {
 			thread = Bukkit.getScheduler().runTaskLaterAsynchronously(DailyJoin.inst(), this::connect, 30*20L);
 		}
 	}
-	
+
+	/**
+	 * reloads connection and configuration.
+	 * resets possible reconnect thread.
+	 */
 	public void reload(){
 		// if Thread exists stop
 		closeThread();
@@ -105,14 +115,21 @@ public class TigerConnection {
 			connect();
 		}
 	}
-	
+
+	/**
+	 * if a reconnect thread is running, stops it hopefully
+	 */
 	private void closeThread(){
 		if(thread != null){
 			thread.cancel();
 			thread = null;
 		}
 	}
-	
+
+	/**
+	 * opens actual connection, chooses driver and connection link
+	 * @throws Exception went wrong
+	 */
 	private void openConnection() throws Exception{
 		// TODO test if needed
 		Class.forName("com.mysql.jdbc.Driver");
@@ -123,7 +140,7 @@ public class TigerConnection {
 	
 	/**
 	 * get SQL-Connection.
-	 * @return connection
+	 * @return {@link Connection}
 	 */
 	public static Connection conn() {
 		return conn;
@@ -142,7 +159,7 @@ public class TigerConnection {
 	}
 	
 	/**
-	 * 
+	 * handle no connection exception
 	 */
 	public static void noConnection() {
 		// if Thread exists stop Thread
@@ -155,10 +172,10 @@ public class TigerConnection {
 	
 	/**
 	 * save close of resources
-	 * @param st PreparedStatment
-	 * @param rs ResultSet
+	 * @param st {@link PreparedStatement} to close
+	 * @param rs {@link ResultSet} to close
 	 */
-	public static void closeRessources(ResultSet rs, PreparedStatement st) {
+	public static void closeResources(ResultSet rs, PreparedStatement st) {
 		if(rs != null) {
 			try {
 				rs.close();

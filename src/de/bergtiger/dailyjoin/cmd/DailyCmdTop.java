@@ -4,7 +4,7 @@ import de.bergtiger.dailyjoin.bdo.DailyPlayer;
 import de.bergtiger.dailyjoin.bdo.TigerList;
 import de.bergtiger.dailyjoin.DailyJoin;
 import de.bergtiger.dailyjoin.dao.DailyDataBase;
-import de.bergtiger.dailyjoin.dao.impl.PlayerDAOimpl;
+import de.bergtiger.dailyjoin.dao.impl.PlayerDAOImpl;
 import de.bergtiger.dailyjoin.exception.NoSQLConnectionException;
 import de.bergtiger.dailyjoin.utils.PlayerUtils;
 import de.bergtiger.dailyjoin.utils.TimeUtils;
@@ -115,7 +115,7 @@ public class DailyCmdTop {
 			// add to players if not exists
 		}
 		try {
-			TigerList<DailyPlayer> list = PlayerDAOimpl.inst().getOrderedPlayers(column, order);
+			TigerList<DailyPlayer> list = PlayerDAOImpl.inst().getOrderedPlayers(column, order);
 			list.setHeader(column);
 			players.put(uuid, list);
 			return players.get(uuid);
@@ -180,7 +180,7 @@ public class DailyCmdTop {
 	 * get value from DailyPlayer as String
 	 * 
 	 * @param dp {@link DailyPlayer}
-	 * @param f  function how to get the value
+	 * @param f  {@link Function} how to get the value
 	 * @return value as String or empty String
 	 */
 	private String getValue(DailyPlayer dp, Function<? super DailyPlayer, Object> f) {
@@ -191,7 +191,7 @@ public class DailyCmdTop {
 				return ((Integer) o).toString();
 			// Timestamp
 			if (o instanceof Timestamp)
-				return TimeUtils.formated((Timestamp) o);
+				return TimeUtils.formatted((Timestamp) o);
 			// String ?
 			return o.toString();
 		}
@@ -201,7 +201,7 @@ public class DailyCmdTop {
 	/**
 	 * get method to get the wanted player value.
 	 * 
-	 * @param column
+	 * @param column of searched values
 	 * @return Function how to get wanted value
 	 */
 	private Function<? super DailyPlayer, Object> getMethod(String column) {

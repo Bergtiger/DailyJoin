@@ -8,11 +8,14 @@ import de.bergtiger.dailyjoin.cmd.DailyCommand;
 import de.bergtiger.dailyjoin.dao.impl.PlayerDAOImpl;
 import de.bergtiger.dailyjoin.dao.migration.DailyNameUpdate;
 import de.bergtiger.dailyjoin.listener.DailyListener;
+import de.bergtiger.dailyjoin.listener.PlayerInfoListener;
 import de.bergtiger.dailyjoin.tab.DailyTabComplete;
 import de.bergtiger.dailyjoin.utils.DailyReward;
 import de.bergtiger.dailyjoin.utils.config.DailyConfig;
 
 import org.bukkit.Bukkit;
+import org.bukkit.event.HandlerList;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import de.bergtiger.dailyjoin.dao.TigerConnection;
@@ -21,7 +24,8 @@ import de.bergtiger.dailyjoin.dao.TigerConnection;
 public class DailyJoin extends JavaPlugin{
 
 	private static DailyJoin instance;
-
+	private PluginManager pm = Bukkit.getPluginManager();
+	
 	/**
 	 * Get plugin instance,
 	 * available after onLoad.
@@ -45,7 +49,9 @@ public class DailyJoin extends JavaPlugin{
 		// start SQLConnection
 		TigerConnection.inst().reload();
 		// register Listener
-		Bukkit.getPluginManager().registerEvents(DailyListener.inst(), this);
+		pm.registerEvents(DailyListener.inst(), this);
+		if(pm.isPluginEnabled("TigerList"))
+			pm.registerEvents(PlayerInfoListener.inst(), this);
 		// register Command
 		getCommand("dailyjoin").setExecutor(new DailyCommand());
 		getCommand("dailyjoin").setTabCompleter(new DailyTabComplete());
@@ -77,6 +83,11 @@ public class DailyJoin extends JavaPlugin{
 		DailyReward.inst().reload();
 		// clear top player cache
 		DailyCmdTop.inst().clear();
+		// check if Listener needs to change
+		// PlayerInfoCommandListener
+		HandlerList.unregisterAll(PlayerInfoListener.inst());
+		if(pm.isPluginEnabled("TigerList"))
+			pm.registerEvents(PlayerInfoListener.inst(), instance);
 	}
 	
 	@Override

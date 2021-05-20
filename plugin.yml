@@ -3,7 +3,8 @@ version: 2.0
 author: Bergtiger
 main: de.bergtiger.dailyjoin.DailyJoin
 api-version: 1.16
-
+website: https://github.com/Bergtiger/DailyJoin
+softdepend: [TigerList]
 
 commands:
   dailyjoin:
